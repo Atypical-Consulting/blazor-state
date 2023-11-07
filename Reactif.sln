@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reactif", "Reactif\Reactif.csproj", "{E596E837-8AAA-4FFB-B6CE-E93D85F8B698}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reactif.Tests", "Reactif.Tests\Reactif.Tests.csproj", "{2134CF45-6BC8-4639-8C22-45355A4062E0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reactif.ConsoleApp", "Reactif.ConsoleApp\Reactif.ConsoleApp.csproj", "{6F2C8F87-8DAC-4EAE-BF06-97E86D88704B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E596E837-8AAA-4FFB-B6CE-E93D85F8B698}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E596E837-8AAA-4FFB-B6CE-E93D85F8B698}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E596E837-8AAA-4FFB-B6CE-E93D85F8B698}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E596E837-8AAA-4FFB-B6CE-E93D85F8B698}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2134CF45-6BC8-4639-8C22-45355A4062E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2134CF45-6BC8-4639-8C22-45355A4062E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2134CF45-6BC8-4639-8C22-45355A4062E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2134CF45-6BC8-4639-8C22-45355A4062E0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6F2C8F87-8DAC-4EAE-BF06-97E86D88704B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F2C8F87-8DAC-4EAE-BF06-97E86D88704B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6F2C8F87-8DAC-4EAE-BF06-97E86D88704B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F2C8F87-8DAC-4EAE-BF06-97E86D88704B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
