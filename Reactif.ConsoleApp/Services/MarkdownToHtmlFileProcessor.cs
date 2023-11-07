@@ -7,18 +7,18 @@ namespace Reactif.ConsoleApp.Services;
 
 public class MarkdownToHtmlFileProcessor : IMarkdownToHtmlFileProcessor
 {
-    private readonly IMarkdownProcessor _markdownProcessor;
+    private readonly IMarkdownToHtmlConverter _markdownToHtmlConverter;
     private readonly IFileService _fileService;
     private readonly ILogger<MarkdownToHtmlFileProcessor> _logger;
     private readonly string _outputDirectory;
 
     public MarkdownToHtmlFileProcessor(
-        IMarkdownProcessor markdownProcessor,
+        IMarkdownToHtmlConverter markdownToHtmlConverter,
         IFileService fileService,
         ILogger<MarkdownToHtmlFileProcessor> logger,
         IOptions<AppConfiguration> options)
     {
-        _markdownProcessor = markdownProcessor ?? throw new ArgumentNullException(nameof(markdownProcessor));
+        _markdownToHtmlConverter = markdownToHtmlConverter ?? throw new ArgumentNullException(nameof(markdownToHtmlConverter));
         _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _outputDirectory = options?.Value.OutputDirectory ?? throw new ArgumentNullException(nameof(options));
@@ -39,7 +39,7 @@ public class MarkdownToHtmlFileProcessor : IMarkdownToHtmlFileProcessor
         return Observable.FromAsync(async () =>
         {
             var markdown = await _fileService.ReadAllTextAsync(inputFilePath);
-            var (html, frontMatter) = _markdownProcessor.ConvertToHtml(markdown);
+            var (html, frontMatter) = _markdownToHtmlConverter.Convert(markdown);
             var outputFileName = Path.ChangeExtension(Path.GetFileName(inputFilePath), ".html");
             var outputFilePath = Path.Combine(_outputDirectory, outputFileName);
             await _fileService.WriteAllTextAsync(outputFilePath, html);

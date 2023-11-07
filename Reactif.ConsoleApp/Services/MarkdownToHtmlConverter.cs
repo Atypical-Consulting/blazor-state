@@ -8,22 +8,22 @@ namespace Reactif.ConsoleApp.Services;
 /// <summary>
 /// Represents a markdown processor.
 /// </summary>
-public class MarkdownProcessor : IMarkdownProcessor
+public class MarkdownToHtmlConverter : IMarkdownToHtmlConverter
 {
-    private readonly ILogger<MarkdownProcessor> _logger;
+    private readonly ILogger<MarkdownToHtmlConverter> _logger;
     private readonly IMarkdownPipelineFactory _pipelineFactory;
     private readonly IHtmlStyler _htmlStyler;
     private readonly IHtmlComposer _htmlComposer;
 
     /// <summary>
-    /// Creates a new instance of <see cref="MarkdownProcessor"/>.
+    /// Creates a new instance of <see cref="MarkdownToHtmlConverter"/>.
     /// </summary>
     /// <param name="logger">The logger.</param>
     /// <param name="pipelineFactory">The pipeline factory.</param>
     /// <param name="htmlStyler">The HTML styler.</param>
     /// <param name="htmlComposer">The HTML composer.</param>
-    public MarkdownProcessor(
-        ILogger<MarkdownProcessor> logger,
+    public MarkdownToHtmlConverter(
+        ILogger<MarkdownToHtmlConverter> logger,
         IMarkdownPipelineFactory pipelineFactory,
         IHtmlStyler htmlStyler,
         IHtmlComposer htmlComposer)
@@ -39,7 +39,7 @@ public class MarkdownProcessor : IMarkdownProcessor
     /// </summary>
     /// <param name="markdown">The markdown to convert.</param>
     /// <returns>The HTML and the front matter.</returns>
-    public (string html, FrontMatter frontMatter) ConvertToHtml(string markdown)
+    public (string html, FrontMatter frontMatter) Convert(string markdown)
     {
         _logger.ConvertingMarkdownToHTML();
         var pipeline = _pipelineFactory.CreatePipeline();
@@ -72,5 +72,5 @@ internal static partial class MarkdownProcessorLoggerExtensions
         Level = LogLevel.Information,
         Message = "Converting markdown to HTML")]
     public static partial void ConvertingMarkdownToHTML(
-        this ILogger<MarkdownProcessor> logger);
+        this ILogger<MarkdownToHtmlConverter> logger);
 }

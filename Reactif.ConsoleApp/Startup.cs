@@ -3,8 +3,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Reactif.ConsoleApp.Config;
 using Reactif.ConsoleApp.Services;
 using Reactif.ConsoleApp.Services.FileWatchers;
+using Reactif.ConsoleApp.Services.Pipelines;
 
-namespace Reactif.ConsoleApp.Run;
+namespace Reactif.ConsoleApp;
 
 /// <summary>
 /// This class is responsible for configuring the application's services.
@@ -15,7 +16,7 @@ public static class Startup
     /// Configures the application's services.
     /// </summary>
     /// <param name="services">The service collection to configure.</param>
-    public static void ConfigureServices(IServiceCollection services)
+    public static void RegisterServices(this IServiceCollection services)
     {
         var configuration = BuildConfiguration();
         services.Configure<AppConfiguration>(configuration);
@@ -26,8 +27,9 @@ public static class Startup
         services.AddSingleton<IFileService, FileService>();
         services.AddSingleton<IFileWatcher, MarkdownFileWatcher>();
         services.AddSingleton<IMarkdownToHtmlFileProcessor, MarkdownToHtmlFileProcessor>();
-        services.AddSingleton<IMarkdownProcessor, MarkdownProcessor>();
+        services.AddSingleton<IMarkdownToHtmlConverter, MarkdownToHtmlConverter>();
         services.AddSingleton<FileProcessingOrchestrator>();
+        services.AddSingleton<ChainOfResponsibilityExample>();
     }
 
     private static IConfigurationRoot BuildConfiguration()
