@@ -1,4 +1,5 @@
 using System;
+// ReSharper disable UnusedMember.Local
 
 namespace ObjectCalisthenics.Sample;
 
@@ -11,7 +12,7 @@ public class ExampleOC0001
         {
             if (i == 5)
             {
-                Console.WriteLine("More than one level of indentation");
+                Console.WriteLine(@"More than one level of indentation");
             }
         }
     }

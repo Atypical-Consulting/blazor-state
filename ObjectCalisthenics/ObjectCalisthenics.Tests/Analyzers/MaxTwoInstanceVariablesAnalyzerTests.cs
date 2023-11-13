@@ -1,7 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Verifier = Microsoft.CodeAnalysis.CSharp.Testing.XUnit.AnalyzerVerifier<ObjectCalisthenics.MaxTwoInstanceVariablesAnalyzer>;
 
-namespace ObjectCalisthenics.Tests;
+namespace ObjectCalisthenics.Tests.Analyzers;
 
 public class MaxTwoInstanceVariablesAnalyzerTests
 {

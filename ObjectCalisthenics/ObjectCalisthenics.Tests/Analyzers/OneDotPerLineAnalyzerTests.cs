@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using Verifier = Microsoft.CodeAnalysis.CSharp.Testing.XUnit.AnalyzerVerifier<ObjectCalisthenics.OneDotPerLineAnalyzer>;
 
-namespace ObjectCalisthenics.Tests;
+namespace ObjectCalisthenics.Tests.Analyzers;
 
 public class OneDotPerLineAnalyzerTests
 {

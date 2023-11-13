@@ -2,7 +2,7 @@ using Verifier =
     Microsoft.CodeAnalysis.CSharp.Testing.XUnit.CodeFixVerifier<ObjectCalisthenics.SampleSyntaxAnalyzer,
         ObjectCalisthenics.SampleCodeFixProvider>;
 
-namespace ObjectCalisthenics.Tests;
+namespace ObjectCalisthenics.Tests.Samples;
 
 public class SampleCodeFixProviderTests
 {
@@ -24,7 +24,7 @@ public class SampleCodeFixProviderTests
             """;
 
         var expected = Verifier.Diagnostic()
-            .WithLocation(2, 14)
+            .WithLocation(1, 14)
             .WithArguments("MyCompanyClass");
         await Verifier.VerifyCodeFixAsync(text, expected, newText).ConfigureAwait(false);
     }

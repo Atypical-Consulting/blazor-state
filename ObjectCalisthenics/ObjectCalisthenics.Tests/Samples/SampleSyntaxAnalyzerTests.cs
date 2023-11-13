@@ -2,7 +2,7 @@ using Verifier =
     Microsoft.CodeAnalysis.CSharp.Testing.XUnit.AnalyzerVerifier<
         ObjectCalisthenics.SampleSyntaxAnalyzer>;
 
-namespace ObjectCalisthenics.Tests;
+namespace ObjectCalisthenics.Tests.Samples;
 
 public class SampleSyntaxAnalyzerTests
 {
@@ -17,7 +17,7 @@ public class SampleSyntaxAnalyzerTests
             """;
 
         var expected = Verifier.Diagnostic()
-            .WithLocation(2, 14)
+            .WithLocation(1, 14)
             .WithArguments("MyCompanyClass");
         await Verifier.VerifyAnalyzerAsync(text, expected).ConfigureAwait(false);
     }

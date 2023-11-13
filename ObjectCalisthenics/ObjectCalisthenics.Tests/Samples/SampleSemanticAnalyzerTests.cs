@@ -2,7 +2,7 @@ using Verifier =
     Microsoft.CodeAnalysis.CSharp.Testing.XUnit.AnalyzerVerifier<
         ObjectCalisthenics.SampleSemanticAnalyzer>;
 
-namespace ObjectCalisthenics.Tests;
+namespace ObjectCalisthenics.Tests.Samples;
 
 public class SampleSemanticAnalyzerTests
 {
@@ -27,7 +27,7 @@ public class SampleSemanticAnalyzerTests
             """;
 
         var expected = Verifier.Diagnostic()
-            .WithLocation(7, 28)
+            .WithLocation(6, 28)
             .WithArguments("300000000");
         await Verifier.VerifyAnalyzerAsync(text, expected);
     }

@@ -1,7 +1,7 @@
 using Verifier =
     Microsoft.CodeAnalysis.CSharp.Testing.XUnit.AnalyzerVerifier<ObjectCalisthenics.MethodIndentationAnalyzer>;
 
-namespace ObjectCalisthenics.Tests;
+namespace ObjectCalisthenics.Tests.Analyzers;
 
 public class MethodIndentationAnalyzerTests
 {
