@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection;
 using Reactif.ConsoleApp.Services.Pipelines.Handlers;
 using Reactif.ConsoleApp.Services.Pipelines.Models;
 
@@ -5,18 +6,24 @@ namespace Reactif.ConsoleApp.Services.Pipelines;
 
 public class ChainOfResponsibilityExample
 {
+    private readonly IServiceProvider _serviceProvider;
     private readonly ILogger<ChainOfResponsibilityExample> _logger;
 
     public ChainOfResponsibilityExample(
+        IServiceProvider serviceProvider,
         ILogger<ChainOfResponsibilityExample> logger)
     {
+        _serviceProvider = serviceProvider;
         _logger = logger;
     }
 
     public void Execute()
     {
         // Set up the chain of responsibility
-        var readMarkdown = new ReadMarkdownHandler(_logger);
+        var readMarkdown = new ReadMarkdownHandler(
+            _serviceProvider.GetRequiredService<IFileService>(),
+            _logger);
+        
         var convertToHtml = new ConvertMarkdownToHtmlHandler(_logger);
         var saveHtml = new SaveHtmlHandler("output.html", _logger);
 

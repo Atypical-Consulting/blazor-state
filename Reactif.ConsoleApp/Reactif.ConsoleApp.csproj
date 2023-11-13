@@ -8,6 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\ObjectCalisthenics\ObjectCalisthenics\ObjectCalisthenics.csproj" />
       <ProjectReference Include="..\Reactif\Reactif.csproj" />
     </ItemGroup>
 
