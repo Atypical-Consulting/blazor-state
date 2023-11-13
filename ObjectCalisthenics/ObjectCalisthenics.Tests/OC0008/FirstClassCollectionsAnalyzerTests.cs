@@ -68,6 +68,48 @@ public class FirstClassCollectionsAnalyzerTests
         
         await Verifier.VerifyAnalyzerAsync(testCode, expectedDiagnostic);
     }
+    
+    [Fact]
+    public async Task AnalyzeCodeForString()
+    {
+        const string testCode =
+            """
+            public class ExampleOC0008
+            {
+                private string _a = "Hello World";
+            }
+            """;
+        
+        await Verifier.VerifyAnalyzerAsync(testCode); // No diagnostics expected
+    }
+    
+    [Fact]
+    public async Task AnalyzeCodeForNonCollection()
+    {
+        const string testCode =
+            """
+            public class ExampleOC0008
+            {
+                private int _a = 42;
+            }
+            """;
+        
+        await Verifier.VerifyAnalyzerAsync(testCode); // No diagnostics expected
+    }
+    
+    [Fact]
+    public async Task AnalyzeCodeForNonCollectionWithCollectionName()
+    {
+        const string testCode =
+            """
+            public class ExampleOC0008
+            {
+                private int _list = 42;
+            }
+            """;
+        
+        await Verifier.VerifyAnalyzerAsync(testCode); // No diagnostics expected
+    }
 
     private static void AddDiagnosticResult(List<DiagnosticResult> diagnosticResults, int line, int column, string fieldName)
     {

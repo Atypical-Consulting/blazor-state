@@ -50,6 +50,13 @@ public class FirstClassCollectionsAnalyzer : DiagnosticAnalyzer
     {
         var fieldDeclaration = (FieldDeclarationSyntax)context.Node;
 
+        // Check if the field type is string and return if it is
+        var fieldType = context.SemanticModel.GetTypeInfo(fieldDeclaration.Declaration.Type).Type;
+        if (fieldType != null && fieldType.SpecialType == SpecialType.System_String)
+        {
+            return;
+        }
+        
         var isCollectionType = IsCollectionType(fieldDeclaration.Declaration.Type, context);
         if (isCollectionType)
         {

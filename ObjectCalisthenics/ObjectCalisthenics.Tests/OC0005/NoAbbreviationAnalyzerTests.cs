@@ -30,15 +30,13 @@ public class NoAbbreviationAnalyzerTests
         var testCode = CreateTestCode(methodName);
         await Verifier.VerifyAnalyzerAsync(testCode); // No diagnostics expected
     }
-
+    
     private static string CreateTestCode(string methodName)
         => $$"""
              public class ExampleOC0005
              {
                  private void {{methodName}}()
                  {
-                     // OC0005: Abbreviation detected in method '{{methodName}}'
-                     var a = 5;
                  }
              }
              """;
