@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace ObjectCalisthenics;
 
@@ -35,6 +36,65 @@ public class NoAbbreviationAnalyzer : DiagnosticAnalyzer
         isEnabledByDefault: true,
         description: Description);
 
+    private static readonly Dictionary<string, string> _commonAbbreviations = new()
+    {
+        { "Args", "Arguments" },
+        { "Arg", "Argument" },
+        { "Btn", "Button" },
+        { "Btns", "Buttons" },
+        { "Calc", "Calculate" },
+        { "Cmd", "Command" },
+        { "Cntr", "Counter" },
+        { "Cnt", "Count" },
+        { "Config", "Configuration" },
+        { "Const", "Constant" },
+        { "Ctrl", "Control" },
+        { "Cur", "Current" },
+        { "Db", "Database" },
+        { "Del", "Delete" },
+        { "Dest", "Destination" },
+        { "Dto", "DataTransferObject" },
+        { "Enum", "Enumeration" },
+        { "Env", "Environment" },
+        { "Evt", "Event" },
+        { "Ex", "Exception" },
+        { "Ext", "Extension" },
+        { "Func", "Function" },
+        { "Idx", "Index" },
+        { "Img", "Image" },
+        { "Info", "Information" },
+        { "Init", "Initialize" },
+        { "Io", "Input/Output" },
+        { "Lib", "Library" },
+        { "Max", "Maximum" },
+        { "Min", "Minimum" },
+        { "Msg", "Message" },
+        { "Num", "Number" },
+        { "Obj", "Object" },
+        { "Param", "Parameter" },
+        { "Params", "Parameters" },
+        { "Proc", "Process" },
+        { "Ref", "Reference" },
+        { "Req", "Request" },
+        { "Resp", "Response" },
+        { "Ret", "Return" },
+        { "Svc", "Service" },
+        { "Src", "Source" },
+        { "Str", "String" },
+        { "Sys", "System" },
+        { "Temp", "Temporary" },
+        { "Txt", "Text" },
+        { "Ui", "User Interface" },
+        { "Util", "Utility" },
+        { "Val", "Value" },
+        { "Var", "Variable" },
+        { "Vec", "Vector" },
+        { "Ver", "Version" },
+        { "Wd", "Word" },
+        { "Wrd", "Word" },
+        { "Wnd", "Window" },
+    };
+
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; }
         = ImmutableArray.Create(Rule);
 
@@ -50,75 +110,20 @@ public class NoAbbreviationAnalyzer : DiagnosticAnalyzer
         var methodDeclaration = (MethodDeclarationSyntax)context.Node;
         var methodName = methodDeclaration.Identifier.ValueText;
 
-        if (ContainsAbbreviation(methodName))
+        if (!ContainsAbbreviation(methodName))
         {
-            var diagnostic = Diagnostic.Create(Rule, methodDeclaration.Identifier.GetLocation(), methodName);
-            context.ReportDiagnostic(diagnostic);
+            return;
         }
+        
+        var diagnostic = Diagnostic.Create(Rule, methodDeclaration.Identifier.GetLocation(), methodName);
+        context.ReportDiagnostic(diagnostic);
     }
 
     private static bool ContainsAbbreviation(string methodName)
     {
-        // Define a list of common abbreviations
-        var commonAbbreviations = new Dictionary<string, string>
-        {
-            { "Args", "Arguments" },
-            { "Arg", "Argument" },
-            { "Btn", "Button" },
-            { "Btns", "Buttons" },
-            { "Calc", "Calculate" },
-            { "Cmd", "Command" },
-            { "Cntr", "Counter" },
-            { "Cnt", "Count" },
-            { "Config", "Configuration" },
-            { "Const", "Constant" },
-            { "Ctrl", "Control" },
-            { "Cur", "Current" },
-            { "Db", "Database" },
-            { "Del", "Delete" },
-            { "Dest", "Destination" },
-            { "Dto", "DataTransferObject" },
-            { "Enum", "Enumeration" },
-            { "Env", "Environment" },
-            { "Evt", "Event" },
-            { "Ex", "Exception" },
-            { "Ext", "Extension" },
-            { "Func", "Function" },
-            { "Idx", "Index" },
-            { "Img", "Image" },
-            { "Info", "Information" },
-            { "Init", "Initialize" },
-            { "Io", "Input/Output" },
-            { "Lib", "Library" },
-            { "Max", "Maximum" },
-            { "Min", "Minimum" },
-            { "Msg", "Message" },
-            { "Num", "Number" },
-            { "Obj", "Object" },
-            { "Param", "Parameter" },
-            { "Params", "Parameters" },
-            { "Proc", "Process" },
-            { "Ref", "Reference" },
-            { "Req", "Request" },
-            { "Resp", "Response" },
-            { "Ret", "Return" },
-            { "Svc", "Service" },
-            { "Src", "Source" },
-            { "Str", "String" },
-            { "Sys", "System" },
-            { "Temp", "Temporary" },
-            { "Txt", "Text" },
-            { "Ui", "User Interface" },
-            { "Util", "Utility" },
-            { "Val", "Value" },
-            { "Var", "Variable" },
-            { "Vec", "Vector" },
-            { "Ver", "Version" },
-            { "Wd", "Word" },
-            { "Wrd", "Word" },
-            { "Wnd", "Window" },
-        };
+        // This Regex pattern will match an abbreviation followed by an uppercase letter or the end of the string
+        var pattern = string.Join("|", _commonAbbreviations.Keys.Select(abbreviation => $"{abbreviation}(?=[A-Z]|$)"));
 
-        return commonAbbreviations.Any(abbreviation => methodName.Contains(abbreviation.Key));
+        return Regex.IsMatch(methodName, pattern);
     }
 }

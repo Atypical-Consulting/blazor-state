@@ -1,3 +1,4 @@
+using Microsoft.CodeAnalysis.Testing;
 using Verifier =
     Microsoft.CodeAnalysis.CSharp.Testing.XUnit.AnalyzerVerifier<ObjectCalisthenics.NoAbbreviationAnalyzer>;
 
@@ -13,23 +14,38 @@ public class NoAbbreviationAnalyzerTests
     [InlineData("GetVer")]
     public async Task AnalyzeCodeForAbbreviation(string methodName)
     {
-        var testCode =
-            $$"""
-              public class ExampleOC0005
-              {
-                  private void {{methodName}}()
-                  {
-                      // OC0005: Abbreviation detected in method 'ExecuteCmd'
-                      var a = 5;
-                  }
-              }
-              """;
-
-        var expectedDiagnostic = Verifier
-            .Diagnostic("OC0005")
-            .WithSpan(3, 18, 3, 18 + methodName.Length) // The location of the abbreviation
-            .WithArguments(methodName);
-
-        await Verifier.VerifyAnalyzerAsync(testCode, expectedDiagnostic); // Expects diagnostic for abbreviation
+        var testCode = CreateTestCode(methodName);
+        var expectedDiagnostic = CreateExpectedDiagnostic(methodName);
+        await Verifier.VerifyAnalyzerAsync(testCode, expectedDiagnostic);
     }
+    
+    [Theory]
+    [InlineData("ExecuteCommand")]
+    [InlineData("ParseArguments")]
+    [InlineData("ParseArgument")]
+    [InlineData("ButtonClick")]
+    [InlineData("GetVersion")]
+    public async Task AnalyzeCodeForNoAbbreviation(string methodName)
+    {
+        var testCode = CreateTestCode(methodName);
+        await Verifier.VerifyAnalyzerAsync(testCode); // No diagnostics expected
+    }
+
+    private static string CreateTestCode(string methodName)
+        => $$"""
+             public class ExampleOC0005
+             {
+                 private void {{methodName}}()
+                 {
+                     // OC0005: Abbreviation detected in method '{{methodName}}'
+                     var a = 5;
+                 }
+             }
+             """;
+
+    private static DiagnosticResult CreateExpectedDiagnostic(string methodName)
+        => Verifier
+            .Diagnostic("OC0005")
+            .WithSpan(3, 18, 3, 18 + methodName.Length)
+            .WithArguments(methodName);
 }

@@ -31,19 +31,44 @@ public class FirstClassCollectionsAnalyzerTests
         // get 9 diagnostics
         List<DiagnosticResult> diagnosticResults = new();
 
-        AddDiagnosticResult(diagnosticResults, 5, 13, "_a");
-        AddDiagnosticResult(diagnosticResults, 6, 13, "_b");
-        AddDiagnosticResult(diagnosticResults, 7, 13, "_c");
-        AddDiagnosticResult(diagnosticResults, 8, 13, "_d");
-        AddDiagnosticResult(diagnosticResults, 9, 13, "_e");
-        AddDiagnosticResult(diagnosticResults, 10, 13, "_f");
-        AddDiagnosticResult(diagnosticResults, 11, 13, "_g");
-        AddDiagnosticResult(diagnosticResults, 12, 13, "_h");
-        AddDiagnosticResult(diagnosticResults, 13, 13, "_i");
+        AddDiagnosticResult(diagnosticResults, 5, 23, "_a");
+        AddDiagnosticResult(diagnosticResults, 6, 37, "_b");
+        AddDiagnosticResult(diagnosticResults, 7, 26, "_c");
+        AddDiagnosticResult(diagnosticResults, 8, 24, "_d");
+        AddDiagnosticResult(diagnosticResults, 9, 24, "_e");
+        AddDiagnosticResult(diagnosticResults, 10, 29, "_f");
+        AddDiagnosticResult(diagnosticResults, 11, 37, "_g");
+        AddDiagnosticResult(diagnosticResults, 12, 28, "_h");
+        AddDiagnosticResult(diagnosticResults, 13, 43, "_i");
 
         await Verifier.VerifyAnalyzerAsync(testCode, diagnosticResults.ToArray());
     }
-    
+
+    [Theory]
+    [InlineData("int")]
+    [InlineData("string")]
+    [InlineData("object")]
+    [InlineData("bool")]
+    public async Task AnalyzeCodeForNonFirstClassCollections(string type)
+    {
+        string testCode =
+          $$"""
+            using System.Collections.Generic;
+
+            public class ExampleOC0008
+            {
+                private List<{{type}}> _a = new();
+            }
+            """;
+        
+        DiagnosticResult expectedDiagnostic = Verifier
+            .Diagnostic("OC0008")
+            .WithSpan(5, 20 + type.Length, 5, 22 + type.Length) // The location of the field name
+            .WithArguments("_a");
+        
+        await Verifier.VerifyAnalyzerAsync(testCode, expectedDiagnostic);
+    }
+
     private static void AddDiagnosticResult(List<DiagnosticResult> diagnosticResults, int line, int column, string fieldName)
     {
         diagnosticResults.Add(

@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace ObjectCalisthenics;
 
 /// <summary>
@@ -40,34 +42,60 @@ public class FirstClassCollectionsAnalyzer : DiagnosticAnalyzer
     {
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
         context.EnableConcurrentExecution();
-        context.RegisterSyntaxNodeAction(AnalyzeClass, SyntaxKind.MethodDeclaration);
+        context.RegisterSyntaxNodeAction(AnalyzeField, SyntaxKind.FieldDeclaration);
+        // context.RegisterSyntaxNodeAction(AnalyzeClass, SyntaxKind.MethodDeclaration);
     }
 
-    private static void AnalyzeClass(SyntaxNodeAnalysisContext context)
+    private static void AnalyzeField(SyntaxNodeAnalysisContext context)
     {
-        var classDeclaration = (ClassDeclarationSyntax)context.Node;
+        var fieldDeclaration = (FieldDeclarationSyntax)context.Node;
 
-        // Check if the class contains a collection type.
-        bool containsCollection = false;
-        foreach (var member in classDeclaration.Members)
+        var isCollectionType = IsCollectionType(fieldDeclaration.Declaration.Type, context);
+        if (isCollectionType)
         {
-            if (member is FieldDeclarationSyntax fieldDeclaration)
+            foreach (var variable in fieldDeclaration.Declaration.Variables)
             {
-                var isCollectionType = fieldDeclaration.Declaration.Type is GenericNameSyntax genericName &&
-                                       genericName.Identifier.Text.EndsWith("Collection");
-                containsCollection |= isCollectionType;
+                var diagnostic = Diagnostic.Create(
+                    Rule,
+                    variable.Identifier.GetLocation(),
+                    variable.Identifier.Text);
+
+                context.ReportDiagnostic(diagnostic);
+            }
+        }
+    }
+
+    private static bool IsCollectionType(TypeSyntax typeSyntax, SyntaxNodeAnalysisContext context)
+    {
+        // Get the type symbol for the type syntax
+        var typeSymbol = context.SemanticModel.GetTypeInfo(typeSyntax).Type;
+
+        if (typeSymbol == null)
+        {
+            return false;
+        }
+
+        // Check if the type implements IEnumerable, ICollection, or IList
+        // You may add more interfaces or specific types as per your requirements
+        var collectionTypeNames = new HashSet<string>
+        {
+            "System.Collections.IEnumerable",
+            "System.Collections.Generic.IEnumerable",
+            "System.Collections.ICollection",
+            "System.Collections.Generic.ICollection",
+            "System.Collections.IList",
+            "System.Collections.Generic.IList"
+        };
+
+        foreach (var symbol in typeSymbol.AllInterfaces)
+        {
+            if (collectionTypeNames.Contains(symbol.ConstructedFrom.ToString()))
+            {
+                return true;
             }
         }
 
-        // If contains collection, ensure no other member variables exist.
-        if (containsCollection && classDeclaration.Members.Count > 1)
-        {
-            var diagnostic = Diagnostic.Create(
-                Rule,
-                classDeclaration.Identifier.GetLocation(),
-                classDeclaration.Identifier.Text);
-
-            context.ReportDiagnostic(diagnostic);
-        }
+        return false;
     }
+
 }
