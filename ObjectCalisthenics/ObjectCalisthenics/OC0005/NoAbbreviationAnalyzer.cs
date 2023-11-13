@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace ObjectCalisthenics;
 
 /// <summary>
@@ -40,11 +42,83 @@ public class NoAbbreviationAnalyzer : DiagnosticAnalyzer
     {
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
         context.EnableConcurrentExecution();
-        context.RegisterSyntaxNodeAction(AnalyzeMethod, SyntaxKind.MethodDeclaration);
+        context.RegisterSyntaxNodeAction(Analyze, SyntaxKind.MethodDeclaration);
     }
 
-    private static void AnalyzeMethod(SyntaxNodeAnalysisContext context)
+    private static void Analyze(SyntaxNodeAnalysisContext context)
     {
-        throw new NotImplementedException();
+        var methodDeclaration = (MethodDeclarationSyntax)context.Node;
+        var methodName = methodDeclaration.Identifier.ValueText;
+
+        if (ContainsAbbreviation(methodName))
+        {
+            var diagnostic = Diagnostic.Create(Rule, methodDeclaration.Identifier.GetLocation(), methodName);
+            context.ReportDiagnostic(diagnostic);
+        }
+    }
+
+    private static bool ContainsAbbreviation(string methodName)
+    {
+        // Define a list of common abbreviations
+        var commonAbbreviations = new Dictionary<string, string>
+        {
+            { "Args", "Arguments" },
+            { "Arg", "Argument" },
+            { "Btn", "Button" },
+            { "Btns", "Buttons" },
+            { "Calc", "Calculate" },
+            { "Cmd", "Command" },
+            { "Cntr", "Counter" },
+            { "Cnt", "Count" },
+            { "Config", "Configuration" },
+            { "Const", "Constant" },
+            { "Ctrl", "Control" },
+            { "Cur", "Current" },
+            { "Db", "Database" },
+            { "Del", "Delete" },
+            { "Dest", "Destination" },
+            { "Dto", "DataTransferObject" },
+            { "Enum", "Enumeration" },
+            { "Env", "Environment" },
+            { "Evt", "Event" },
+            { "Ex", "Exception" },
+            { "Ext", "Extension" },
+            { "Func", "Function" },
+            { "Idx", "Index" },
+            { "Img", "Image" },
+            { "Info", "Information" },
+            { "Init", "Initialize" },
+            { "Io", "Input/Output" },
+            { "Lib", "Library" },
+            { "Max", "Maximum" },
+            { "Min", "Minimum" },
+            { "Msg", "Message" },
+            { "Num", "Number" },
+            { "Obj", "Object" },
+            { "Param", "Parameter" },
+            { "Params", "Parameters" },
+            { "Proc", "Process" },
+            { "Ref", "Reference" },
+            { "Req", "Request" },
+            { "Resp", "Response" },
+            { "Ret", "Return" },
+            { "Svc", "Service" },
+            { "Src", "Source" },
+            { "Str", "String" },
+            { "Sys", "System" },
+            { "Temp", "Temporary" },
+            { "Txt", "Text" },
+            { "Ui", "User Interface" },
+            { "Util", "Utility" },
+            { "Val", "Value" },
+            { "Var", "Variable" },
+            { "Vec", "Vector" },
+            { "Ver", "Version" },
+            { "Wd", "Word" },
+            { "Wrd", "Word" },
+            { "Wnd", "Window" },
+        };
+
+        return commonAbbreviations.Any(abbreviation => methodName.Contains(abbreviation.Key));
     }
 }

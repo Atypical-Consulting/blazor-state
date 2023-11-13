@@ -1,6 +1,6 @@
 using Verifier = Microsoft.CodeAnalysis.CSharp.Testing.XUnit.AnalyzerVerifier<ObjectCalisthenics.NoGettersSettersAnalyzer>;
 
-namespace ObjectCalisthenics.Tests.Analyzers;
+namespace ObjectCalisthenics.Tests.OC0009;
 
 public class NoGettersSettersAnalyzerTests
 {

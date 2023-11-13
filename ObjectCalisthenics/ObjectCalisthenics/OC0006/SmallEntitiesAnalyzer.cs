@@ -55,12 +55,14 @@ public class SmallEntitiesAnalyzer : DiagnosticAnalyzer
         var lineSpan = Location.Create(classDeclaration.SyntaxTree, TextSpan.FromBounds(firstToken.SpanStart, lastToken.Span.End)).GetLineSpan();
 
         // Lines are zero-based, so add 1 for the actual count
-        int numberOfLines = lineSpan.EndLinePosition.Line - lineSpan.StartLinePosition.Line + 1;
+        var numberOfLines = lineSpan.EndLinePosition.Line - lineSpan.StartLinePosition.Line + 1;
 
-        if (numberOfLines > 50)
+        if (numberOfLines <= 50)
         {
-            var diagnostic = Diagnostic.Create(Rule, classDeclaration.Identifier.GetLocation(), classDeclaration.Identifier.Text);
-            context.ReportDiagnostic(diagnostic);
+            return;
         }
+        
+        var diagnostic = Diagnostic.Create(Rule, classDeclaration.Identifier.GetLocation(), classDeclaration.Identifier.Text);
+        context.ReportDiagnostic(diagnostic);
     }
 }

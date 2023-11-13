@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis.Testing;
 using Verifier =
     Microsoft.CodeAnalysis.CSharp.Testing.XUnit.AnalyzerVerifier<ObjectCalisthenics.WrapPrimitivesAnalyzer>;
 
-namespace ObjectCalisthenics.Tests.Analyzers;
+namespace ObjectCalisthenics.Tests.OC0003;
 
 public class WrapPrimitivesAnalyzerTests
 {

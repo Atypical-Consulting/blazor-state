@@ -1,6 +1,6 @@
 using Verifier = Microsoft.CodeAnalysis.CSharp.Testing.XUnit.AnalyzerVerifier<ObjectCalisthenics.SmallEntitiesAnalyzer>;
 
-namespace ObjectCalisthenics.Tests.Analyzers;
+namespace ObjectCalisthenics.Tests.OC0006;
 
 public class SmallEntitiesAnalyzerTests
 {
