@@ -10,10 +10,10 @@ using Mutty.Generator.Templates;
 namespace Mutty.Generator;
 
 /// <summary>
-/// A generator that creates mutable wrappers for records.
+/// A generator that creates extension methods for mutable records.
 /// </summary>
 [Generator]
-public class MutableRecordGenerator : BaseSourceGenerator
+public class MutableExtensionsGenerator : BaseSourceGenerator
 {
     /// <inheritdoc />
     public override void GenerateCode(SourceProductionContext context, ImmutableArray<INamedTypeSymbol> recordTypes)
@@ -29,12 +29,12 @@ public class MutableRecordGenerator : BaseSourceGenerator
             var recordName = recordTokens.RecordName;
             var namespaceName = recordTokens.NamespaceName;
 
-            // Generate mutable wrapper
-            var mutableWrapperSource = new MutableWrapperTemplate(recordTokens).GenerateCode();
-            var mutableFileName = namespaceName is not null
-                ? $"{namespaceName}.Mutable{recordName}.g.cs"
-                : $"Mutable{recordName}.g.cs";
-            AddSource(context, mutableFileName, mutableWrapperSource);
+            // Generate extension methods
+            var mutableExtensionSource = new MutableExtensionsTemplate(recordTokens).GenerateCode();
+            var extensionFileName = namespaceName is not null
+                ? $"{namespaceName}.Extensions{recordName}.g.cs"
+                : $"Extensions{recordName}.g.cs";
+            AddSource(context, extensionFileName, mutableExtensionSource);
         }
     }
 }
