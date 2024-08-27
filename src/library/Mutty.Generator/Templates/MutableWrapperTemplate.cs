@@ -162,14 +162,28 @@ public class MutableWrapperTemplate(RecordTokens tokens) : IndentedCodeBuilder
 
     private string ConvertImmutableToMutable(string immutableType)
     {
-        if (immutableType.StartsWith("System.Collections.Immutable.ImmutableList", StringComparison.Ordinal))
+        Dictionary<string, string> immutableMap = new()
         {
-            return "List";
-        }
+            { "System.Collections.Immutable.ImmutableArray", "List" },
+            { "System.Collections.Immutable.ImmutableDictionary", "Dictionary" },
+            { "System.Collections.Immutable.ImmutableHashSet", "HashSet" },
+            { "System.Collections.Immutable.ImmutableList", "List" },
+            { "System.Collections.Immutable.ImmutableQueue", "Queue" },
+            { "System.Collections.Immutable.ImmutableSortedDictionary", "SortedDictionary" },
+            { "System.Collections.Immutable.ImmutableSortedSet", "SortedSet" },
+            { "System.Collections.Immutable.ImmutableStack", "Stack" },
+        };
 
-        if (immutableType.StartsWith("System.Collections.Immutable.ImmutableArray", StringComparison.Ordinal))
+        // use immutableMap and StartsWith
+        foreach (var pair in immutableMap)
         {
-            return "List"; // Use List for array conversions in this context
+            var key = pair.Key;
+            var value = pair.Value;
+
+            if (immutableType.StartsWith(key, StringComparison.Ordinal))
+            {
+                return value;
+            }
         }
 
         // Handle other types as needed
@@ -191,8 +205,7 @@ public class MutableWrapperTemplate(RecordTokens tokens) : IndentedCodeBuilder
     private void GenerateImplicitOperatorToMutable()
     {
         EmptyLine();
-        Summary(
-            $"Performs an implicit conversion from <see cref=\"{_recordName}\"/> to <see cref=\"{_mutableRecordName}\"/>.");
+        Summary($"Performs an implicit conversion from <see cref=\"{_recordName}\"/> to <see cref=\"{_mutableRecordName}\"/>.");
         Line($"public static implicit operator {_mutableRecordName}({_recordName} record)");
         Braces(() => Line($"return new {_mutableRecordName}(record);"));
     }
@@ -200,8 +213,7 @@ public class MutableWrapperTemplate(RecordTokens tokens) : IndentedCodeBuilder
     private void GenerateImplicitOperatorToRecord()
     {
         EmptyLine();
-        Summary(
-            $"Performs an implicit conversion from <see cref=\"{_mutableRecordName}\"/> to <see cref=\"{_recordName}\"/>.");
+        Summary($"Performs an implicit conversion from <see cref=\"{_mutableRecordName}\"/> to <see cref=\"{_recordName}\"/>.");
         Line($"public static implicit operator {_recordName}({_mutableRecordName} mutable)");
         Braces(() => Line("return mutable.Build();"));
     }
