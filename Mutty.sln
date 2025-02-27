@@ -7,6 +7,11 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mutty.Generator", "src\library\Mutty.Generator\Mutty.Generator.csproj", "{05C38793-20A7-4117-8751-6A36F722A0B6}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{1F6F9D2E-F39A-4146-B951-C2313F68ACE5}"
+	ProjectSection(SolutionItems) = preProject
+		src\Directory.Build.props = src\Directory.Build.props
+		src\Directory.Build.targets = src\Directory.Build.targets
+		src\Directory.Packages.props = src\Directory.Packages.props
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "demo", "demo", "{59B34D71-FC18-438B-A8C3-83485895DF9B}"
 EndProject

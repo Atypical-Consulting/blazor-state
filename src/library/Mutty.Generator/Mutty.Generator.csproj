@@ -13,7 +13,10 @@
 
   <ItemGroup>
     <PackageReference
-        Include="Microsoft.CodeAnalysis.CSharp.Workspaces"
+        Include="Microsoft.CodeAnalysis.Common"
+        PrivateAssets="all" />
+    <PackageReference
+        Include="Microsoft.CodeAnalysis.CSharp"
         PrivateAssets="all" />
 
     <None
