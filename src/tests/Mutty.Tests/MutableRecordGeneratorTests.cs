@@ -2,26 +2,33 @@
 // Atypical Consulting SRL licenses this file to you under the Apache 2.0 license.
 // See the LICENSE file in the project root for full license information.
 
-using Mutty.Tests.Setup;
+using System.Collections.Immutable;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Mutty.Generator;
 using NUnit.Framework;
 
 namespace Mutty.Tests;
 
-public class MutableRecordGeneratorTests : GeneratorTests
+public class MutableRecordGeneratorTests
 {
+    [SetUp]
+    public void Setup()
+    {
+    }
+
     [Test]
     public void ShouldGenerateMutableRecord()
     {
         // Arrange
-        const string recordString = "public record StudentDetails(string Name, int Age);";
-        var input = CreateInput(recordString);
-        var outputMutable = GetOutputMutable();
-        var outputExtensions = GetOutputExtensions();
+        string input = GetInput();
+        string outputMutable = GetOutputMutable();
+        string outputExtensions = GetOutputExtensions();
 
         // Act
-        var generatedOutputs = GetGeneratedOutput(input);
-        var resultMutable = generatedOutputs.First(x => x.Contains("class MutableStudentDetails"));
-        var resultExtensions = generatedOutputs.First(x => x.Contains("class StudentDetailsExtensions"));
+        string[] generatedOutputs = GetGeneratedOutput(input);
+        string resultMutable = generatedOutputs.First(x => x.Contains("class MutableStudentDetails"));
+        string resultExtensions = generatedOutputs.First(x => x.Contains("class StudentDetailsExtensions"));
 
         // Assert
         Assert.Multiple(() =>
@@ -29,6 +36,59 @@ public class MutableRecordGeneratorTests : GeneratorTests
             Assert.That(resultMutable, Is.EqualTo(outputMutable));
             Assert.That(resultExtensions, Is.EqualTo(outputExtensions));
         });
+    }
+
+    private static string[] GetGeneratedOutput(string sourceCode)
+    {
+        SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(sourceCode);
+        IEnumerable<MetadataReference> references = AppDomain.CurrentDomain.GetAssemblies()
+            .Where(static assembly => !assembly.IsDynamic)
+            .Select(static assembly => MetadataReference.CreateFromFile(assembly.Location))
+            .Cast<MetadataReference>()
+            .Concat([MetadataReference.CreateFromFile(typeof(MutableGenerationAttribute).Assembly.Location)]);
+
+        CSharpCompilation compilation = CSharpCompilation.Create(
+            "SourceGeneratorTests",
+            [syntaxTree],
+            references,
+            new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+
+        // Source Generator to test
+        MutableRecordGenerator generator = new();
+
+        _ = CSharpGeneratorDriver.Create(generator)
+            .RunGeneratorsAndUpdateCompilation(
+                compilation,
+                out Compilation outputCompilation,
+                out ImmutableArray<Diagnostic> diagnostics);
+
+        // optional
+        Assert.That(
+            diagnostics.Where(static d => d.Severity == DiagnosticSeverity.Error),
+            Is.Empty);
+
+        string[] generatedOutput = outputCompilation
+            .SyntaxTrees
+            .Skip(1)
+            .Select(static tree => tree.ToString())
+            .ToArray();
+
+        return generatedOutput;
+    }
+
+    private static string GetInput()
+    {
+        return
+            """
+            using System.Collections.Immutable;
+            using Mutty;
+            using Mutty.Tests.Setup;
+            
+            namespace Mutty.Tests;
+            
+            [MutableGeneration]
+            public record StudentDetails(string Name, int Age);
+            """;
     }
 
     private static string GetOutputMutable()
