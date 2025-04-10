@@ -2,10 +2,12 @@
 // Atypical Consulting SRL licenses this file to you under the Apache 2.0 license.
 // See the LICENSE file in the project root for full license information.
 
+using System;
+using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace Mutty.Generator.Models;
+namespace Mutty.Models;
 
 /// <summary>
 /// Represents a property of a class.

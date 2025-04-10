@@ -2,7 +2,7 @@
 // Atypical Consulting SRL licenses this file to you under the Apache 2.0 license.
 // See the LICENSE file in the project root for full license information.
 
-namespace Mutty.ConsoleApp;
+namespace Mutty.ConsoleApp.Models;
 
 /// <summary>
 /// Represents a student with a unique email, details, and a list of enrollments.

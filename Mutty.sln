@@ -2,14 +2,11 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp", "src\demo\ConsoleApp\ConsoleApp.csproj", "{6F989D78-74A3-498F-837D-18C5AD0E43F5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mutty", "src\library\Mutty\Mutty.csproj", "{8DC24BDF-06F3-496B-BB88-7324F94F5DC9}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mutty.Generator", "src\library\Mutty.Generator\Mutty.Generator.csproj", "{05C38793-20A7-4117-8751-6A36F722A0B6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mutty", "src\library\Mutty\Mutty.csproj", "{05C38793-20A7-4117-8751-6A36F722A0B6}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{1F6F9D2E-F39A-4146-B951-C2313F68ACE5}"
 	ProjectSection(SolutionItems) = preProject
 		src\Directory.Build.props = src\Directory.Build.props
-		src\Directory.Build.targets = src\Directory.Build.targets
 		src\Directory.Packages.props = src\Directory.Packages.props
 	EndProjectSection
 EndProject
@@ -33,12 +30,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{B20DD076
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mutty.Tests", "src\tests\Mutty.Tests\Mutty.Tests.csproj", "{3024D438-9CAF-4CA7-8C50-F96A2E815D94}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "_build", "build\_build.csproj", "{E330048E-EECC-4E32-9467-A34940EEBE60}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E330048E-EECC-4E32-9467-A34940EEBE60}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E330048E-EECC-4E32-9467-A34940EEBE60}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6F989D78-74A3-498F-837D-18C5AD0E43F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6F989D78-74A3-498F-837D-18C5AD0E43F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6F989D78-74A3-498F-837D-18C5AD0E43F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -47,10 +48,6 @@ Global
 		{05C38793-20A7-4117-8751-6A36F722A0B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{05C38793-20A7-4117-8751-6A36F722A0B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{05C38793-20A7-4117-8751-6A36F722A0B6}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8DC24BDF-06F3-496B-BB88-7324F94F5DC9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8DC24BDF-06F3-496B-BB88-7324F94F5DC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8DC24BDF-06F3-496B-BB88-7324F94F5DC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8DC24BDF-06F3-496B-BB88-7324F94F5DC9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3024D438-9CAF-4CA7-8C50-F96A2E815D94}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3024D438-9CAF-4CA7-8C50-F96A2E815D94}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3024D438-9CAF-4CA7-8C50-F96A2E815D94}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -60,7 +57,6 @@ Global
 		{59B34D71-FC18-438B-A8C3-83485895DF9B} = {1F6F9D2E-F39A-4146-B951-C2313F68ACE5}
 		{E081D3BF-D62B-4728-91EC-B8F00FBB3F39} = {1F6F9D2E-F39A-4146-B951-C2313F68ACE5}
 		{6F989D78-74A3-498F-837D-18C5AD0E43F5} = {59B34D71-FC18-438B-A8C3-83485895DF9B}
-		{8DC24BDF-06F3-496B-BB88-7324F94F5DC9} = {E081D3BF-D62B-4728-91EC-B8F00FBB3F39}
 		{05C38793-20A7-4117-8751-6A36F722A0B6} = {E081D3BF-D62B-4728-91EC-B8F00FBB3F39}
 		{582B0464-D23B-4FA0-BEC9-6DAC02716E56} = {1F6F9D2E-F39A-4146-B951-C2313F68ACE5}
 		{B20DD076-CCAC-4814-91D6-60B08AD91170} = {1F6F9D2E-F39A-4146-B951-C2313F68ACE5}

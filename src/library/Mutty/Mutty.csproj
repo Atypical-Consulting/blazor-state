@@ -1,18 +1,40 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
-    <LangVersion>13.0</LangVersion>
-    <ImplicitUsings>enable</ImplicitUsings>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <DebugSymbols>True</DebugSymbols>
+    <DebugType>Embedded</DebugType>
+    <DisableImplicitNamespaceImports>true</DisableImplicitNamespaceImports>
+    <BaseOutputPath>bin\$(RoslynVersion)\</BaseOutputPath>
+    <IsRoslynComponent>true</IsRoslynComponent>
+
+    <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
+    
+    <DevelopmentDependency>true</DevelopmentDependency>
+    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+
+    <RootNamespace>Mutty</RootNamespace>
+    <PackageId>Mutty</PackageId>
+    
+<!--    <IncludeBuildOutput>false</IncludeBuildOutput>-->
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>CA1822;NU5128</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference
-        Include="..\Mutty.Generator\Mutty.Generator.csproj"
-        PrivateAssets="contentfiles;build"
-        SetTargetFramework="TargetFramework=netstandard2.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" PrivateAssets="all"/>
+    <PackageReference Include="Microsoft.CodeAnalysis.AnalyzerUtilities" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" PrivateAssets="all"/>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <None Include="$(TargetPath)"
+          Pack="true"
+          PackagePath="analyzers/dotnet/cs"
+          Visible="false"/>
   </ItemGroup>
 
 </Project>

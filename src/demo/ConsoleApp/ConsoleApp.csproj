@@ -12,14 +12,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\library\Mutty\Mutty.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference
-        Include="..\..\library\Mutty.Generator\Mutty.Generator.csproj"
-        OutputItemType="Analyzer"
-        ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\..\library\Mutty\Mutty.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
   <ItemGroup>

@@ -5,6 +5,7 @@
 global using System.Collections.Immutable;
 global using Mutty.ConsoleApp.Abstractions;
 global using Mutty.ConsoleApp.Examples;
+global using Mutty.ConsoleApp.Models;
 global using Spectre.Console;
 
 global using static Spectre.Console.AnsiConsole;

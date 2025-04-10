@@ -7,7 +7,7 @@ namespace Mutty.ConsoleApp.Examples;
 /// <summary>
 /// Basic example that demonstrates manual mutation of an immutable object.
 /// </summary>
-public sealed class ExampleBasic : ExampleBase
+public sealed class ExampleBasic : ExampleStudent
 {
     /// <inheritdoc />
     public override void Run()

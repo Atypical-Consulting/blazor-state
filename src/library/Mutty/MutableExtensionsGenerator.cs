@@ -4,10 +4,11 @@
 
 using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
-using Mutty.Generator.Models;
-using Mutty.Generator.Templates;
+using Mutty.Abstractions;
+using Mutty.Models;
+using Mutty.Templates;
 
-namespace Mutty.Generator;
+namespace Mutty;
 
 /// <summary>
 /// A generator that creates extension methods for mutable records.
@@ -23,15 +24,15 @@ public class MutableExtensionsGenerator : BaseSourceGenerator
             return;
         }
 
-        foreach (var record in recordTypes)
+        foreach (INamedTypeSymbol record in recordTypes)
         {
-            var recordTokens = new RecordTokens(record);
-            var recordName = recordTokens.RecordName;
-            var namespaceName = recordTokens.NamespaceName;
+            RecordTokens recordTokens = new(record);
+            string recordName = recordTokens.RecordName;
+            string? namespaceName = recordTokens.NamespaceName;
 
             // Generate extension methods
-            var mutableExtensionSource = new MutableExtensionsTemplate(recordTokens).GenerateCode();
-            var extensionFileName = namespaceName is not null
+            string mutableExtensionSource = new MutableExtensionsTemplate(recordTokens).GenerateCode();
+            string extensionFileName = (namespaceName is not null)
                 ? $"{namespaceName}.Extensions{recordName}.g.cs"
                 : $"Extensions{recordName}.g.cs";
             AddSource(context, extensionFileName, mutableExtensionSource);

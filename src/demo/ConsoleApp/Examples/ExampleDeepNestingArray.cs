@@ -7,7 +7,7 @@ namespace Mutty.ConsoleApp.Examples;
 /// <summary>
 /// Example that demonstrates deep nesting of immutable arrays.
 /// </summary>
-public sealed class ExampleDeepNestingArray : ExampleBase
+public sealed class ExampleDeepNestingArray : ExampleStudent
 {
     /// <inheritdoc />
     public override void Run()

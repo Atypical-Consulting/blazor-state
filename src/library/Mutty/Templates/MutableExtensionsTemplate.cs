@@ -2,10 +2,10 @@
 // Atypical Consulting SRL licenses this file to you under the Apache 2.0 license.
 // See the LICENSE file in the project root for full license information.
 
-using Mutty.Generator.CodeHelpers;
-using Mutty.Generator.Models;
+using Mutty.CodeHelpers;
+using Mutty.Models;
 
-namespace Mutty.Generator.Templates;
+namespace Mutty.Templates;
 
 /// <summary>
 /// A template that generates the mutable extensions for a record.

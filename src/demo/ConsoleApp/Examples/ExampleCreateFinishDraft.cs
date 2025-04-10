@@ -7,7 +7,7 @@ namespace Mutty.ConsoleApp.Examples;
 /// <summary>
 /// Basic example that demonstrates CreateDraft and FinishDraft methods.
 /// </summary>
-public sealed class ExampleCreateFinishDraft : ExampleBase
+public sealed class ExampleCreateFinishDraft : ExampleStudent
 {
     /// <inheritdoc />
     public override void Run()

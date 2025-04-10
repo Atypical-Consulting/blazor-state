@@ -3,9 +3,10 @@
 // See the LICENSE file in the project root for full license information.
 
 using System.Collections.Immutable;
+using System.Linq;
 using Microsoft.CodeAnalysis;
 
-namespace Mutty.Generator.Models;
+namespace Mutty.Models;
 
 /// <summary>
 /// Represents some string tokens that will be used to generate a record.

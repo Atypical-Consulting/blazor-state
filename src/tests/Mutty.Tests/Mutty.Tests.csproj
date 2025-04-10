@@ -8,8 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\library\Mutty\Mutty.csproj" />
-    <ProjectReference Include="..\..\library\Mutty.Generator\Mutty.Generator.csproj" OutputItemType="Analyzer" />
+    <ProjectReference Include="..\..\library\Mutty\Mutty.csproj" OutputItemType="Analyzer" />
   </ItemGroup>
 
 </Project>

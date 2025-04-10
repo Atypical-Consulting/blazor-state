@@ -2,11 +2,14 @@
 // Atypical Consulting SRL licenses this file to you under the Apache 2.0 license.
 // See the LICENSE file in the project root for full license information.
 
+using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
-using Mutty.Generator.CodeHelpers;
-using Mutty.Generator.Models;
+using System.Linq;
+using Mutty.CodeHelpers;
+using Mutty.Models;
 
-namespace Mutty.Generator.Templates;
+namespace Mutty.Templates;
 
 /// <summary>
 /// A template that generates the mutable wrapper for a record.
@@ -180,23 +183,21 @@ public class MutableWrapperTemplate(RecordTokens tokens) : IndentedCodeBuilder
 
     private string ConvertImmutableToMutable(string immutableType)
     {
-        Dictionary<string, string> immutableMap = new()
-        {
-            { "System.Collections.Immutable.ImmutableArray", "List" },
-            { "System.Collections.Immutable.ImmutableDictionary", "Dictionary" },
-            { "System.Collections.Immutable.ImmutableHashSet", "HashSet" },
-            { "System.Collections.Immutable.ImmutableList", "List" },
-            { "System.Collections.Immutable.ImmutableQueue", "Queue" },
-            { "System.Collections.Immutable.ImmutableSortedDictionary", "SortedDictionary" },
-            { "System.Collections.Immutable.ImmutableSortedSet", "SortedSet" },
-            { "System.Collections.Immutable.ImmutableStack", "Stack" },
-        };
+        Dictionary<string, string> immutableMap = [];
+        immutableMap.Add("System.Collections.Immutable.ImmutableArray", "List");
+        immutableMap.Add("System.Collections.Immutable.ImmutableDictionary", "Dictionary");
+        immutableMap.Add("System.Collections.Immutable.ImmutableHashSet", "HashSet");
+        immutableMap.Add("System.Collections.Immutable.ImmutableList", "List");
+        immutableMap.Add("System.Collections.Immutable.ImmutableQueue", "Queue");
+        immutableMap.Add("System.Collections.Immutable.ImmutableSortedDictionary", "SortedDictionary");
+        immutableMap.Add("System.Collections.Immutable.ImmutableSortedSet", "SortedSet");
+        immutableMap.Add("System.Collections.Immutable.ImmutableStack", "Stack");
 
         // use immutableMap and StartsWith
-        foreach (var pair in immutableMap)
+        foreach (KeyValuePair<string, string> pair in immutableMap)
         {
-            var key = pair.Key;
-            var value = pair.Value;
+            string key = pair.Key;
+            string value = pair.Value;
 
             if (immutableType.StartsWith(key, StringComparison.Ordinal))
             {

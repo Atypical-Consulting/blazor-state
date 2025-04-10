@@ -3,13 +3,14 @@
 // See the LICENSE file in the project root for full license information.
 
 using System.Collections.Immutable;
+using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 
-namespace Mutty.Generator;
+namespace Mutty.Abstractions;
 
 /// <summary>
 /// The base source generator for incremental generation of records with the MutableGenerationAttribute.
@@ -20,7 +21,7 @@ public abstract class BaseSourceGenerator : IIncrementalGenerator
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
         // Create a provider that finds all records with the MutableGenerationAttribute
-        var recordTypesWithAttribute = context.SyntaxProvider
+        IncrementalValueProvider<ImmutableArray<INamedTypeSymbol>> recordTypesWithAttribute = context.SyntaxProvider
             .CreateSyntaxProvider(
                 predicate: static (syntaxNode, _) => CouldBeMutableGenerationAttribute(syntaxNode),
                 transform: static (ctx, _) => GetRecordTypeWithAttribute(ctx)!)
@@ -44,7 +45,7 @@ public abstract class BaseSourceGenerator : IIncrementalGenerator
     /// <param name="context">The source production context.</param>
     /// <param name="name">The name of the source file.</param>
     /// <param name="source">The source code.</param>
-    protected static void AddSource(SourceProductionContext context, string name, string source)
+    protected static void AddSource(in SourceProductionContext context, string name, string source)
     {
         context.AddSource(name, SourceText.From(source, Encoding.UTF8));
     }
@@ -56,11 +57,11 @@ public abstract class BaseSourceGenerator : IIncrementalGenerator
             return false;
         }
 
-        var name = ExtractName(attribute.Name);
+        string? name = ExtractName(attribute.Name);
         return name is "MutableGeneration" or "MutableGenerationAttribute";
     }
 
-    private static INamedTypeSymbol? GetRecordTypeWithAttribute(GeneratorSyntaxContext context)
+    private static INamedTypeSymbol? GetRecordTypeWithAttribute(in GeneratorSyntaxContext context)
     {
         var attributeSyntax = (AttributeSyntax)context.Node;
 
@@ -71,10 +72,10 @@ public abstract class BaseSourceGenerator : IIncrementalGenerator
         }
 
         // Get the semantic model and check the type symbol
-        var type = context.SemanticModel.GetDeclaredSymbol(recordDeclaration);
+        INamedTypeSymbol? type = context.SemanticModel.GetDeclaredSymbol(recordDeclaration);
 
         // Check if the type symbol has the MutableGenerationAttribute
-        return type is null || !HasMutableGenerationAttribute(type) ? null : type;
+        return (type is null || !HasMutableGenerationAttribute(type)) ? null : type;
     }
 
     private static string? ExtractName(NameSyntax? name)
@@ -90,11 +91,14 @@ public abstract class BaseSourceGenerator : IIncrementalGenerator
     private static bool HasMutableGenerationAttribute(ISymbol type)
     {
         return type.GetAttributes().Any(static a =>
-            a.AttributeClass?.Name == "MutableGenerationAttribute" &&
-            a.AttributeClass.ContainingNamespace is
+            a.AttributeClass is
             {
-                Name: "Mutty",
-                ContainingNamespace.IsGlobalNamespace: true
+                Name: "MutableGenerationAttribute",
+                ContainingNamespace:
+                {
+                    Name: "Mutty",
+                    ContainingNamespace.IsGlobalNamespace: true
+                }
             });
     }
 }

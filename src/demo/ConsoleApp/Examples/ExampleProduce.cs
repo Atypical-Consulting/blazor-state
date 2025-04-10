@@ -7,7 +7,7 @@ namespace Mutty.ConsoleApp.Examples;
 /// <summary>
 /// Example that demonstrates the Produce method for fluent mutation.
 /// </summary>
-public sealed class ExampleProduce : ExampleBase
+public sealed class ExampleProduce : ExampleStudent
 {
     /// <inheritdoc />
     public override void Run()
