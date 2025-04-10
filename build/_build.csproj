@@ -23,4 +23,10 @@
     <Folder Include="logs\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="..\CHANGELOG.md">
+      <Link>config\CHANGELOG.md</Link>
+    </Content>
+  </ItemGroup>
+
 </Project>
