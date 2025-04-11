@@ -61,7 +61,7 @@ The basic idea is that with Mutty, you will apply all your changes to a temporar
 Once all your mutations are completed, Mutty will produce the next immutable state based on the mutations to the mutable wrapper.
 This means that you can interact with your data by simply modifying it while keeping all the benefits of immutable data.
 
-![Mutty Overview](docs/images/mutty-overview.png)
+![Mutty Overview](Writerside/images/mutty-overview.png)
 
 Using Mutty is like having a personal assistant. The assistant takes a letter (the current state) and gives you a copy (mutable wrapper) to jot changes onto.
 Once you are done, the assistant will take your draft and produce the real immutable, final letter for you (the next state).
