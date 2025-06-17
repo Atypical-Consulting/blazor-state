@@ -225,9 +225,13 @@ public sealed class IndentedStringBuilder(byte indent = 0, byte indentSize = 2)
     /// <returns>This builder so that additional calls can be chained.</returns>
     public IndentedStringBuilder DecrementIndent(byte count)
     {
-        if (_indent > 0)
+        if (_indent >= count)
         {
             _indent -= count;
+        }
+        else
+        {
+            _indent = 0;
         }
 
         return this;
