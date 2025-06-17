@@ -47,7 +47,7 @@ public static class MutableStringConverter
         // Check for generic types
         if (input.Contains('<'))
         {
-            string baseType = input.Substring(0, input.IndexOf('<'));
+            string baseType = input[..input.IndexOf('<')];
             string genericArgs = input.Substring(input.IndexOf('<') + 1, input.LastIndexOf('>') - input.IndexOf('<') - 1);
 
             string convertedBaseType = ConvertToMutableBaseType(baseType);
@@ -69,7 +69,7 @@ public static class MutableStringConverter
         // Check for generic types
         if (input.Contains('<'))
         {
-            string baseType = input.Substring(0, input.IndexOf('<'));
+            string baseType = input[..input.IndexOf('<')];
             string genericArgs = input.Substring(input.IndexOf('<') + 1, input.LastIndexOf('>') - input.IndexOf('<') - 1);
 
             string convertedBaseType = ConvertToImmutableBaseType(baseType);

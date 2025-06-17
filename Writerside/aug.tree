@@ -10,6 +10,7 @@
   <toc-element topic="Installation.md"/>
   <toc-element topic="Usage.md"/>
   <toc-element topic="API-Reference.md"/>
+  <toc-element topic="Analyzers.md"/>
   <toc-element topic="Best-Practices.md"/>
   <toc-element topic="Architecture.md"/>
   <toc-element topic="Contributing.md"/>
