@@ -1,3 +1,4 @@
+using Bustand.DevTools.Middleware;
 using Bustand.DevTools.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -53,6 +54,8 @@ public static class DevToolsServiceCollectionExtensions
     /// </para>
     /// <list type="bullet">
     /// <item><see cref="IDevToolsStore"/> as Scoped (one instance per circuit/user).</item>
+    /// <item><see cref="DiffService"/> as Scoped for state comparison.</item>
+    /// <item><c>DevToolsMiddleware&lt;TState&gt;</c> as Scoped (open generic, closed per-store by Bustand core).</item>
     /// </list>
     /// </remarks>
     public static IServiceCollection AddBustandDevTools(
@@ -104,11 +107,29 @@ public static class DevToolsServiceCollectionExtensions
     /// <summary>
     /// Internal method that performs the actual service registration.
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Services registered:
+    /// </para>
+    /// <list type="bullet">
+    /// <item><see cref="IDevToolsStore"/> as Scoped (one instance per circuit/user).</item>
+    /// <item><see cref="DiffService"/> as Scoped for state comparison.</item>
+    /// <item><see cref="DevToolsMiddleware{TState}"/> as Scoped (open generic, closed per-store by Bustand core).</item>
+    /// </list>
+    /// </remarks>
     private static IServiceCollection RegisterDevToolsServices(this IServiceCollection services)
     {
         // Register DevToolsStore as Scoped (one per circuit/user)
         // This ensures each user gets their own state history
         services.AddScoped<IDevToolsStore, DevToolsStore>();
+
+        // Register DiffService for state comparison in diff viewer panel
+        services.AddScoped<DiffService>();
+
+        // Register the open generic DevToolsMiddleware
+        // The Bustand core will close it over each store's state type when creating pipelines
+        // Registered as Scoped so each circuit gets its own middleware instances
+        services.AddScoped(typeof(DevToolsMiddleware<>));
 
         return services;
     }
