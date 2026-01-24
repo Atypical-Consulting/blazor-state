@@ -10,6 +10,16 @@ public interface IStore
     /// Event raised when state changes.
     /// </summary>
     event EventHandler? StateChanged;
+
+    /// <summary>
+    /// Gets whether the store has been initialized.
+    /// </summary>
+    /// <remarks>
+    /// For stores with async initialization via <c>InitializeAsync()</c>,
+    /// this property returns <c>true</c> after initialization completes.
+    /// For stores without async initialization, this returns <c>true</c> immediately.
+    /// </remarks>
+    bool IsInitialized { get; }
 }
 
 /// <summary>
