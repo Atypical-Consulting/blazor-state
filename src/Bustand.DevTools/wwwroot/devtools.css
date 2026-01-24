@@ -1,0 +1,328 @@
+/* Bustand DevTools - Dark Theme Styles */
+
+:root {
+    /* Base colors */
+    --devtools-bg: #1e1e1e;
+    --devtools-sidebar-bg: #252526;
+    --devtools-border: #3c3c3c;
+    --devtools-text: #cccccc;
+    --devtools-text-dim: #808080;
+    --devtools-accent: #0e639c;
+    --devtools-accent-hover: #1177bb;
+    --devtools-selected: #094771;
+
+    /* Type colors for tree view */
+    --color-string: #ce9178;
+    --color-number: #b5cea8;
+    --color-boolean: #569cd6;
+    --color-null: #808080;
+    --color-property: #9cdcfe;
+
+    /* Diff colors */
+    --diff-added: #2ea043;
+    --diff-added-bg: rgba(46, 160, 67, 0.15);
+    --diff-removed: #f85149;
+    --diff-removed-bg: rgba(248, 81, 73, 0.15);
+    --diff-modified: #d29922;
+    --diff-modified-bg: rgba(210, 153, 34, 0.15);
+}
+
+/* Main container layout */
+.devtools-container {
+    display: flex;
+    height: 100vh;
+    background: var(--devtools-bg);
+    color: var(--devtools-text);
+    font-family: 'Segoe UI', Consolas, monospace;
+    font-size: 13px;
+}
+
+/* Sidebar */
+.devtools-sidebar {
+    width: 280px;
+    min-width: 280px;
+    background: var(--devtools-sidebar-bg);
+    border-right: 1px solid var(--devtools-border);
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-header {
+    padding: 12px;
+    border-bottom: 1px solid var(--devtools-border);
+}
+
+.sidebar-header h2 {
+    margin: 0 0 8px 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--devtools-text);
+}
+
+/* Store search input */
+.store-search {
+    width: 100%;
+    padding: 6px 8px;
+    background: var(--devtools-bg);
+    border: 1px solid var(--devtools-border);
+    border-radius: 4px;
+    color: var(--devtools-text);
+    font-size: 12px;
+    box-sizing: border-box;
+}
+
+.store-search:focus {
+    outline: none;
+    border-color: var(--devtools-accent);
+}
+
+.store-search::placeholder {
+    color: var(--devtools-text-dim);
+}
+
+/* Store list */
+.store-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.store-item {
+    padding: 8px 12px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--devtools-border);
+    transition: background-color 0.15s ease;
+}
+
+.store-item:hover {
+    background: var(--devtools-accent-hover);
+}
+
+.store-item.selected {
+    background: var(--devtools-selected);
+}
+
+.store-name {
+    font-weight: 500;
+    color: var(--devtools-text);
+}
+
+.store-timestamp {
+    font-size: 11px;
+    color: var(--devtools-text-dim);
+}
+
+/* Main content area */
+.devtools-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Tab bar */
+.tab-bar {
+    display: flex;
+    background: var(--devtools-sidebar-bg);
+    border-bottom: 1px solid var(--devtools-border);
+    padding: 0;
+}
+
+.tab {
+    padding: 10px 16px;
+    background: transparent;
+    border: none;
+    color: var(--devtools-text-dim);
+    cursor: pointer;
+    font-size: 13px;
+    font-family: inherit;
+    border-bottom: 2px solid transparent;
+    transition: all 0.15s ease;
+}
+
+.tab:hover {
+    color: var(--devtools-text);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.tab.active {
+    color: var(--devtools-text);
+    border-bottom-color: var(--devtools-accent);
+}
+
+/* Tab content area */
+.tab-content {
+    flex: 1;
+    overflow: auto;
+    padding: 16px;
+}
+
+/* Empty state */
+.empty-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--devtools-text-dim);
+    font-size: 14px;
+}
+
+.empty-state p {
+    margin: 0;
+}
+
+/* Placeholder for upcoming panels */
+.panel-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+    background: var(--devtools-sidebar-bg);
+    border-radius: 4px;
+    color: var(--devtools-text-dim);
+    font-style: italic;
+}
+
+/* Error message styling */
+.devtools-error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background: var(--devtools-bg);
+    color: var(--devtools-text);
+    text-align: center;
+    padding: 24px;
+}
+
+.devtools-error h2 {
+    margin: 0 0 12px 0;
+    font-size: 20px;
+    color: var(--diff-removed);
+}
+
+.devtools-error p {
+    margin: 0;
+    color: var(--devtools-text-dim);
+    max-width: 400px;
+}
+
+/* Tree view styles (for future State Inspector) */
+.tree-node {
+    margin-left: 16px;
+}
+
+.tree-toggle {
+    cursor: pointer;
+    user-select: none;
+}
+
+.tree-toggle::before {
+    content: '+';
+    margin-right: 4px;
+    color: var(--devtools-text-dim);
+}
+
+.tree-toggle.expanded::before {
+    content: '-';
+}
+
+.tree-children {
+    margin-left: 8px;
+}
+
+.tree-property {
+    padding: 2px 0;
+}
+
+.property-name {
+    color: var(--color-property);
+}
+
+.value.string {
+    color: var(--color-string);
+}
+
+.value.number {
+    color: var(--color-number);
+}
+
+.value.boolean {
+    color: var(--color-boolean);
+}
+
+.value.null {
+    color: var(--color-null);
+    font-style: italic;
+}
+
+/* Diff view styles (for future Diff Viewer) */
+.diff-container {
+    display: flex;
+    gap: 16px;
+}
+
+.diff-panel {
+    flex: 1;
+    padding: 12px;
+    background: var(--devtools-sidebar-bg);
+    border-radius: 4px;
+    overflow: auto;
+}
+
+.diff-added {
+    background: var(--diff-added-bg);
+    border-left: 3px solid var(--diff-added);
+    padding-left: 8px;
+}
+
+.diff-removed {
+    background: var(--diff-removed-bg);
+    border-left: 3px solid var(--diff-removed);
+    padding-left: 8px;
+}
+
+.diff-modified {
+    background: var(--diff-modified-bg);
+    border-left: 3px solid var(--diff-modified);
+    padding-left: 8px;
+}
+
+/* Action history styles (for future History Panel) */
+.history-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.history-item {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--devtools-border);
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.history-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.history-item.current {
+    background: var(--devtools-selected);
+}
+
+.history-action {
+    font-weight: 500;
+    color: var(--devtools-text);
+}
+
+.history-timestamp {
+    font-size: 11px;
+    color: var(--devtools-text-dim);
+    margin-left: 8px;
+}
