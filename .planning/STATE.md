@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Phase: 1 of 6 (Foundation)
-Plan: 1 of TBD in current phase
+Plan: 2 of TBD in current phase
 Status: In progress
-Last activity: 2026-01-24 - Completed 01-01-PLAN.md (Core Store Foundation)
+Last activity: 2026-01-24 - Completed 01-02-PLAN.md (DI Registration System)
 
-Progress: [█░░░░░░░░░] 10%
+Progress: [██░░░░░░░░] 20%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 1
-- Average duration: 3 min
-- Total execution time: 3 min
+- Total plans completed: 2
+- Average duration: 2.5 min
+- Total execution time: 5 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-foundation | 1 | 3 min | 3 min |
+| 01-foundation | 2 | 5 min | 2.5 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (3 min)
-- Trend: -
+- Last 5 plans: 01-01 (3 min), 01-02 (2 min)
+- Trend: Stable
 
 *Updated after each plan completion*
 
@@ -47,6 +47,9 @@ Recent decisions affecting current work:
 - [Roadmap]: Persistence split from Middleware phase due to JS interop complexity
 - [01-01]: Simplified MODE-05 - subscribers call InvokeAsync in handlers (ComponentBase.InvokeAsync is protected)
 - [01-01]: Used classic .sln format over .slnx for broader tool compatibility
+- [01-02]: Used OperatingSystem.IsBrowser() for WASM detection (most reliable .NET 6+ approach)
+- [01-02]: Post-process pattern for lifetime overrides (Scrutor scans first, then re-register with explicit lifetimes)
+- [01-02]: Console.WriteLine for warnings (simple, no logging dependency required in Phase 1)
 
 ### Pending Todos
 
@@ -58,6 +61,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-01-24T11:04:33Z
-Stopped at: Completed 01-01-PLAN.md
+Last session: 2026-01-24T11:09:35Z
+Stopped at: Completed 01-02-PLAN.md
 Resume file: None
