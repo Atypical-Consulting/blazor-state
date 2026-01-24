@@ -7,6 +7,10 @@
     <RootNamespace>Bustand.DevTools</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="Bustand.Tests" />
+  </ItemGroup>
+
 
   <ItemGroup>
     <SupportedPlatform Include="browser" />
