@@ -1,3 +1,6 @@
+using System.Runtime.CompilerServices;
+using Bustand.Middleware;
+
 namespace Bustand.Core;
 
 /// <summary>
@@ -44,6 +47,7 @@ public abstract class ZustandStore<TState> : IStore<TState> where TState : class
     private bool _isInitialized;
     private bool _isInitializing;
     private bool _stateInitialized;
+    private MiddlewarePipeline<TState> _pipeline = MiddlewarePipeline<TState>.Empty;
 
     /// <summary>
     /// Gets the initial state for this store.
@@ -53,6 +57,15 @@ public abstract class ZustandStore<TState> : IStore<TState> where TState : class
     /// This is called once when the store is first accessed.
     /// </remarks>
     protected abstract TState InitialState { get; }
+
+    /// <summary>
+    /// Sets the middleware pipeline. Called by DI during store construction.
+    /// </summary>
+    /// <param name="pipeline">The pipeline to set, or null for empty pipeline.</param>
+    internal void SetPipeline(MiddlewarePipeline<TState> pipeline)
+    {
+        _pipeline = pipeline ?? MiddlewarePipeline<TState>.Empty;
+    }
 
     /// <inheritdoc />
     public TState State
@@ -75,6 +88,7 @@ public abstract class ZustandStore<TState> : IStore<TState> where TState : class
     /// The mutator receives the current state and should return a new state (use 'with' expression for records).
     /// </summary>
     /// <param name="mutator">A function that takes current state and returns new state.</param>
+    /// <param name="actionName">Optional action name for middleware context. Defaults to caller method name.</param>
     /// <exception cref="RenderLoopException">
     /// Thrown when Set() is called during a component's render phase.
     /// </exception>
@@ -84,15 +98,42 @@ public abstract class ZustandStore<TState> : IStore<TState> where TState : class
     /// Set(state => state with { Count = state.Count + 1 });
     /// </code>
     /// </example>
-    protected void Set(Func<TState, TState> mutator)
+    protected void Set(Func<TState, TState> mutator, [CallerMemberName] string? actionName = null)
     {
         ThrowIfRendering();
         EnsureStateInitialized();
 
+        TState oldState;
+        TState newState;
+
         lock (_lock)
         {
-            _state = mutator(_state!);
+            oldState = _state!;
+            newState = mutator(oldState);
         }
+
+        // Create middleware context
+        var context = new MiddlewareContext<TState>
+        {
+            OldState = oldState,
+            NewState = newState,
+            StoreType = GetType(),
+            ActionName = actionName,
+            Timestamp = DateTimeOffset.UtcNow
+        };
+
+        // BeforeChange - can block
+        if (!_pipeline.InvokeBeforeChange(context))
+            return; // State change blocked by middleware
+
+        lock (_lock)
+        {
+            _state = newState;
+        }
+
+        // AfterChange - cannot block
+        _pipeline.InvokeAfterChange(context);
+
         OnStateChanged();
     }
 
@@ -100,6 +141,7 @@ public abstract class ZustandStore<TState> : IStore<TState> where TState : class
     /// Updates the state to the specified new state, replacing the current state entirely.
     /// </summary>
     /// <param name="newState">The new state to set.</param>
+    /// <param name="actionName">Optional action name for middleware context. Defaults to caller method name.</param>
     /// <exception cref="ArgumentNullException">Thrown when newState is null.</exception>
     /// <exception cref="RenderLoopException">
     /// Thrown when Set() is called during a component's render phase.
@@ -110,16 +152,37 @@ public abstract class ZustandStore<TState> : IStore<TState> where TState : class
     /// Set(new CounterState(42));
     /// </code>
     /// </example>
-    protected void Set(TState newState)
+    protected void Set(TState newState, [CallerMemberName] string? actionName = null)
     {
         ArgumentNullException.ThrowIfNull(newState);
         ThrowIfRendering();
         EnsureStateInitialized();
 
+        TState oldState;
+
+        lock (_lock)
+        {
+            oldState = _state!;
+        }
+
+        var context = new MiddlewareContext<TState>
+        {
+            OldState = oldState,
+            NewState = newState,
+            StoreType = GetType(),
+            ActionName = actionName,
+            Timestamp = DateTimeOffset.UtcNow
+        };
+
+        if (!_pipeline.InvokeBeforeChange(context))
+            return;
+
         lock (_lock)
         {
             _state = newState;
         }
+
+        _pipeline.InvokeAfterChange(context);
         OnStateChanged();
     }
 
@@ -128,6 +191,7 @@ public abstract class ZustandStore<TState> : IStore<TState> where TState : class
     /// Handles SynchronizationContext marshalling for background thread safety.
     /// </summary>
     /// <param name="mutator">A function that takes current state and returns new state.</param>
+    /// <param name="actionName">Optional action name for middleware context. Defaults to caller method name.</param>
     /// <returns>A task that completes when the state change notification has been processed.</returns>
     /// <remarks>
     /// Use this method when updating state from background threads (e.g., from async APIs,
@@ -143,20 +207,43 @@ public abstract class ZustandStore<TState> : IStore<TState> where TState : class
     /// }
     /// </code>
     /// </example>
-    protected async Task SetAsync(Func<TState, TState> mutator)
+    protected async Task SetAsync(Func<TState, TState> mutator, [CallerMemberName] string? actionName = null)
     {
         EnsureStateInitialized();
-        var context = SynchronizationContext.Current;
+        var syncContext = SynchronizationContext.Current;
+
+        TState oldState;
+        TState newState;
 
         lock (_lock)
         {
-            _state = mutator(_state!);
+            oldState = _state!;
+            newState = mutator(oldState);
         }
 
-        if (context != null)
+        var middlewareContext = new MiddlewareContext<TState>
+        {
+            OldState = oldState,
+            NewState = newState,
+            StoreType = GetType(),
+            ActionName = actionName,
+            Timestamp = DateTimeOffset.UtcNow
+        };
+
+        if (!_pipeline.InvokeBeforeChange(middlewareContext))
+            return; // State change blocked by middleware
+
+        lock (_lock)
+        {
+            _state = newState;
+        }
+
+        _pipeline.InvokeAfterChange(middlewareContext);
+
+        if (syncContext != null)
         {
             var tcs = new TaskCompletionSource();
-            context.Post(_ =>
+            syncContext.Post(_ =>
             {
                 OnStateChanged();
                 tcs.SetResult();
@@ -174,26 +261,48 @@ public abstract class ZustandStore<TState> : IStore<TState> where TState : class
     /// Handles SynchronizationContext marshalling for background thread safety.
     /// </summary>
     /// <param name="newState">The new state to set.</param>
+    /// <param name="actionName">Optional action name for middleware context. Defaults to caller method name.</param>
     /// <returns>A task that completes when the state change notification has been processed.</returns>
     /// <exception cref="ArgumentNullException">Thrown when newState is null.</exception>
     /// <remarks>
     /// Use this method when updating state from background threads.
     /// </remarks>
-    protected async Task SetAsync(TState newState)
+    protected async Task SetAsync(TState newState, [CallerMemberName] string? actionName = null)
     {
         ArgumentNullException.ThrowIfNull(newState);
         EnsureStateInitialized();
-        var context = SynchronizationContext.Current;
+        var syncContext = SynchronizationContext.Current;
+
+        TState oldState;
+
+        lock (_lock)
+        {
+            oldState = _state!;
+        }
+
+        var middlewareContext = new MiddlewareContext<TState>
+        {
+            OldState = oldState,
+            NewState = newState,
+            StoreType = GetType(),
+            ActionName = actionName,
+            Timestamp = DateTimeOffset.UtcNow
+        };
+
+        if (!_pipeline.InvokeBeforeChange(middlewareContext))
+            return; // State change blocked by middleware
 
         lock (_lock)
         {
             _state = newState;
         }
 
-        if (context != null)
+        _pipeline.InvokeAfterChange(middlewareContext);
+
+        if (syncContext != null)
         {
             var tcs = new TaskCompletionSource();
-            context.Post(_ =>
+            syncContext.Post(_ =>
             {
                 OnStateChanged();
                 tcs.SetResult();
