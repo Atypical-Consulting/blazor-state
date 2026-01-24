@@ -49,10 +49,13 @@ Plans:
   4. Component subscriptions dispose properly when component is disposed (no memory leaks)
   5. State updates in background thread do not crash in Blazor Server mode (InvokeAsync works)
   6. Library components do not specify @rendermode (mode-agnostic design)
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 02-01: TBD
+- [ ] 02-01-PLAN.md - Enhanced store API (Set overloads, SetAsync, InitialState, render loop detection)
+- [ ] 02-02-PLAN.md - Subscription system with selector-based change detection
+- [ ] 02-03-PLAN.md - Component integration (ZustandComponent, ZustandScope, UseState)
+- [ ] 02-04-PLAN.md - Comprehensive test suite for Phase 2 requirements
 
 ### Phase 3: Middleware & DX
 **Goal**: Developers can extend store behavior via middleware pipeline and auto-discover stores without registration boilerplate
@@ -122,7 +125,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 3/3 | Complete | 2026-01-24 |
-| 2. Core Store | 0/TBD | Not started | - |
+| 2. Core Store | 0/4 | Not started | - |
 | 3. Middleware & DX | 0/TBD | Not started | - |
 | 4. Persistence | 0/TBD | Not started | - |
 | 5. DevTools | 0/TBD | Not started | - |
