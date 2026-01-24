@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Phase: 4 of 6 (Persistence)
-Plan: 1 of 3 in current phase
+Plan: 2 of 5 in current phase
 Status: In progress
-Last activity: 2026-01-24 - Completed 04-01-PLAN.md (Storage Abstraction Layer)
+Last activity: 2026-01-24 - Completed 04-02-PLAN.md (Persistence Middleware)
 
-Progress: [████████░░] 80%
+Progress: [████████░░] 81%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 12
+- Total plans completed: 13
 - Average duration: 2.5 min
-- Total execution time: 31.7 min
+- Total execution time: 33.7 min
 
 **By Phase:**
 
@@ -30,11 +30,11 @@ Progress: [████████░░] 80%
 | 01-foundation | 3 | 8 min | 2.7 min |
 | 02-core-store | 4 | 13.7 min | 3.4 min |
 | 03-middleware-dx | 4 | 8 min | 2 min |
-| 04-persistence | 1 | 2 min | 2 min |
+| 04-persistence | 2 | 4 min | 2 min |
 
 **Recent Trend:**
-- Last 5 plans: 03-01 (2 min), 03-02 (2 min), 03-03 (2 min), 03-04 (2 min), 04-01 (2 min)
-- Note: Phase 4 started with efficient storage abstraction setup
+- Last 5 plans: 03-02 (2 min), 03-03 (2 min), 03-04 (2 min), 04-01 (2 min), 04-02 (2 min)
+- Note: Phase 4 continues with consistent 2-min plan execution
 
 *Updated after each plan completion*
 
@@ -81,6 +81,9 @@ Recent decisions affecting current work:
 - [04-01]: volatile bool for IsAvailable flag (thread-safe prerender detection)
 - [04-01]: Debug.WriteLine for storage warnings (consistent with Phase 1 approach)
 - [04-01]: 100KB threshold for large state warning (per RESEARCH.md recommendation)
+- [04-02]: Timer-based debouncing with lock for thread safety
+- [04-02]: Dispose does NOT flush - caller must call FlushAsync if data loss matters
+- [04-02]: OnBeforeChange always true - persistence middleware never blocks state changes
 
 ### Pending Todos
 
@@ -92,6 +95,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-01-24T19:17:00Z
-Stopped at: Completed 04-01-PLAN.md
+Last session: 2026-01-24T19:22:00Z
+Stopped at: Completed 04-02-PLAN.md
 Resume file: None
