@@ -38,6 +38,8 @@ public abstract class ZustandStore<TState> : IStore<TState> where TState : class
 {
     private TState? _state;
     private readonly object _lock = new();
+    private readonly List<ISubscription> _subscriptions = new();
+    private readonly object _subscriptionLock = new();
     private bool _isRendering;
     private bool _isInitialized;
     private bool _isInitializing;
@@ -205,6 +207,75 @@ public abstract class ZustandStore<TState> : IStore<TState> where TState : class
     }
 
     /// <summary>
+    /// Subscribe to all state changes. Callback invoked on every Set() call.
+    /// </summary>
+    /// <param name="callback">Action to invoke when state changes.</param>
+    /// <returns>Subscription handle. Dispose to unsubscribe.</returns>
+    /// <example>
+    /// <code>
+    /// var sub = store.Subscribe(() => Console.WriteLine("State changed!"));
+    /// // Later: sub.Dispose();
+    /// </code>
+    /// </example>
+    public ISubscription Subscribe(Action callback)
+    {
+        var subscription = new FullStateSubscription<TState>(callback, RemoveSubscription);
+        lock (_subscriptionLock)
+        {
+            _subscriptions.Add(subscription);
+        }
+        return subscription;
+    }
+
+    /// <summary>
+    /// Subscribe to changes in a specific state slice. Callback only invoked when selected value changes.
+    /// </summary>
+    /// <typeparam name="TSlice">The type of the selected state slice.</typeparam>
+    /// <param name="selector">Function to select the state slice to watch.</param>
+    /// <param name="callback">Action to invoke when selected slice changes.</param>
+    /// <returns>Subscription handle. Dispose to unsubscribe.</returns>
+    /// <remarks>
+    /// Uses reference equality to determine if the slice has changed, which works naturally
+    /// with C# records. The callback is only invoked when the selected slice reference changes.
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// var sub = store.Subscribe(s => s.Count, () => Console.WriteLine("Count changed!"));
+    /// // Later: sub.Dispose();
+    /// </code>
+    /// </example>
+    public ISubscription Subscribe<TSlice>(Func<TState, TSlice> selector, Action callback)
+    {
+        EnsureStateInitialized();
+        var subscription = new Subscription<TState, TSlice>(
+            selector,
+            callback,
+            RemoveSubscription,
+            State);
+        lock (_subscriptionLock)
+        {
+            _subscriptions.Add(subscription);
+        }
+        return subscription;
+    }
+
+    /// <summary>
+    /// Gets the current number of active subscriptions. For testing/debugging.
+    /// </summary>
+    internal int SubscriptionCount
+    {
+        get { lock (_subscriptionLock) return _subscriptions.Count; }
+    }
+
+    private void RemoveSubscription(ISubscription subscription)
+    {
+        lock (_subscriptionLock)
+        {
+            _subscriptions.Remove(subscription);
+        }
+    }
+
+    /// <summary>
     /// Override this method to perform async initialization when the store is first resolved.
     /// </summary>
     /// <returns>A task representing the initialization operation.</returns>
@@ -272,7 +343,7 @@ public abstract class ZustandStore<TState> : IStore<TState> where TState : class
     }
 
     /// <summary>
-    /// Raises the StateChanged event to notify subscribers of state changes.
+    /// Raises the StateChanged event and notifies all subscriptions of state changes.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -280,14 +351,37 @@ public abstract class ZustandStore<TState> : IStore<TState> where TState : class
     /// Override to add custom behavior such as logging or validation.
     /// </para>
     /// <para>
-    /// <b>Important for Blazor Server (MODE-05):</b> Subscribers must use
+    /// <b>Important for Blazor Server (MODE-05):</b> Legacy event subscribers must use
     /// <c>InvokeAsync(StateHasChanged)</c> in their event handlers to ensure
-    /// proper synchronization context handling.
+    /// proper synchronization context handling. Selector-based subscriptions handle this
+    /// more elegantly through the subscription system.
     /// </para>
     /// </remarks>
     protected virtual void OnStateChanged()
     {
+        // Notify legacy event subscribers
         StateChanged?.Invoke(this, EventArgs.Empty);
+
+        // Notify subscription-based subscribers
+        NotifySubscriptions();
+    }
+
+    private void NotifySubscriptions()
+    {
+        List<ISubscription> subs;
+        lock (_subscriptionLock)
+        {
+            subs = _subscriptions.ToList(); // Copy for thread safety
+        }
+
+        var state = State;
+        foreach (var sub in subs)
+        {
+            if (sub is IInternalSubscription<TState> internalSub)
+            {
+                internalSub.NotifyStateChanged(state);
+            }
+        }
     }
 
     private void EnsureStateInitialized()
