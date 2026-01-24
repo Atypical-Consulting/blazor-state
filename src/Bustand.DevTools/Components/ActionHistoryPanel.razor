@@ -1,0 +1,62 @@
+@using Bustand.DevTools.Services
+@using Bustand.DevTools.Models
+
+@inject IDevToolsStore DevToolsStore
+
+<div class="action-history-panel">
+    <div class="history-header">
+        <span class="history-count">@History.Count entries</span>
+    </div>
+
+    <div class="history-list">
+        @if (History.Count == 0)
+        {
+            <div class="no-history">
+                <p>No state changes recorded</p>
+            </div>
+        }
+        else
+        {
+            @* Display newest first per CONTEXT.md *@
+            @foreach (var snapshot in History.Reverse())
+            {
+                var isCurrent = snapshot.Index == CurrentIndex;
+                <div class="history-entry @(isCurrent ? "current" : "")"
+                     @onclick="() => JumpTo(snapshot.Index)"
+                     @key="snapshot.Index">
+                    <div class="entry-header">
+                        <span class="entry-action">@(snapshot.ActionName ?? "Unknown")</span>
+                        <span class="entry-timestamp">@snapshot.Timestamp.ToString("HH:mm:ss.fff")</span>
+                    </div>
+                    <div class="entry-index">
+                        @if (isCurrent)
+                        {
+                            <span class="current-marker">current</span>
+                        }
+                        else
+                        {
+                            <span class="entry-num">#@snapshot.Index</span>
+                        }
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+@code {
+    /// <summary>
+    /// The name of the store to display history for.
+    /// </summary>
+    [Parameter]
+    public string StoreName { get; set; } = "";
+
+    private IReadOnlyList<StateSnapshot> History => DevToolsStore.GetHistory(StoreName);
+
+    private int CurrentIndex => DevToolsStore.GetCurrentIndex(StoreName);
+
+    private void JumpTo(int index)
+    {
+        DevToolsStore.JumpToState(StoreName, index);
+    }
+}
