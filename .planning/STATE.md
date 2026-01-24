@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-24)
 
 **Core value:** Minimal boilerplate state management with exceptional debugging experience
-**Current focus:** Phase 3: Middleware & DX (In Progress)
+**Current focus:** Phase 3: Middleware & DX (Complete)
 
 ## Current Position
 
 Phase: 3 of 6 (Middleware & DX)
-Plan: 3 of 4 in current phase
-Status: In progress
-Last activity: 2026-01-24 - Completed 03-03-PLAN.md (Logging Middleware)
+Plan: 4 of 4 in current phase
+Status: Phase complete
+Last activity: 2026-01-24 - Completed 03-04-PLAN.md (Middleware Tests)
 
-Progress: [████████░░] 80%
+Progress: [████████░░] 85%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 10
+- Total plans completed: 11
 - Average duration: 2.5 min
-- Total execution time: 27.7 min
+- Total execution time: 29.7 min
 
 **By Phase:**
 
@@ -29,11 +29,11 @@ Progress: [████████░░] 80%
 |-------|-------|-------|----------|
 | 01-foundation | 3 | 8 min | 2.7 min |
 | 02-core-store | 4 | 13.7 min | 3.4 min |
-| 03-middleware-dx | 3 | 6 min | 2 min |
+| 03-middleware-dx | 4 | 8 min | 2 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-03 (2 min), 02-04 (7 min), 03-01 (2 min), 03-02 (2 min), 03-03 (2 min)
-- Note: Phase 3 plans executing quickly due to focused middleware additions
+- Last 5 plans: 02-04 (7 min), 03-01 (2 min), 03-02 (2 min), 03-03 (2 min), 03-04 (2 min)
+- Note: Phase 3 completed efficiently with focused middleware additions
 
 *Updated after each plan completion*
 
@@ -74,6 +74,9 @@ Recent decisions affecting current work:
 - [03-03]: IOptions<LoggingMiddlewareOptions> nullable for flexibility without DI registration
 - [03-03]: IsEnabled check before diffing for zero-cost when logging disabled
 - [03-03]: Store type filtering applies before expensive diff operation
+- [03-04]: NSubstitute for ILogger mocking over Moq (simpler API)
+- [03-04]: Separate test middleware helpers in TestMiddleware namespace for reusability
+- [03-04]: OrderTrackingMiddleware uses shared list for cross-instance verification
 
 ### Pending Todos
 
@@ -85,6 +88,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-01-24T18:07:00Z
-Stopped at: Completed 03-03-PLAN.md
+Last session: 2026-01-24T17:57:00Z
+Stopped at: Completed 03-04-PLAN.md (Phase 3 complete)
 Resume file: None
