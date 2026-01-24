@@ -1,0 +1,66 @@
+@page "/bustand-devtools"
+@using Bustand.DevTools.Services
+@using Microsoft.Extensions.Hosting
+@implements IDisposable
+@inject IDevToolsStore DevToolsStore
+@inject IHostEnvironment Environment
+
+@if (!Environment.IsDevelopment())
+{
+    <div class="devtools-error">
+        <h2>DevTools Unavailable</h2>
+        <p>Bustand DevTools is only available in Development environment.</p>
+    </div>
+}
+else
+{
+    <div class="devtools-container">
+        <StoreSidebar DevToolsStore="DevToolsStore"
+                      SelectedStore="@SelectedStore"
+                      OnStoreSelected="SelectStore" />
+
+        <main class="devtools-main">
+            @if (SelectedStore != null)
+            {
+                <div class="tab-bar">
+                    <button class="tab @(ActiveTab == "state" ? "active" : "")"
+                            @onclick='() => ActiveTab = "state"'>Current State</button>
+                    <button class="tab @(ActiveTab == "history" ? "active" : "")"
+                            @onclick='() => ActiveTab = "history"'>History</button>
+                    <button class="tab @(ActiveTab == "diff" ? "active" : "")"
+                            @onclick='() => ActiveTab = "diff"'>Diff View</button>
+                </div>
+
+                <div class="tab-content">
+                    @switch (ActiveTab)
+                    {
+                        case "state":
+                            <div class="panel-placeholder">
+                                <p>State Inspector - Coming in Plan 04</p>
+                                @* <StateInspectorPanel StoreName="@SelectedStore" /> *@
+                            </div>
+                            break;
+                        case "history":
+                            <div class="panel-placeholder">
+                                <p>Action History - Coming in Plan 05</p>
+                                @* <ActionHistoryPanel StoreName="@SelectedStore" /> *@
+                            </div>
+                            break;
+                        case "diff":
+                            <div class="panel-placeholder">
+                                <p>Diff View - Coming in Plan 06</p>
+                                @* <DiffViewerPanel StoreName="@SelectedStore" /> *@
+                            </div>
+                            break;
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="empty-state">
+                    <p>Select a store to inspect</p>
+                </div>
+            }
+        </main>
+    </div>
+}
