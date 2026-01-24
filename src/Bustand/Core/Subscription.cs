@@ -73,6 +73,9 @@ internal sealed class Subscription<TState, TSlice> : ISubscription, IInternalSub
     }
 
     /// <inheritdoc />
+    public void Unsubscribe() => Dispose();
+
+    /// <inheritdoc />
     public void Dispose()
     {
         if (_isActive)
@@ -116,6 +119,9 @@ internal sealed class FullStateSubscription<TState> : ISubscription, IInternalSu
     {
         if (_isActive) _callback();
     }
+
+    /// <inheritdoc />
+    public void Unsubscribe() => Dispose();
 
     /// <inheritdoc />
     public void Dispose()

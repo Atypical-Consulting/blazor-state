@@ -377,9 +377,17 @@ public abstract class ZustandStore<TState> : IStore<TState> where TState : class
         var state = State;
         foreach (var sub in subs)
         {
-            if (sub is IInternalSubscription<TState> internalSub)
+            try
             {
-                internalSub.NotifyStateChanged(state);
+                if (sub is IInternalSubscription<TState> internalSub)
+                {
+                    internalSub.NotifyStateChanged(state);
+                }
+            }
+            catch (ObjectDisposedException)
+            {
+                // Component disposed during notification - silently ignore per CONTEXT.md
+                // "Silently ignore subscriptions during component disposal (graceful degradation)"
             }
         }
     }
