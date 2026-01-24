@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Phase: 5 of 6 (DevTools)
-Plan: 1 of 8 in current phase
+Plan: 2 of 8 in current phase
 Status: In progress
-Last activity: 2026-01-24 - Completed 05-01-PLAN.md (DevToolsStore Service)
+Last activity: 2026-01-24 - Completed 05-02-PLAN.md (DevTools Middleware Integration)
 
-Progress: [████████░░] 71% (17/24 plans)
+Progress: [████████░░] 75% (18/24 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 17
+- Total plans completed: 18
 - Average duration: 2.7 min
-- Total execution time: 45.7 min
+- Total execution time: 47.7 min
 
 **By Phase:**
 
@@ -31,10 +31,10 @@ Progress: [████████░░] 71% (17/24 plans)
 | 02-core-store | 4 | 13.7 min | 3.4 min |
 | 03-middleware-dx | 4 | 8 min | 2 min |
 | 04-persistence | 5 | 15 min | 3 min |
-| 05-devtools | 1 | 3 min | 3 min |
+| 05-devtools | 2 | 5 min | 2.5 min |
 
 **Recent Trend:**
-- Last 5 plans: 04-02 (2 min), 04-03 (2 min), 04-05 (2 min), 04-04 (5 min), 05-01 (3 min)
+- Last 5 plans: 04-03 (2 min), 04-05 (2 min), 04-04 (5 min), 05-01 (3 min), 05-02 (2 min)
 
 *Updated after each plan completion*
 
@@ -96,6 +96,10 @@ Recent decisions affecting current work:
 - [05-01]: 100-entry history limit per store per CONTEXT.md decision
 - [05-01]: Branch history model: truncate future entries when new changes occur after time-travel
 - [05-01]: RegisterStore internal method for middleware to register store instances
+- [05-02]: DevToolsMiddleware always returns true in OnBeforeChange (passive observer)
+- [05-02]: Console.WriteLine for production warning (consistent with Phase 1 approach)
+- [05-02]: Two AddBustandDevTools overloads: environment-aware (recommended) and manual
+- [05-02]: DevToolsEnabled flag for coordination between core and DevTools packages
 
 ### Pending Todos
 
@@ -107,6 +111,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-01-24T20:45:30Z
-Stopped at: Completed 05-01-PLAN.md (DevToolsStore Service)
+Last session: 2026-01-24T20:50:30Z
+Stopped at: Completed 05-02-PLAN.md (DevTools Middleware Integration)
 Resume file: None
