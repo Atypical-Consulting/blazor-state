@@ -18,4 +18,14 @@ public class CounterStore : ZustandStore<CounterState>
     /// Sets the count using direct state replacement (tests Set(TState) overload).
     /// </summary>
     public void SetCountDirect(int count) => Set(new CounterState(count));
+
+    /// <summary>
+    /// Computed property: true if count is greater than 0.
+    /// </summary>
+    public bool IsPositive => State.Count > 0;
+
+    /// <summary>
+    /// Async increment method (tests SetAsync).
+    /// </summary>
+    public async Task IncrementAsync() => await SetAsync(s => s with { Count = s.Count + 1 });
 }
