@@ -67,6 +67,10 @@ Recent decisions affecting current work:
 - [03-01]: BeforeChange exceptions bubble up to caller (validation failures must be visible)
 - [03-01]: AfterChange exceptions logged via Debug and continue pipeline (side effects don't break each other)
 - [03-01]: Static Empty property on pipeline for zero-allocation when no middleware configured
+- [03-02]: UseMiddleware<T> uses class constraint (IMiddleware<> constraint not possible for open generics)
+- [03-02]: SetPipeline is internal method (only DI should inject pipelines)
+- [03-02]: Factory-based DI registration wraps store construction with pipeline injection
+- [03-02]: Middleware types closed per-store (e.g., LoggingMiddleware<CounterState>)
 - [03-03]: IOptions<LoggingMiddlewareOptions> nullable for flexibility without DI registration
 - [03-03]: IsEnabled check before diffing for zero-cost when logging disabled
 - [03-03]: Store type filtering applies before expensive diff operation
