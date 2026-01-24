@@ -1,3 +1,4 @@
+using Bustand.Core;
 using Bustand.DevTools.Services;
 using Bustand.Middleware;
 
@@ -25,6 +26,10 @@ namespace Bustand.DevTools.Middleware;
 /// <b>Time-travel aware:</b> Skips recording when <see cref="IDevToolsStore.IsTimeTraveling"/>
 /// is <c>true</c> to prevent history pollution during time-travel navigation.
 /// </item>
+/// <item>
+/// <b>Auto-registers stores:</b> On first state change, registers the store instance
+/// with DevToolsStore for time-travel support.
+/// </item>
 /// </list>
 /// </remarks>
 /// <example>
@@ -39,6 +44,8 @@ namespace Bustand.DevTools.Middleware;
 public class DevToolsMiddleware<TState> : IMiddleware<TState> where TState : class
 {
     private readonly IDevToolsStore _devToolsStore;
+    private bool _storeRegistered;
+    private object? _storeInstance;
 
     /// <summary>
     /// Initializes a new instance of <see cref="DevToolsMiddleware{TState}"/>.
@@ -47,6 +54,21 @@ public class DevToolsMiddleware<TState> : IMiddleware<TState> where TState : cla
     public DevToolsMiddleware(IDevToolsStore devToolsStore)
     {
         _devToolsStore = devToolsStore ?? throw new ArgumentNullException(nameof(devToolsStore));
+    }
+
+    /// <summary>
+    /// Sets the store instance for time-travel support.
+    /// Called by DI factory during store construction.
+    /// </summary>
+    /// <param name="store">The store instance to register.</param>
+    /// <remarks>
+    /// This method is called via reflection by the Bustand DI factory when constructing
+    /// stores with middleware. It enables time-travel functionality by providing the
+    /// store instance to DevToolsStore.
+    /// </remarks>
+    internal void SetStoreInstance(object store)
+    {
+        _storeInstance = store;
     }
 
     /// <summary>
@@ -83,6 +105,10 @@ public class DevToolsMiddleware<TState> : IMiddleware<TState> where TState : cla
     /// When <see cref="IDevToolsStore.IsTimeTraveling"/> is <c>true</c>, recording is
     /// skipped to prevent the time-travel operation itself from creating new history entries.
     /// </para>
+    /// <para>
+    /// On the first state change, the store is registered with DevToolsStore for time-travel.
+    /// This lazy registration prevents issues with store construction order.
+    /// </para>
     /// </remarks>
     public void OnAfterChange(MiddlewareContext<TState> context)
     {
@@ -90,6 +116,19 @@ public class DevToolsMiddleware<TState> : IMiddleware<TState> where TState : cla
         if (_devToolsStore.IsTimeTraveling)
         {
             return;
+        }
+
+        // Register store on first state change (lazy registration)
+        if (!_storeRegistered && _storeInstance != null)
+        {
+            var storeName = context.StoreType.Name;
+
+            // Access RegisterStore on DevToolsStore (internal method)
+            if (_devToolsStore is DevToolsStore devToolsStore)
+            {
+                devToolsStore.RegisterStore(storeName, (IStore)_storeInstance);
+                _storeRegistered = true;
+            }
         }
 
         _devToolsStore.RecordStateChange(
