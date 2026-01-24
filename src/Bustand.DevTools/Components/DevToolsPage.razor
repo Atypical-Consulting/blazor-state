@@ -35,16 +35,10 @@ else
                     @switch (ActiveTab)
                     {
                         case "state":
-                            <div class="panel-placeholder">
-                                <p>State Inspector - Coming in Plan 04</p>
-                                @* <StateInspectorPanel StoreName="@SelectedStore" /> *@
-                            </div>
+                            <StateInspectorPanel StoreName="@SelectedStore" />
                             break;
                         case "history":
-                            <div class="panel-placeholder">
-                                <p>Action History - Coming in Plan 05</p>
-                                @* <ActionHistoryPanel StoreName="@SelectedStore" /> *@
-                            </div>
+                            <ActionHistoryPanel StoreName="@SelectedStore" />
                             break;
                         case "diff":
                             <div class="panel-placeholder">
