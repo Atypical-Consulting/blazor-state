@@ -67,6 +67,36 @@ public abstract class ZustandStore<TState> : IStore<TState> where TState : class
         _pipeline = pipeline ?? MiddlewarePipeline<TState>.Empty;
     }
 
+    /// <summary>
+    /// Sets the initial state from persistence restoration.
+    /// Called by DI factory before the store is returned to consumer.
+    /// </summary>
+    /// <param name="restoredState">The state restored from storage, or null to use InitialState.</param>
+    /// <remarks>
+    /// This method is called only once during store construction, before any Set() calls.
+    /// If restoredState is null or invalid, InitialState is used instead.
+    /// </remarks>
+    internal void SetRestoredState(TState? restoredState)
+    {
+        if (restoredState is null)
+            return;
+
+        // Only restore if state hasn't been initialized yet
+        lock (_lock)
+        {
+            if (_stateInitialized)
+                return;
+
+            _state = restoredState;
+            _stateInitialized = true;
+        }
+    }
+
+    /// <summary>
+    /// Gets the initial state. Used by persistence to merge with restored state.
+    /// </summary>
+    internal TState GetInitialState() => InitialState;
+
     /// <inheritdoc />
     public TState State
     {
