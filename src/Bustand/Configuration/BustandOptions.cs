@@ -33,6 +33,16 @@ public class BustandOptions
     internal List<Type> MiddlewareTypes { get; } = new();
 
     /// <summary>
+    /// Gets whether DevTools middleware should be enabled.
+    /// </summary>
+    /// <remarks>
+    /// When <c>true</c>, the DevTools package will register its middleware
+    /// to capture state changes for debugging and time-travel.
+    /// This flag is set by calling <see cref="UseDevTools"/>.
+    /// </remarks>
+    internal bool DevToolsEnabled { get; private set; }
+
+    /// <summary>
     /// Prefix for all storage keys.
     /// Default: "Bustand"
     /// Example: With prefix "MyApp", key becomes "MyApp.CounterStore"
@@ -123,6 +133,44 @@ public class BustandOptions
     public BustandOptions UseMiddleware<TMiddleware>() where TMiddleware : class
     {
         MiddlewareTypes.Add(typeof(TMiddleware));
+        return this;
+    }
+
+    /// <summary>
+    /// Enables DevTools middleware for state change capture.
+    /// Call this only when DevTools services are registered (development environment).
+    /// </summary>
+    /// <returns>The options instance for chaining.</returns>
+    /// <remarks>
+    /// <para>
+    /// DevTools middleware captures all state changes for inspection in the DevTools page.
+    /// This should only be enabled in development environments for security reasons.
+    /// </para>
+    /// <para>
+    /// <b>Important:</b> This method sets a flag that the DevTools package reads.
+    /// You must also call <c>AddBustandDevTools()</c> to register the DevTools services.
+    /// The DevTools package will automatically register its middleware when both
+    /// <c>UseDevTools()</c> is called and DevTools services are registered.
+    /// </para>
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// // In Program.cs:
+    /// builder.Services.AddBustand(options => options
+    ///     .ScanAssemblyContaining&lt;CounterStore&gt;()
+    ///     .UseLogging()
+    ///     .UseDevTools());
+    ///
+    /// // Also register DevTools services in development:
+    /// if (builder.Environment.IsDevelopment())
+    /// {
+    ///     builder.Services.AddBustandDevTools(builder.Environment);
+    /// }
+    /// </code>
+    /// </example>
+    public BustandOptions UseDevTools()
+    {
+        DevToolsEnabled = true;
         return this;
     }
 
