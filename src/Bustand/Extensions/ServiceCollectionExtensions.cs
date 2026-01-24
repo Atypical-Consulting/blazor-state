@@ -78,13 +78,14 @@ public static class ServiceCollectionExtensions
         ApplyPerStoreLifetimeOverrides(services, assemblies, defaultLifetime, options.WarnOnSingletonInServerMode);
 
         // Register middleware types and wire pipelines
-        if (options.MiddlewareTypes.Count > 0)
+        // Also trigger pipeline wiring if DevTools is enabled (even without other middleware)
+        if (options.MiddlewareTypes.Count > 0 || options.DevToolsEnabled)
         {
             RegisterMiddlewareAndPipelines(services, assemblies, options.MiddlewareTypes, options);
         }
 
         // Auto-register persistence for [Persist] stores even without other middleware
-        if (options.MiddlewareTypes.Count == 0)
+        if (options.MiddlewareTypes.Count == 0 && !options.DevToolsEnabled)
         {
             var persistentStores = assemblies
                 .SelectMany(a => a.GetTypes())
@@ -273,8 +274,17 @@ public static class ServiceCollectionExtensions
             var middleware = sp.GetService(concreteType);
             if (middleware != null)
             {
+                // Pass store instance to middleware if it supports SetStoreInstance
+                // This enables DevToolsMiddleware to register stores for time-travel
+                TrySetStoreInstance(middleware, store);
                 middlewares.Add(middleware);
             }
+        }
+
+        // If DevTools is enabled, try to add DevToolsMiddleware dynamically
+        if (options.DevToolsEnabled)
+        {
+            TryAddDevToolsMiddleware(sp, store, stateType, middlewareInterfaceType, middlewares);
         }
 
         // Handle persistence if [Persist] attribute is present
@@ -377,6 +387,85 @@ public static class ServiceCollectionExtensions
                 storeType,
                 sp => CreateStoreWithPipeline(sp, storeType, stateType, new List<Type>(), options, persistAttr),
                 descriptor.Lifetime));
+        }
+    }
+
+    /// <summary>
+    /// Attempts to call SetStoreInstance on middleware that supports it.
+    /// This enables DevToolsMiddleware to register stores for time-travel functionality.
+    /// </summary>
+    /// <param name="middleware">The middleware instance.</param>
+    /// <param name="store">The store instance to pass.</param>
+    private static void TrySetStoreInstance(object middleware, object store)
+    {
+        try
+        {
+            // Look for SetStoreInstance method (internal or public)
+            var setStoreMethod = middleware.GetType().GetMethod(
+                "SetStoreInstance",
+                BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+
+            setStoreMethod?.Invoke(middleware, new[] { store });
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine(
+                $"[Bustand] Failed to set store instance on middleware: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Attempts to add DevToolsMiddleware dynamically when DevTools is enabled.
+    /// Uses reflection to find the middleware type in the Bustand.DevTools assembly.
+    /// </summary>
+    /// <param name="sp">The service provider.</param>
+    /// <param name="store">The store instance.</param>
+    /// <param name="stateType">The state type for the store.</param>
+    /// <param name="middlewareInterfaceType">The IMiddleware&lt;TState&gt; interface type.</param>
+    /// <param name="middlewares">The middleware collection to add to.</param>
+    private static void TryAddDevToolsMiddleware(
+        IServiceProvider sp,
+        object store,
+        Type stateType,
+        Type middlewareInterfaceType,
+        System.Collections.IList middlewares)
+    {
+        try
+        {
+            // Try to find DevToolsMiddleware type by name
+            // Assembly name: Bustand.DevTools
+            // Type name: Bustand.DevTools.Middleware.DevToolsMiddleware`1
+            var devToolsMiddlewareOpenType = Type.GetType(
+                "Bustand.DevTools.Middleware.DevToolsMiddleware`1, Bustand.DevTools");
+
+            if (devToolsMiddlewareOpenType == null)
+            {
+                // DevTools assembly not loaded - that's fine, just skip
+                return;
+            }
+
+            // Close the generic type over the state type
+            var devToolsMiddlewareType = devToolsMiddlewareOpenType.MakeGenericType(stateType);
+
+            // Verify it implements IMiddleware<TState>
+            if (!middlewareInterfaceType.IsAssignableFrom(devToolsMiddlewareType))
+            {
+                return;
+            }
+
+            // Try to resolve from DI
+            var devToolsMiddleware = sp.GetService(devToolsMiddlewareType);
+            if (devToolsMiddleware != null)
+            {
+                // Pass store instance to middleware
+                TrySetStoreInstance(devToolsMiddleware, store);
+                middlewares.Add(devToolsMiddleware);
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine(
+                $"[Bustand] Failed to add DevTools middleware: {ex.Message}");
         }
     }
 
