@@ -5,34 +5,34 @@
 See: .planning/PROJECT.md (updated 2026-01-24)
 
 **Core value:** Minimal boilerplate state management with exceptional debugging experience
-**Current focus:** Phase 2: Core Store (Wave 2 complete)
+**Current focus:** Phase 2: Core Store (Wave 3 complete)
 
 ## Current Position
 
 Phase: 2 of 6 (Core Store)
-Plan: 2 of 4 in current phase
+Plan: 3 of 4 in current phase
 Status: In progress
-Last activity: 2026-01-24 - Completed 02-02-PLAN.md (Subscription System)
+Last activity: 2026-01-24 - Completed 02-03-PLAN.md (Component Integration)
 
-Progress: [████████░░] 80%
+Progress: [█████████░] 90%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 5
+- Total plans completed: 6
 - Average duration: 2.5 min
-- Total execution time: 12.7 min
+- Total execution time: 14.7 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-foundation | 3 | 8 min | 2.7 min |
-| 02-core-store | 2 | 4.7 min | 2.35 min |
+| 02-core-store | 3 | 6.7 min | 2.2 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-02 (2 min), 01-03 (3 min), 02-01 (2.5 min), 02-02 (2.2 min)
-- Trend: Stable
+- Last 5 plans: 01-03 (3 min), 02-01 (2.5 min), 02-02 (2.2 min), 02-03 (2 min)
+- Trend: Improving
 
 *Updated after each plan completion*
 
@@ -58,6 +58,8 @@ Recent decisions affecting current work:
 - [02-02]: IInternalSubscription<TState> interface for polymorphic notification
 - [02-02]: Reference equality for slice change detection (works with C# records)
 - [02-02]: Unsubscribe() method on ISubscription for semantic clarity
+- [02-03]: Two component base classes: ZustandComponent (DI) and ZustandComponentScoped (CascadingParameter)
+- [02-03]: UseStateResult<T> struct with implicit T conversion for ergonomic usage
 
 ### Pending Todos
 
@@ -69,6 +71,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-01-24T12:26:06Z
-Stopped at: Completed 02-02-PLAN.md
+Last session: 2026-01-24T12:29:46Z
+Stopped at: Completed 02-03-PLAN.md
 Resume file: None
