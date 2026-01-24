@@ -5,33 +5,33 @@
 See: .planning/PROJECT.md (updated 2026-01-24)
 
 **Core value:** Minimal boilerplate state management with exceptional debugging experience
-**Current focus:** Phase 2: Core Store
+**Current focus:** Phase 2: Core Store (Wave 2 complete)
 
 ## Current Position
 
 Phase: 2 of 6 (Core Store)
-Plan: 1 of 4 in current phase
+Plan: 2 of 4 in current phase
 Status: In progress
-Last activity: 2026-01-24 — Completed 02-01-PLAN.md (Core Store API Enhancement)
+Last activity: 2026-01-24 - Completed 02-02-PLAN.md (Subscription System)
 
 Progress: [████████░░] 80%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4
-- Average duration: 2.6 min
-- Total execution time: 10.5 min
+- Total plans completed: 5
+- Average duration: 2.5 min
+- Total execution time: 12.7 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-foundation | 3 | 8 min | 2.7 min |
-| 02-core-store | 1 | 2.5 min | 2.5 min |
+| 02-core-store | 2 | 4.7 min | 2.35 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (3 min), 01-02 (2 min), 01-03 (3 min), 02-01 (2.5 min)
+- Last 5 plans: 01-02 (2 min), 01-03 (3 min), 02-01 (2.5 min), 02-02 (2.2 min)
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -55,6 +55,9 @@ Recent decisions affecting current work:
 - [01-03]: Used BunitContext instead of deprecated TestContext for component testing
 - [02-01]: Abstract InitialState property instead of constructor parameter (cleaner API, enforces initialization)
 - [02-01]: SynchronizationContext.Current capture for SetAsync (proper thread marshalling)
+- [02-02]: IInternalSubscription<TState> interface for polymorphic notification
+- [02-02]: Reference equality for slice change detection (works with C# records)
+- [02-02]: Unsubscribe() method on ISubscription for semantic clarity
 
 ### Pending Todos
 
@@ -66,6 +69,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-01-24T12:21:09Z
-Stopped at: Completed 02-01-PLAN.md
+Last session: 2026-01-24T12:26:06Z
+Stopped at: Completed 02-02-PLAN.md
 Resume file: None
