@@ -1,0 +1,94 @@
+@using System.Text.Json
+
+@if (Value.ValueKind == JsonValueKind.Object)
+{
+    <div class="tree-node tree-object">
+        <span class="tree-toggle @(IsExpanded ? "expanded" : "")" @onclick="Toggle">
+            <span class="tree-bracket">{</span>
+        </span>
+        @if (IsExpanded)
+        {
+            <div class="tree-children">
+                @foreach (var prop in Value.EnumerateObject())
+                {
+                    <div class="tree-property">
+                        <span class="property-name">"@prop.Name"</span>
+                        <span class="property-colon">:</span>
+                        <StateTreeView Value="prop.Value" Depth="@(Depth + 1)" />
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <span class="tree-collapsed-hint">...</span>
+        }
+        <span class="tree-bracket">}</span>
+    </div>
+}
+else if (Value.ValueKind == JsonValueKind.Array)
+{
+    <div class="tree-node tree-array">
+        <span class="tree-toggle @(IsExpanded ? "expanded" : "")" @onclick="Toggle">
+            <span class="tree-bracket">[</span>
+        </span>
+        @if (IsExpanded)
+        {
+            <div class="tree-children">
+                @{ var index = 0; }
+                @foreach (var item in Value.EnumerateArray())
+                {
+                    <div class="tree-array-item">
+                        <span class="array-index">[@index]</span>
+                        <StateTreeView Value="item" Depth="@(Depth + 1)" />
+                    </div>
+                    index++;
+                }
+            </div>
+        }
+        else
+        {
+            <span class="tree-collapsed-hint">@Value.GetArrayLength() items</span>
+        }
+        <span class="tree-bracket">]</span>
+    </div>
+}
+else
+{
+    @* Primitive values *@
+    <span class="tree-value @GetValueClass()">@GetDisplayValue()</span>
+}
+
+@code {
+    [Parameter] public JsonElement Value { get; set; }
+    [Parameter] public int Depth { get; set; } = 0;
+
+    private bool IsExpanded { get; set; }
+
+    protected override void OnInitialized()
+    {
+        // First level expanded by default per CONTEXT.md
+        IsExpanded = Depth < 1;
+    }
+
+    private void Toggle() => IsExpanded = !IsExpanded;
+
+    private string GetValueClass() => Value.ValueKind switch
+    {
+        JsonValueKind.String => "value-string",
+        JsonValueKind.Number => "value-number",
+        JsonValueKind.True or JsonValueKind.False => "value-boolean",
+        JsonValueKind.Null => "value-null",
+        _ => ""
+    };
+
+    private string GetDisplayValue() => Value.ValueKind switch
+    {
+        JsonValueKind.String => $"\"{Value.GetString()}\"",
+        JsonValueKind.Number => Value.GetRawText(),
+        JsonValueKind.True => "true",
+        JsonValueKind.False => "false",
+        JsonValueKind.Null => "null",
+        _ => Value.GetRawText()
+    };
+}
