@@ -5,32 +5,33 @@
 See: .planning/PROJECT.md (updated 2026-01-24)
 
 **Core value:** Minimal boilerplate state management with exceptional debugging experience
-**Current focus:** Phase 1: Foundation
+**Current focus:** Phase 2: Core Store
 
 ## Current Position
 
-Phase: 1 of 6 (Foundation)
-Plan: 3 of 3 in current phase
-Status: Phase complete ✓
-Last activity: 2026-01-24 — Phase 1 complete, all 3 plans executed and verified
+Phase: 2 of 6 (Core Store)
+Plan: 1 of 4 in current phase
+Status: In progress
+Last activity: 2026-01-24 — Completed 02-01-PLAN.md (Core Store API Enhancement)
 
-Progress: [████████░░] 75%
+Progress: [████████░░] 80%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 3
-- Average duration: 2.7 min
-- Total execution time: 8 min
+- Total plans completed: 4
+- Average duration: 2.6 min
+- Total execution time: 10.5 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-foundation | 3 | 8 min | 2.7 min |
+| 02-core-store | 1 | 2.5 min | 2.5 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (3 min), 01-02 (2 min), 01-03 (3 min)
+- Last 5 plans: 01-01 (3 min), 01-02 (2 min), 01-03 (3 min), 02-01 (2.5 min)
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -52,6 +53,8 @@ Recent decisions affecting current work:
 - [01-02]: Console.WriteLine for warnings (simple, no logging dependency required in Phase 1)
 - [01-03]: Added InternalsVisibleTo for test access to GetRegisteredLifetime helper
 - [01-03]: Used BunitContext instead of deprecated TestContext for component testing
+- [02-01]: Abstract InitialState property instead of constructor parameter (cleaner API, enforces initialization)
+- [02-01]: SynchronizationContext.Current capture for SetAsync (proper thread marshalling)
 
 ### Pending Todos
 
@@ -63,6 +66,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-01-24T11:14:22Z
-Stopped at: Completed 01-03-PLAN.md
+Last session: 2026-01-24T12:21:09Z
+Stopped at: Completed 02-01-PLAN.md
 Resume file: None
