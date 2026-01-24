@@ -51,4 +51,16 @@ public interface IBrowserStorage
     /// Marks storage as available. Called after first render when JS interop becomes available.
     /// </summary>
     void SetAvailable();
+
+    /// <summary>
+    /// Marks storage as temporarily unavailable.
+    /// Called when circuit disconnects in Blazor Server mode.
+    /// </summary>
+    void SetUnavailable();
+
+    /// <summary>
+    /// Event raised when storage availability changes.
+    /// Subscribers can use this to trigger state re-restoration on reconnect.
+    /// </summary>
+    event Action? OnAvailabilityChanged;
 }

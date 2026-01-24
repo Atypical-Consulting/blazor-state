@@ -33,7 +33,31 @@ public class BrowserStorageService : IBrowserStorage
     public bool IsAvailable => _isAvailable;
 
     /// <inheritdoc />
-    public void SetAvailable() => _isAvailable = true;
+    public event Action? OnAvailabilityChanged;
+
+    /// <inheritdoc />
+    public void SetAvailable()
+    {
+        var wasAvailable = _isAvailable;
+        _isAvailable = true;
+
+        // Raise event if this is a state change (new availability or re-availability after reset)
+        if (!wasAvailable)
+        {
+            OnAvailabilityChanged?.Invoke();
+            Debug.WriteLine("[Bustand] Storage availability changed: now available");
+        }
+    }
+
+    /// <inheritdoc />
+    public void SetUnavailable()
+    {
+        if (_isAvailable)
+        {
+            _isAvailable = false;
+            Debug.WriteLine("[Bustand] Storage marked as unavailable (circuit disconnect)");
+        }
+    }
 
     /// <inheritdoc />
     public async Task<T?> GetAsync<T>(string key, StorageType storageType) where T : class
