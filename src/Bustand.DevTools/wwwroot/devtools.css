@@ -326,3 +326,37 @@
     color: var(--devtools-text-dim);
     margin-left: 8px;
 }
+
+/* JSON Exporter styles */
+.json-exporter {
+    display: flex;
+    gap: 8px;
+    padding: 8px;
+    border-bottom: 1px solid var(--devtools-border);
+}
+
+.export-btn {
+    background: var(--devtools-sidebar-bg);
+    border: 1px solid var(--devtools-border);
+    color: var(--devtools-text);
+    padding: 6px 12px;
+    cursor: pointer;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-family: inherit;
+    font-size: 12px;
+}
+
+.export-btn:hover {
+    background: var(--devtools-accent-hover);
+}
+
+.btn-icon {
+    font-size: 14px;
+}
+
+.btn-text {
+    min-width: 50px;
+}
