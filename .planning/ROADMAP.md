@@ -85,10 +85,13 @@ Plans:
   3. Store state persists to SessionStorage and survives page reload (WASM)
   4. Store state restores on Blazor Server circuit reconnect
   5. Developer can configure storage key prefix for namespacing
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 04-01: TBD
+- [ ] 04-01-PLAN.md - Storage abstraction (PersistAttribute, StorageType, IBrowserStorage, BrowserStorageService)
+- [ ] 04-02-PLAN.md - PersistenceMiddleware with debounced writes (DebouncedWriter)
+- [ ] 04-03-PLAN.md - DI integration and state restoration (ServiceCollectionExtensions, ZustandStore hooks)
+- [ ] 04-04-PLAN.md - Comprehensive test suite for persistence functionality
 
 ### Phase 5: DevTools
 **Goal**: Developers can inspect, debug, and time-travel through state changes via built-in DevTools page
@@ -130,6 +133,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | 1. Foundation | 3/3 | Complete | 2026-01-24 |
 | 2. Core Store | 4/4 | Complete | 2026-01-24 |
 | 3. Middleware & DX | 4/4 | Complete | 2026-01-24 |
-| 4. Persistence | 0/TBD | Not started | - |
+| 4. Persistence | 0/4 | Not started | - |
 | 5. DevTools | 0/TBD | Not started | - |
 | 6. Distribution | 0/TBD | Not started | - |
