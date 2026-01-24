@@ -11,7 +11,7 @@ namespace Bustand.Core;
 /// [BustandStore]
 /// public class CounterStore : ZustandStore&lt;CounterState&gt;
 /// {
-///     public CounterStore() : base(new CounterState()) { }
+///     protected override CounterState InitialState => new CounterState();
 ///
 ///     public void Increment() => Set(s => s with { Count = s.Count + 1 });
 /// }
@@ -25,41 +25,57 @@ namespace Bustand.Core;
 /// synchronization context handling.
 /// </para>
 /// <para>
-/// <b>Example subscription pattern:</b>
-/// <code>
-/// private async void OnStateChanged(object? sender, EventArgs e)
-/// {
-///     await InvokeAsync(StateHasChanged);
-/// }
-/// </code>
+/// <b>SetAsync for background threads:</b> Use <see cref="SetAsync(Func{TState, TState})"/>
+/// when updating state from background threads. It automatically handles
+/// SynchronizationContext marshalling.
+/// </para>
+/// <para>
+/// <b>Render loop protection:</b> Calling Set() during a component's render phase
+/// will throw <see cref="RenderLoopException"/> to prevent infinite loops.
 /// </para>
 /// </remarks>
 public abstract class ZustandStore<TState> : IStore<TState> where TState : class
 {
-    private TState _state;
+    private TState? _state;
     private readonly object _lock = new();
+    private bool _isRendering;
+    private bool _isInitialized;
+    private bool _isInitializing;
+    private bool _stateInitialized;
+
+    /// <summary>
+    /// Gets the initial state for this store.
+    /// </summary>
+    /// <remarks>
+    /// Override this property to provide the initial state for your store.
+    /// This is called once when the store is first accessed.
+    /// </remarks>
+    protected abstract TState InitialState { get; }
 
     /// <inheritdoc />
-    public TState State => _state;
+    public TState State
+    {
+        get
+        {
+            EnsureStateInitialized();
+            return _state!;
+        }
+    }
+
+    /// <inheritdoc />
+    public bool IsInitialized => _isInitialized;
 
     /// <inheritdoc />
     public event EventHandler? StateChanged;
-
-    /// <summary>
-    /// Creates a new store with the specified initial state.
-    /// </summary>
-    /// <param name="initialState">The initial state. Cannot be null.</param>
-    /// <exception cref="ArgumentNullException">Thrown when initialState is null.</exception>
-    protected ZustandStore(TState initialState)
-    {
-        _state = initialState ?? throw new ArgumentNullException(nameof(initialState));
-    }
 
     /// <summary>
     /// Updates the state using the provided mutator function.
     /// The mutator receives the current state and should return a new state (use 'with' expression for records).
     /// </summary>
     /// <param name="mutator">A function that takes current state and returns new state.</param>
+    /// <exception cref="RenderLoopException">
+    /// Thrown when Set() is called during a component's render phase.
+    /// </exception>
     /// <example>
     /// <code>
     /// // For record state:
@@ -68,11 +84,191 @@ public abstract class ZustandStore<TState> : IStore<TState> where TState : class
     /// </example>
     protected void Set(Func<TState, TState> mutator)
     {
+        ThrowIfRendering();
+        EnsureStateInitialized();
+
         lock (_lock)
         {
-            _state = mutator(_state);
+            _state = mutator(_state!);
         }
         OnStateChanged();
+    }
+
+    /// <summary>
+    /// Updates the state to the specified new state, replacing the current state entirely.
+    /// </summary>
+    /// <param name="newState">The new state to set.</param>
+    /// <exception cref="ArgumentNullException">Thrown when newState is null.</exception>
+    /// <exception cref="RenderLoopException">
+    /// Thrown when Set() is called during a component's render phase.
+    /// </exception>
+    /// <example>
+    /// <code>
+    /// // Direct state replacement:
+    /// Set(new CounterState(42));
+    /// </code>
+    /// </example>
+    protected void Set(TState newState)
+    {
+        ArgumentNullException.ThrowIfNull(newState);
+        ThrowIfRendering();
+        EnsureStateInitialized();
+
+        lock (_lock)
+        {
+            _state = newState;
+        }
+        OnStateChanged();
+    }
+
+    /// <summary>
+    /// Asynchronously updates the state using the provided mutator function.
+    /// Handles SynchronizationContext marshalling for background thread safety.
+    /// </summary>
+    /// <param name="mutator">A function that takes current state and returns new state.</param>
+    /// <returns>A task that completes when the state change notification has been processed.</returns>
+    /// <remarks>
+    /// Use this method when updating state from background threads (e.g., from async APIs,
+    /// timers, or Task.Run). It ensures the StateChanged event is raised on the correct
+    /// synchronization context if one is available.
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// public async Task LoadDataAsync()
+    /// {
+    ///     var data = await _api.GetDataAsync();
+    ///     await SetAsync(state => state with { Data = data });
+    /// }
+    /// </code>
+    /// </example>
+    protected async Task SetAsync(Func<TState, TState> mutator)
+    {
+        EnsureStateInitialized();
+        var context = SynchronizationContext.Current;
+
+        lock (_lock)
+        {
+            _state = mutator(_state!);
+        }
+
+        if (context != null)
+        {
+            var tcs = new TaskCompletionSource();
+            context.Post(_ =>
+            {
+                OnStateChanged();
+                tcs.SetResult();
+            }, null);
+            await tcs.Task;
+        }
+        else
+        {
+            OnStateChanged();
+        }
+    }
+
+    /// <summary>
+    /// Asynchronously updates the state to the specified new state.
+    /// Handles SynchronizationContext marshalling for background thread safety.
+    /// </summary>
+    /// <param name="newState">The new state to set.</param>
+    /// <returns>A task that completes when the state change notification has been processed.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when newState is null.</exception>
+    /// <remarks>
+    /// Use this method when updating state from background threads.
+    /// </remarks>
+    protected async Task SetAsync(TState newState)
+    {
+        ArgumentNullException.ThrowIfNull(newState);
+        EnsureStateInitialized();
+        var context = SynchronizationContext.Current;
+
+        lock (_lock)
+        {
+            _state = newState;
+        }
+
+        if (context != null)
+        {
+            var tcs = new TaskCompletionSource();
+            context.Post(_ =>
+            {
+                OnStateChanged();
+                tcs.SetResult();
+            }, null);
+            await tcs.Task;
+        }
+        else
+        {
+            OnStateChanged();
+        }
+    }
+
+    /// <summary>
+    /// Override this method to perform async initialization when the store is first resolved.
+    /// </summary>
+    /// <returns>A task representing the initialization operation.</returns>
+    /// <remarks>
+    /// <para>
+    /// This method is called automatically when the store is first resolved from DI.
+    /// Use it to load initial data from APIs, databases, or other async sources.
+    /// </para>
+    /// <para>
+    /// The store's <see cref="InitialState"/> is available immediately, even before
+    /// this method completes. This allows components to render with initial state
+    /// while async initialization happens in the background.
+    /// </para>
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// protected override async Task InitializeAsync()
+    /// {
+    ///     var data = await _api.GetInitialDataAsync();
+    ///     Set(state => state with { Data = data, IsLoaded = true });
+    /// }
+    /// </code>
+    /// </example>
+    protected virtual Task InitializeAsync() => Task.CompletedTask;
+
+    /// <summary>
+    /// Ensures the store is initialized. Called by DI activation.
+    /// </summary>
+    /// <returns>A task that completes when initialization is done.</returns>
+    internal async Task EnsureInitializedAsync()
+    {
+        if (_isInitialized || _isInitializing)
+        {
+            return;
+        }
+
+        _isInitializing = true;
+        try
+        {
+            await InitializeAsync();
+            _isInitialized = true;
+        }
+        finally
+        {
+            _isInitializing = false;
+        }
+    }
+
+    /// <summary>
+    /// Marks the beginning of a component render phase.
+    /// Called by component base classes before StateHasChanged.
+    /// </summary>
+    internal void BeginRender()
+    {
+        _isRendering = true;
+    }
+
+    /// <summary>
+    /// Marks the end of a component render phase.
+    /// Called by component base classes after StateHasChanged.
+    /// </summary>
+    internal void EndRender()
+    {
+        _isRendering = false;
     }
 
     /// <summary>
@@ -80,7 +276,7 @@ public abstract class ZustandStore<TState> : IStore<TState> where TState : class
     /// </summary>
     /// <remarks>
     /// <para>
-    /// This method is called automatically after each <see cref="Set"/> call.
+    /// This method is called automatically after each <see cref="Set(Func{TState, TState})"/> call.
     /// Override to add custom behavior such as logging or validation.
     /// </para>
     /// <para>
@@ -92,5 +288,33 @@ public abstract class ZustandStore<TState> : IStore<TState> where TState : class
     protected virtual void OnStateChanged()
     {
         StateChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+    private void EnsureStateInitialized()
+    {
+        if (_stateInitialized)
+        {
+            return;
+        }
+
+        lock (_lock)
+        {
+            if (_stateInitialized)
+            {
+                return;
+            }
+
+            _state = InitialState ?? throw new InvalidOperationException(
+                $"InitialState property of {GetType().Name} cannot return null.");
+            _stateInitialized = true;
+        }
+    }
+
+    private void ThrowIfRendering()
+    {
+        if (_isRendering)
+        {
+            throw new RenderLoopException(GetType());
+        }
     }
 }
