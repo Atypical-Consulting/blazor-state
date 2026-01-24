@@ -199,20 +199,37 @@ public sealed class DevToolsStore : IDevToolsStore
         _isTimeTraveling = true;
         try
         {
-            // Use reflection to call internal SetRestoredState method
-            var setMethod = store.GetType().GetMethod(
-                "SetRestoredState",
-                BindingFlags.Instance | BindingFlags.NonPublic);
+            // Use reflection to directly set the _state field in ZustandStore base class.
+            // SetRestoredState has an early-exit check (_stateInitialized) that prevents
+            // it from working for time-travel, so we access the field directly.
+            var storeType = store.GetType();
 
-            setMethod?.Invoke(store, new[] { snapshot.State });
+            // Walk up to find ZustandStore<T> base type
+            var baseType = storeType.BaseType;
+            while (baseType != null && (!baseType.IsGenericType ||
+                   baseType.GetGenericTypeDefinition() != typeof(ZustandStore<>)))
+            {
+                baseType = baseType.BaseType;
+            }
 
-            // Trigger StateChanged notification on the store
-            // Note: NonPublic flag covers both private and protected members
-            var onChangedMethod = store.GetType().GetMethod(
-                "OnStateChanged",
-                BindingFlags.Instance | BindingFlags.NonPublic);
+            if (baseType == null)
+            {
+                return;
+            }
 
-            onChangedMethod?.Invoke(store, null);
+            // Get the private _state field from ZustandStore<TState>
+            var stateField = baseType.GetField("_state", BindingFlags.Instance | BindingFlags.NonPublic);
+            if (stateField != null)
+            {
+                stateField.SetValue(store, snapshot.State);
+
+                // Trigger OnStateChanged to notify subscribers
+                var onChangedMethod = storeType.GetMethod(
+                    "OnStateChanged",
+                    BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy);
+
+                onChangedMethod?.Invoke(store, null);
+            }
         }
         finally
         {
@@ -223,6 +240,12 @@ public sealed class DevToolsStore : IDevToolsStore
 
         // Notify subscribers
         StateHistoryChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+    /// <inheritdoc />
+    public int GetCurrentIndex(string storeName)
+    {
+        return _currentIndex.TryGetValue(storeName, out var index) ? index : -1;
     }
 
     /// <summary>

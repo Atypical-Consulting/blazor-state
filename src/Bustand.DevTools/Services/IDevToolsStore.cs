@@ -123,4 +123,17 @@ public interface IDevToolsStore
     /// </para>
     /// </remarks>
     void JumpToState(string storeName, int index);
+
+    /// <summary>
+    /// Gets the current time-travel position (index) for the specified store.
+    /// </summary>
+    /// <param name="storeName">The name of the store.</param>
+    /// <returns>
+    /// The current index in the history, or -1 if the store has no history.
+    /// </returns>
+    /// <remarks>
+    /// This value changes when <see cref="JumpToState"/> is called or when new state changes
+    /// are recorded. It always points to the most recent entry unless time-travel is active.
+    /// </remarks>
+    int GetCurrentIndex(string storeName);
 }
