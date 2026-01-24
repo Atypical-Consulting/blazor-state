@@ -9,5 +9,5 @@ public record SingletonState(string Config = "default");
 [BustandStore(ServiceLifetime.Singleton)]
 public class SingletonStore : ZustandStore<SingletonState>
 {
-    public SingletonStore() : base(new SingletonState()) { }
+    protected override SingletonState InitialState => new SingletonState();
 }

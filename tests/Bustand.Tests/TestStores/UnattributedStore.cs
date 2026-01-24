@@ -7,5 +7,5 @@ public record UnattributedState(string Value = "");
 
 public class UnattributedStore : ZustandStore<UnattributedState>
 {
-    public UnattributedStore() : base(new UnattributedState()) { }
+    protected override UnattributedState InitialState => new UnattributedState();
 }

@@ -12,7 +12,7 @@ public record ScopedState(int Value = 0);
 [BustandStore(ServiceLifetime.Scoped)]
 public class ExplicitScopedStore : ZustandStore<ScopedState>
 {
-    public ExplicitScopedStore() : base(new ScopedState()) { }
+    protected override ScopedState InitialState => new ScopedState();
 }
 
 public record TransientState(int Value = 0);
@@ -20,7 +20,7 @@ public record TransientState(int Value = 0);
 [BustandStore(ServiceLifetime.Transient)]
 public class ExplicitTransientStore : ZustandStore<TransientState>
 {
-    public ExplicitTransientStore() : base(new TransientState()) { }
+    protected override TransientState InitialState => new TransientState();
 }
 
 /// <summary>
