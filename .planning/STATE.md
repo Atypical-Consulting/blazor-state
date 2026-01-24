@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Phase: 5 of 6 (DevTools)
-Plan: 4 of 8 in current phase
+Plan: 5 of 8 in current phase
 Status: In progress
-Last activity: 2026-01-24 - Completed 05-04-PLAN.md (State Inspector Panel)
+Last activity: 2026-01-24 - Completed 05-05-PLAN.md (Action History Panel)
 
-Progress: [████████░░] 83% (20/24 plans)
+Progress: [████████░░] 88% (21/24 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 20
-- Average duration: 2.6 min
-- Total execution time: 52.7 min
+- Total plans completed: 21
+- Average duration: 2.7 min
+- Total execution time: 56.7 min
 
 **By Phase:**
 
@@ -31,10 +31,10 @@ Progress: [████████░░] 83% (20/24 plans)
 | 02-core-store | 4 | 13.7 min | 3.4 min |
 | 03-middleware-dx | 4 | 8 min | 2 min |
 | 04-persistence | 5 | 15 min | 3 min |
-| 05-devtools | 4 | 10 min | 2.5 min |
+| 05-devtools | 5 | 14 min | 2.8 min |
 
 **Recent Trend:**
-- Last 5 plans: 04-04 (5 min), 05-01 (3 min), 05-02 (2 min), 05-03 (2 min), 05-04 (3 min)
+- Last 5 plans: 05-01 (3 min), 05-02 (2 min), 05-03 (2 min), 05-04 (3 min), 05-05 (4 min)
 
 *Updated after each plan completion*
 
@@ -106,6 +106,9 @@ Recent decisions affecting current work:
 - [05-04]: Depth < 1 for default expansion (top-level expanded, nested collapsed)
 - [05-04]: MarkupString for HTML entity icons in export buttons
 - [05-04]: JsonDocument.Parse with Clone() for long-lived JsonElement
+- [05-05]: Direct field access via reflection for time-travel (SetRestoredState has early-exit check)
+- [05-05]: Walk inheritance chain to find ZustandStore<T> base type for field access
+- [05-05]: Newest-first ordering using LINQ Reverse() for history display
 
 ### Pending Todos
 
@@ -117,6 +120,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-01-24T21:08:00Z
-Stopped at: Completed 05-04-PLAN.md (State Inspector Panel)
+Last session: 2026-01-24T21:02:42Z
+Stopped at: Completed 05-05-PLAN.md (Action History Panel)
 Resume file: None
