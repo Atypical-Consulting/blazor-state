@@ -1,10 +1,12 @@
 using System.Reflection;
 using Bustand.Attributes;
+using Bustand.Blazor;
 using Bustand.Configuration;
 using Bustand.Core;
 using Bustand.Detection;
 using Bustand.Middleware;
 using Bustand.Persistence;
+using Microsoft.AspNetCore.Components.Server.Circuits;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.JSInterop;
@@ -236,6 +238,11 @@ public static class ServiceCollectionExtensions
             var jsRuntime = sp.GetRequiredService<IJSRuntime>();
             return new BrowserStorageService(jsRuntime, options.JsonSerializerOptions);
         });
+
+        // Register circuit handler for Blazor Server reconnect handling
+        // Note: In WASM, CircuitHandler services are never resolved, so this registration
+        // is harmless but unused. In Server mode, this enables reconnect detection.
+        services.TryAddScoped<CircuitHandler, BustandCircuitHandler>();
     }
 
     private static object CreateStoreWithPipeline(

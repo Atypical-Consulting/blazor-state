@@ -13,10 +13,14 @@
     <SupportedPlatform Include="browser" />
   </ItemGroup>
 
+  <!-- Reference ASP.NET Core shared framework for CircuitHandler support -->
+  <!-- This provides Components.Web, Logging, and Server-specific types -->
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="CompareNETObjects" Version="4.84.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="10.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.0" />
     <PackageReference Include="Scrutor" Version="7.0.0" />
   </ItemGroup>
 
