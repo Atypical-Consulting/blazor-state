@@ -104,10 +104,17 @@ Plans:
   3. DevTools page shows history of state changes with timestamps
   4. Developer can click a previous state to rewind (time-travel) and see app update
   5. DevTools page shows diff between consecutive states highlighting what changed
-**Plans**: TBD
+**Plans**: 8 plans
 
 Plans:
-- [ ] 05-01: TBD
+- [ ] 05-01-PLAN.md - DevToolsStore core, StateSnapshot model, IDevToolsStore interface
+- [ ] 05-02-PLAN.md - DevToolsMiddleware and DI integration with environment protection
+- [ ] 05-03-PLAN.md - DevTools page layout, sidebar, tab bar, dark theme CSS
+- [ ] 05-04-PLAN.md - StateTreeView recursive component and export features
+- [ ] 05-05-PLAN.md - ActionHistoryPanel with time-travel implementation
+- [ ] 05-06-PLAN.md - DiffViewerPanel with side-by-side comparison
+- [ ] 05-07-PLAN.md - Complete middleware wiring and store registration
+- [ ] 05-08-PLAN.md - Tests and human verification of complete DevTools
 
 ### Phase 6: Distribution
 **Goal**: Bustand is installable from NuGet with documentation and working sample app
@@ -135,5 +142,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | 2. Core Store | 4/4 | Complete | 2026-01-24 |
 | 3. Middleware & DX | 4/4 | Complete | 2026-01-24 |
 | 4. Persistence | 5/5 | Complete | 2026-01-24 |
-| 5. DevTools | 0/TBD | Not started | - |
+| 5. DevTools | 0/8 | Planned | - |
 | 6. Distribution | 0/TBD | Not started | - |
