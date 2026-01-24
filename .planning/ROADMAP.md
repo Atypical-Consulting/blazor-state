@@ -52,10 +52,10 @@ Plans:
 **Plans**: 4 plans
 
 Plans:
-- [ ] 02-01-PLAN.md - Enhanced store API (Set overloads, SetAsync, InitialState, render loop detection)
-- [ ] 02-02-PLAN.md - Subscription system with selector-based change detection
-- [ ] 02-03-PLAN.md - Component integration (ZustandComponent, ZustandScope, UseState)
-- [ ] 02-04-PLAN.md - Comprehensive test suite for Phase 2 requirements
+- [x] 02-01-PLAN.md - Enhanced store API (Set overloads, SetAsync, InitialState, render loop detection)
+- [x] 02-02-PLAN.md - Subscription system with selector-based change detection
+- [x] 02-03-PLAN.md - Component integration (ZustandComponent, ZustandScope, UseState)
+- [x] 02-04-PLAN.md - Comprehensive test suite for Phase 2 requirements
 
 ### Phase 3: Middleware & DX
 **Goal**: Developers can extend store behavior via middleware pipeline and auto-discover stores without registration boilerplate
@@ -67,10 +67,13 @@ Plans:
   3. Logging middleware logs state changes to console with old/new state
   4. Developer can call AddBustand() and all stores in assembly are registered automatically
   5. Auto-discovery works without any manual store registration code
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 03-01: TBD
+- [ ] 03-01-PLAN.md - Middleware infrastructure (IMiddleware, MiddlewareContext, MiddlewarePipeline)
+- [ ] 03-02-PLAN.md - Store integration and registration API (ZustandStore hooks, BustandOptions.UseMiddleware)
+- [ ] 03-03-PLAN.md - Logging middleware with CompareNETObjects diffing
+- [ ] 03-04-PLAN.md - Comprehensive test suite for middleware pipeline (TEST-03)
 
 ### Phase 4: Persistence
 **Goal**: Store state persists across page reloads and circuit reconnects
@@ -126,7 +129,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 |-------|----------------|--------|-----------|
 | 1. Foundation | 3/3 | Complete | 2026-01-24 |
 | 2. Core Store | 4/4 | Complete | 2026-01-24 |
-| 3. Middleware & DX | 0/TBD | Not started | - |
+| 3. Middleware & DX | 0/4 | Not started | - |
 | 4. Persistence | 0/TBD | Not started | - |
 | 5. DevTools | 0/TBD | Not started | - |
 | 6. Distribution | 0/TBD | Not started | - |
