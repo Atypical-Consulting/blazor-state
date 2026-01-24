@@ -5,34 +5,34 @@
 See: .planning/PROJECT.md (updated 2026-01-24)
 
 **Core value:** Minimal boilerplate state management with exceptional debugging experience
-**Current focus:** Phase 2: Core Store (Wave 3 complete)
+**Current focus:** Phase 2: Core Store (Complete)
 
 ## Current Position
 
 Phase: 2 of 6 (Core Store)
-Plan: 3 of 4 in current phase
-Status: In progress
-Last activity: 2026-01-24 - Completed 02-03-PLAN.md (Component Integration)
+Plan: 4 of 4 in current phase
+Status: Phase complete
+Last activity: 2026-01-24 - Completed 02-04-PLAN.md (Phase 2 Test Suite)
 
-Progress: [█████████░] 90%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 6
-- Average duration: 2.5 min
-- Total execution time: 14.7 min
+- Total plans completed: 7
+- Average duration: 2.8 min
+- Total execution time: 21.7 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-foundation | 3 | 8 min | 2.7 min |
-| 02-core-store | 3 | 6.7 min | 2.2 min |
+| 02-core-store | 4 | 13.7 min | 3.4 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-03 (3 min), 02-01 (2.5 min), 02-02 (2.2 min), 02-03 (2 min)
-- Trend: Improving
+- Last 5 plans: 02-01 (2.5 min), 02-02 (2.2 min), 02-03 (2 min), 02-04 (7 min)
+- Note: 02-04 longer due to comprehensive test suite creation
 
 *Updated after each plan completion*
 
@@ -60,6 +60,9 @@ Recent decisions affecting current work:
 - [02-02]: Unsubscribe() method on ISubscription for semantic clarity
 - [02-03]: Two component base classes: ZustandComponent (DI) and ZustandComponentScoped (CascadingParameter)
 - [02-03]: UseStateResult<T> struct with implicit T conversion for ergonomic usage
+- [02-04]: Reference equality for value types always triggers notifications due to boxing
+- [02-04]: Store method invocation in bUnit tests for reliable event testing
+- [02-04]: Switched test project to Microsoft.NET.Sdk.Razor for component compilation
 
 ### Pending Todos
 
@@ -71,6 +74,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-01-24T12:29:46Z
-Stopped at: Completed 02-03-PLAN.md
+Last session: 2026-01-24T12:39:14Z
+Stopped at: Completed 02-04-PLAN.md
 Resume file: None
