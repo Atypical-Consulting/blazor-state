@@ -13,7 +13,7 @@ Bustand delivers Zustand-inspired state management for Blazor in six phases, sta
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation** - Project scaffolding, multi-mode architecture, DI integration
-- [ ] **Phase 2: Core Store** - ZustandStore base class, subscriptions, selectors, component integration
+- [x] **Phase 2: Core Store** - ZustandStore base class, subscriptions, selectors, component integration
 - [ ] **Phase 3: Middleware & DX** - Middleware pipeline, auto-discovery, logging middleware
 - [ ] **Phase 4: Persistence** - Persistence middleware for LocalStorage/SessionStorage
 - [ ] **Phase 5: DevTools** - DevTools page with state inspector, action log, time-travel, diff view
@@ -125,7 +125,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 3/3 | Complete | 2026-01-24 |
-| 2. Core Store | 0/4 | Not started | - |
+| 2. Core Store | 4/4 | Complete | 2026-01-24 |
 | 3. Middleware & DX | 0/TBD | Not started | - |
 | 4. Persistence | 0/TBD | Not started | - |
 | 5. DevTools | 0/TBD | Not started | - |
