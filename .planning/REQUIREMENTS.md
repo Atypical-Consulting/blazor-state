@@ -34,7 +34,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **MODE-01**: Store works in Blazor Server mode
 - [ ] **MODE-02**: Store works in Blazor WebAssembly mode
 - [ ] **MODE-03**: Store works in Static SSR mode (with limitations)
-- [ ] **MODE-04**: Store works in Interactive Auto mode (Server → WASM transition)
+- [ ] **MODE-04**: Store works in Interactive Auto mode (Server -> WASM transition)
 - [ ] **MODE-05**: State updates respect Blazor synchronization context (no threading errors)
 - [ ] **MODE-06**: Store handles prerendering without state mismatch
 - [ ] **MODE-07**: Library components never specify @rendermode (mode-agnostic)
@@ -149,13 +149,83 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| (To be filled by roadmapper) | | |
+| CORE-01 | Phase 2 | Pending |
+| CORE-02 | Phase 2 | Pending |
+| CORE-03 | Phase 2 | Pending |
+| CORE-04 | Phase 2 | Pending |
+| CORE-05 | Phase 2 | Pending |
+| CORE-06 | Phase 2 | Pending |
+| CORE-07 | Phase 2 | Pending |
+| CORE-08 | Phase 2 | Pending |
+| COMP-01 | Phase 2 | Pending |
+| COMP-02 | Phase 2 | Pending |
+| COMP-03 | Phase 2 | Pending |
+| COMP-04 | Phase 2 | Pending |
+| COMP-05 | Phase 2 | Pending |
+| COMP-06 | Phase 2 | Pending |
+| COMP-07 | Phase 2 | Pending |
+| COMP-08 | Phase 2 | Pending |
+| MODE-01 | Phase 1 | Pending |
+| MODE-02 | Phase 1 | Pending |
+| MODE-03 | Phase 1 | Pending |
+| MODE-04 | Phase 1 | Pending |
+| MODE-05 | Phase 1 | Pending |
+| MODE-06 | Phase 1 | Pending |
+| MODE-07 | Phase 1 | Pending |
+| MIDL-01 | Phase 3 | Pending |
+| MIDL-02 | Phase 3 | Pending |
+| MIDL-03 | Phase 3 | Pending |
+| MIDL-04 | Phase 3 | Pending |
+| MIDL-05 | Phase 3 | Pending |
+| MIDL-06 | Phase 3 | Pending |
+| MIDL-07 | Phase 4 | Pending |
+| MIDL-08 | Phase 4 | Pending |
+| MIDL-09 | Phase 5 | Pending |
+| DISC-01 | Phase 3 | Pending |
+| DISC-02 | Phase 3 | Pending |
+| DISC-03 | Phase 3 | Pending |
+| DISC-04 | Phase 3 | Pending |
+| DISC-05 | Phase 3 | Pending |
+| PERS-01 | Phase 4 | Pending |
+| PERS-02 | Phase 4 | Pending |
+| PERS-03 | Phase 4 | Pending |
+| PERS-04 | Phase 4 | Pending |
+| PERS-05 | Phase 4 | Pending |
+| PERS-06 | Phase 4 | Pending |
+| DEVO-01 | Phase 5 | Pending |
+| DEVO-02 | Phase 5 | Pending |
+| DEVO-03 | Phase 5 | Pending |
+| DEVO-04 | Phase 5 | Pending |
+| DEVO-05 | Phase 5 | Pending |
+| DEVO-06 | Phase 5 | Pending |
+| DEVO-07 | Phase 5 | Pending |
+| DEVO-08 | Phase 5 | Pending |
+| DEVO-09 | Phase 5 | Pending |
+| DEVO-10 | Phase 5 | Pending |
+| DEVO-11 | Phase 5 | Pending |
+| DEVO-12 | Phase 5 | Pending |
+| DEVO-13 | Phase 5 | Pending |
+| DEVO-14 | Phase 5 | Pending |
+| DIST-01 | Phase 6 | Pending |
+| DIST-02 | Phase 6 | Pending |
+| DIST-03 | Phase 6 | Pending |
+| DIST-04 | Phase 6 | Pending |
+| DIST-05 | Phase 6 | Pending |
+| DIST-06 | Phase 6 | Pending |
+| DIST-07 | Phase 6 | Pending |
+| DIST-08 | Phase 6 | Pending |
+| DIST-09 | Phase 6 | Pending |
+| TEST-01 | Phase 2 | Pending |
+| TEST-02 | Phase 2 | Pending |
+| TEST-03 | Phase 3 | Pending |
+| TEST-04 | Phase 6 | Pending |
+| TEST-05 | Phase 6 | Pending |
 
 **Coverage:**
-- v1 requirements: 60 total
-- Mapped to phases: 0
-- Unmapped: 60 ⚠️
+- v1 requirements: 71 total
+- Mapped to phases: 71
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-01-24*
-*Last updated: 2026-01-24 after initial definition*
+*Last updated: 2026-01-24 after roadmap creation*
