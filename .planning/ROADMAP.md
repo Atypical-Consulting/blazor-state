@@ -26,15 +26,17 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Depends on**: Nothing (first phase)
 **Requirements**: MODE-01, MODE-02, MODE-03, MODE-04, MODE-05, MODE-06, MODE-07
 **Success Criteria** (what must be TRUE):
-  1. Project compiles and targets both .NET 8 and .NET 10
+  1. Project compiles and targets .NET 10
   2. Store can be registered in DI container with configurable lifetime
   3. Store instance can be resolved in Blazor Server mode without errors
   4. Store instance can be resolved in Blazor WebAssembly mode without errors
   5. Store instance can be resolved in Static SSR mode without errors
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 01-01: TBD
+- [ ] 01-01-PLAN.md - Solution scaffolding and core ZustandStore base class
+- [ ] 01-02-PLAN.md - DI registration with attribute-based discovery and mode-aware lifetimes
+- [ ] 01-03-PLAN.md - Test project, core tests, and DevTools shell
 
 ### Phase 2: Core Store
 **Goal**: Developers can create stores, update state immutably, and components automatically re-render on changes
@@ -118,7 +120,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/TBD | Not started | - |
+| 1. Foundation | 0/3 | Planned | - |
 | 2. Core Store | 0/TBD | Not started | - |
 | 3. Middleware & DX | 0/TBD | Not started | - |
 | 4. Persistence | 0/TBD | Not started | - |
