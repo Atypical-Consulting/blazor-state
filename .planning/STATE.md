@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Phase: 4 of 6 (Persistence)
-Plan: 2 of 5 in current phase
+Plan: 3 of 5 in current phase
 Status: In progress
-Last activity: 2026-01-24 - Completed 04-02-PLAN.md (Persistence Middleware)
+Last activity: 2026-01-24 - Completed 04-03-PLAN.md (DI Integration)
 
-Progress: [████████░░] 81%
+Progress: [████████░░] 85%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 13
+- Total plans completed: 14
 - Average duration: 2.5 min
-- Total execution time: 33.7 min
+- Total execution time: 35.7 min
 
 **By Phase:**
 
@@ -30,10 +30,10 @@ Progress: [████████░░] 81%
 | 01-foundation | 3 | 8 min | 2.7 min |
 | 02-core-store | 4 | 13.7 min | 3.4 min |
 | 03-middleware-dx | 4 | 8 min | 2 min |
-| 04-persistence | 2 | 4 min | 2 min |
+| 04-persistence | 3 | 6 min | 2 min |
 
 **Recent Trend:**
-- Last 5 plans: 03-02 (2 min), 03-03 (2 min), 03-04 (2 min), 04-01 (2 min), 04-02 (2 min)
+- Last 5 plans: 03-03 (2 min), 03-04 (2 min), 04-01 (2 min), 04-02 (2 min), 04-03 (2 min)
 - Note: Phase 4 continues with consistent 2-min plan execution
 
 *Updated after each plan completion*
@@ -84,6 +84,9 @@ Recent decisions affecting current work:
 - [04-02]: Timer-based debouncing with lock for thread safety
 - [04-02]: Dispose does NOT flush - caller must call FlushAsync if data loss matters
 - [04-02]: OnBeforeChange always true - persistence middleware never blocks state changes
+- [04-03]: IBrowserStorage registered as Scoped (one per circuit/user)
+- [04-03]: State restoration in DI factory via reflection (can't await, uses synchronous check)
+- [04-03]: BustandInitializer component triggers SetAvailable() on first render
 
 ### Pending Todos
 
@@ -95,6 +98,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-01-24T19:22:00Z
-Stopped at: Completed 04-02-PLAN.md
+Last session: 2026-01-24T19:25:00Z
+Stopped at: Completed 04-03-PLAN.md
 Resume file: None
