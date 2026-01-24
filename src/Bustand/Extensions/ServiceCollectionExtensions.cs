@@ -3,7 +3,9 @@ using Bustand.Attributes;
 using Bustand.Configuration;
 using Bustand.Core;
 using Bustand.Detection;
+using Bustand.Middleware;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Bustand.Extensions;
 
@@ -71,6 +73,12 @@ public static class ServiceCollectionExtensions
         // Post-process to apply per-store lifetime overrides
         ApplyPerStoreLifetimeOverrides(services, assemblies, defaultLifetime, options.WarnOnSingletonInServerMode);
 
+        // Register middleware types and wire pipelines
+        if (options.MiddlewareTypes.Count > 0)
+        {
+            RegisterMiddlewareAndPipelines(services, assemblies, options.MiddlewareTypes);
+        }
+
         return services;
     }
 
@@ -114,6 +122,118 @@ public static class ServiceCollectionExtensions
                 services.Add(new ServiceDescriptor(store.Type, store.Type, explicitLifetime));
             }
         }
+    }
+
+    private static void RegisterMiddlewareAndPipelines(
+        IServiceCollection services,
+        IEnumerable<Assembly> assemblies,
+        List<Type> middlewareTypes)
+    {
+        // Register each middleware type as transient
+        foreach (var middlewareType in middlewareTypes)
+        {
+            // For open generic types like LoggingMiddleware<>, we need to register per-state-type
+            // For closed types, register directly
+            if (!middlewareType.IsGenericTypeDefinition)
+            {
+                services.TryAddTransient(middlewareType);
+            }
+            // Open generics will be closed and registered per-store below
+        }
+
+        // Find all store types to wrap their registrations with pipeline injection
+        var storeTypes = services
+            .Where(d => typeof(IStore).IsAssignableFrom(d.ServiceType) && d.ServiceType.IsClass)
+            .Select(d => d.ServiceType)
+            .ToList();
+
+        foreach (var storeType in storeTypes)
+        {
+            var descriptor = services.First(d => d.ServiceType == storeType);
+            services.Remove(descriptor);
+
+            // Get the state type from the store's base class
+            var stateType = GetStoreStateType(storeType);
+            if (stateType == null)
+                continue;
+
+            // Register closed middleware types for this state type
+            foreach (var middlewareType in middlewareTypes)
+            {
+                if (middlewareType.IsGenericTypeDefinition)
+                {
+                    var closedType = middlewareType.MakeGenericType(stateType);
+                    services.TryAddTransient(closedType);
+                }
+            }
+
+            // Re-register store with a factory that injects the pipeline
+            var middlewareTypesCopy = middlewareTypes.ToList(); // Capture for closure
+            services.Add(new ServiceDescriptor(
+                storeType,
+                sp =>
+                {
+                    var store = ActivatorUtilities.CreateInstance(sp, storeType);
+                    InjectPipeline(store, sp, middlewareTypesCopy, stateType);
+                    return store;
+                },
+                descriptor.Lifetime));
+        }
+    }
+
+    private static Type? GetStoreStateType(Type storeType)
+    {
+        // Walk up the type hierarchy to find ZustandStore<TState>
+        var baseType = storeType.BaseType;
+        while (baseType != null)
+        {
+            if (baseType.IsGenericType &&
+                baseType.GetGenericTypeDefinition() == typeof(ZustandStore<>))
+            {
+                return baseType.GetGenericArguments()[0];
+            }
+            baseType = baseType.BaseType;
+        }
+        return null;
+    }
+
+    private static void InjectPipeline(
+        object store,
+        IServiceProvider sp,
+        List<Type> middlewareTypes,
+        Type stateType)
+    {
+        // Build middleware list
+        var middlewareInterfaceType = typeof(IMiddleware<>).MakeGenericType(stateType);
+        var middlewareListType = typeof(List<>).MakeGenericType(middlewareInterfaceType);
+        var middlewares = (System.Collections.IList)Activator.CreateInstance(middlewareListType)!;
+
+        foreach (var mwType in middlewareTypes)
+        {
+            var concreteType = mwType.IsGenericTypeDefinition
+                ? mwType.MakeGenericType(stateType)
+                : mwType;
+
+            // Check if this middleware implements IMiddleware<TState>
+            if (!middlewareInterfaceType.IsAssignableFrom(concreteType))
+                continue;
+
+            var middleware = sp.GetService(concreteType);
+            if (middleware != null)
+            {
+                middlewares.Add(middleware);
+            }
+        }
+
+        // Create the pipeline
+        var pipelineType = typeof(MiddlewarePipeline<>).MakeGenericType(stateType);
+        var pipeline = Activator.CreateInstance(pipelineType, middlewares);
+
+        // Call SetPipeline via reflection
+        var setPipelineMethod = store.GetType().GetMethod(
+            "SetPipeline",
+            BindingFlags.Instance | BindingFlags.NonPublic);
+        setPipelineMethod?.Invoke(store, new[] { pipeline });
     }
 
     /// <summary>
