@@ -4,6 +4,11 @@
     <RootNamespace>Bustand</RootNamespace>
   </PropertyGroup>
 
+  <!-- Allow test project to access internal members -->
+  <ItemGroup>
+    <InternalsVisibleTo Include="Bustand.Tests" />
+  </ItemGroup>
+
   <ItemGroup>
     <SupportedPlatform Include="browser" />
   </ItemGroup>
