@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Foundation** - Project scaffolding, multi-mode architecture, DI integration
 - [x] **Phase 2: Core Store** - ZustandStore base class, subscriptions, selectors, component integration
 - [x] **Phase 3: Middleware & DX** - Middleware pipeline, auto-discovery, logging middleware
-- [ ] **Phase 4: Persistence** - Persistence middleware for LocalStorage/SessionStorage
+- [x] **Phase 4: Persistence** - Persistence middleware for LocalStorage/SessionStorage
 - [ ] **Phase 5: DevTools** - DevTools page with state inspector, action log, time-travel, diff view
 - [ ] **Phase 6: Distribution** - NuGet packaging, sample app, documentation
 
@@ -85,13 +85,14 @@ Plans:
   3. Store state persists to SessionStorage and survives page reload (WASM)
   4. Store state restores on Blazor Server circuit reconnect
   5. Developer can configure storage key prefix for namespacing
-**Plans**: 4 plans
+**Plans**: 5 plans
 
 Plans:
-- [ ] 04-01-PLAN.md - Storage abstraction (PersistAttribute, StorageType, IBrowserStorage, BrowserStorageService)
-- [ ] 04-02-PLAN.md - PersistenceMiddleware with debounced writes (DebouncedWriter)
-- [ ] 04-03-PLAN.md - DI integration and state restoration (ServiceCollectionExtensions, ZustandStore hooks)
-- [ ] 04-04-PLAN.md - Comprehensive test suite for persistence functionality
+- [x] 04-01-PLAN.md - Storage abstraction (PersistAttribute, StorageType, IBrowserStorage, BrowserStorageService)
+- [x] 04-02-PLAN.md - PersistenceMiddleware with debounced writes (DebouncedWriter)
+- [x] 04-03-PLAN.md - DI integration and state restoration (ServiceCollectionExtensions, ZustandStore hooks, BustandInitializer)
+- [x] 04-05-PLAN.md - Circuit reconnect handling (BustandCircuitHandler for Blazor Server)
+- [x] 04-04-PLAN.md - Comprehensive test suite for persistence functionality
 
 ### Phase 5: DevTools
 **Goal**: Developers can inspect, debug, and time-travel through state changes via built-in DevTools page
@@ -133,6 +134,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | 1. Foundation | 3/3 | Complete | 2026-01-24 |
 | 2. Core Store | 4/4 | Complete | 2026-01-24 |
 | 3. Middleware & DX | 4/4 | Complete | 2026-01-24 |
-| 4. Persistence | 0/4 | Not started | - |
+| 4. Persistence | 5/5 | Complete | 2026-01-24 |
 | 5. DevTools | 0/TBD | Not started | - |
 | 6. Distribution | 0/TBD | Not started | - |

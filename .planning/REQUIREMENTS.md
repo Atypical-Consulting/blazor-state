@@ -178,20 +178,20 @@ Which phases cover which requirements. Updated during roadmap creation.
 | MIDL-04 | Phase 3 | Pending |
 | MIDL-05 | Phase 3 | Pending |
 | MIDL-06 | Phase 3 | Pending |
-| MIDL-07 | Phase 4 | Pending |
-| MIDL-08 | Phase 4 | Pending |
+| MIDL-07 | Complete | 4 |
+| MIDL-08 | Complete | 4 |
 | MIDL-09 | Phase 5 | Pending |
 | DISC-01 | Phase 3 | Pending |
 | DISC-02 | Phase 3 | Pending |
 | DISC-03 | Phase 3 | Pending |
 | DISC-04 | Phase 3 | Pending |
 | DISC-05 | Phase 3 | Pending |
-| PERS-01 | Phase 4 | Pending |
-| PERS-02 | Phase 4 | Pending |
-| PERS-03 | Phase 4 | Pending |
-| PERS-04 | Phase 4 | Pending |
-| PERS-05 | Phase 4 | Pending |
-| PERS-06 | Phase 4 | Pending |
+| PERS-01 | Complete | 4 |
+| PERS-02 | Complete | 4 |
+| PERS-03 | Complete | 4 |
+| PERS-04 | Complete | 4 |
+| PERS-05 | Complete | 4 |
+| PERS-06 | Complete | 4 |
 | DEVO-01 | Phase 5 | Pending |
 | DEVO-02 | Phase 5 | Pending |
 | DEVO-03 | Phase 5 | Pending |
