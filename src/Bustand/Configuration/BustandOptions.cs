@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Bustand.Configuration;
@@ -30,6 +31,47 @@ public class BustandOptions
     /// Middleware types to apply to all stores, in registration order.
     /// </summary>
     internal List<Type> MiddlewareTypes { get; } = new();
+
+    /// <summary>
+    /// Prefix for all storage keys.
+    /// Default: "Bustand"
+    /// Example: With prefix "MyApp", key becomes "MyApp.CounterStore"
+    /// </summary>
+    /// <remarks>
+    /// Use a unique prefix per application to prevent key collisions when
+    /// multiple apps share the same origin.
+    /// </remarks>
+    public string StorageKeyPrefix { get; set; } = "Bustand";
+
+    /// <summary>
+    /// JSON serialization options for state persistence.
+    /// Default: camelCase naming, ignore null values.
+    /// </summary>
+    /// <remarks>
+    /// Customize to match your state serialization needs. Ensure options
+    /// are consistent between persist and restore operations.
+    /// </remarks>
+    public JsonSerializerOptions JsonSerializerOptions { get; set; } = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
+    };
+
+    /// <summary>
+    /// Debounce delay for persistence writes in milliseconds.
+    /// Default: 300ms
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// State changes within this window are batched into a single write.
+    /// This reduces storage I/O for rapid state updates.
+    /// </para>
+    /// <para>
+    /// Lower values: More responsive persistence, more I/O.
+    /// Higher values: Less I/O, risk of losing more recent changes on crash.
+    /// </para>
+    /// </remarks>
+    public int PersistenceDebounceMs { get; set; } = 300;
 
     /// <summary>
     /// Adds the assembly containing the specified type to the scan list.
@@ -82,5 +124,19 @@ public class BustandOptions
     {
         MiddlewareTypes.Add(typeof(TMiddleware));
         return this;
+    }
+
+    /// <summary>
+    /// Builds the full storage key for a store type.
+    /// </summary>
+    /// <param name="storeType">The store type.</param>
+    /// <param name="customKey">Optional custom key from PersistAttribute.</param>
+    /// <returns>The full storage key with prefix.</returns>
+    internal string BuildStorageKey(Type storeType, string? customKey)
+    {
+        var key = customKey ?? storeType.FullName ?? storeType.Name;
+        return string.IsNullOrEmpty(StorageKeyPrefix)
+            ? key
+            : $"{StorageKeyPrefix}.{key}";
     }
 }
