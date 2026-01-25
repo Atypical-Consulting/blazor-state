@@ -1,9 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk.Razor">
 
+  <!-- Package-specific metadata -->
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
+    <PackageId>Bustand.DevTools</PackageId>
+    <Description>DevTools for Bustand state management. Inspect state in real-time, view action history with timestamps, time-travel debug through state changes, and see diffs between states. Development environment only.</Description>
+    <PackageTags>blazor;state-management;zustand;devtools;debugging;time-travel;state-inspector</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageReleaseNotes>Initial release with state inspector, action history, time-travel debugging, and diff view.</PackageReleaseNotes>
+  </PropertyGroup>
+
+  <PropertyGroup>
     <RootNamespace>Bustand.DevTools</RootNamespace>
   </PropertyGroup>
 
@@ -11,17 +18,24 @@
     <InternalsVisibleTo Include="Bustand.Tests" />
   </ItemGroup>
 
-
   <ItemGroup>
     <SupportedPlatform Include="browser" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="10.0.0" />
+  <!-- For development: use ProjectReference -->
+  <ItemGroup Condition="'$(Configuration)' != 'Release'">
+    <ProjectReference Include="..\Bustand\Bustand.csproj" />
   </ItemGroup>
 
+  <!-- For Release/packaging: use exact version PackageReference -->
+  <ItemGroup Condition="'$(Configuration)' == 'Release'">
+    <PackageReference Include="Bustand" Version="[$(Version)]" />
+  </ItemGroup>
+
+  <!-- Package README and icon (to be created in Plan 02) -->
   <ItemGroup>
-    <ProjectReference Include="..\Bustand\Bustand.csproj" />
+    <None Include="../../README.md" Pack="true" PackagePath="" />
+    <None Include="../../icon.png" Pack="true" PackagePath="" />
   </ItemGroup>
 
 </Project>
