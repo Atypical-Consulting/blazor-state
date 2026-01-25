@@ -15,6 +15,12 @@ builder.Services.AddBustand(options =>
 {
     options.ScanAssemblyContaining<Program>();
     options.ScanAssemblyContaining<Bustand.Sample.Client._Imports>();
+
+    // Enable DevTools middleware in development
+    if (builder.Environment.IsDevelopment())
+    {
+        options.UseDevTools();
+    }
 });
 
 // DevTools in development only

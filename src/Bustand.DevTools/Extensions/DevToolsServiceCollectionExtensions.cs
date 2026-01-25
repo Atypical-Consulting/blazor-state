@@ -53,7 +53,7 @@ public static class DevToolsServiceCollectionExtensions
     /// Services registered:
     /// </para>
     /// <list type="bullet">
-    /// <item><see cref="IDevToolsStore"/> as Scoped (one instance per circuit/user).</item>
+    /// <item><see cref="IDevToolsStore"/> as Singleton (shared across all circuits for development).</item>
     /// <item><see cref="DiffService"/> as Scoped for state comparison.</item>
     /// <item><c>DevToolsMiddleware&lt;TState&gt;</c> as Scoped (open generic, closed per-store by Bustand core).</item>
     /// </list>
@@ -112,16 +112,17 @@ public static class DevToolsServiceCollectionExtensions
     /// Services registered:
     /// </para>
     /// <list type="bullet">
-    /// <item><see cref="IDevToolsStore"/> as Scoped (one instance per circuit/user).</item>
+    /// <item><see cref="IDevToolsStore"/> as Singleton (shared across all circuits for development).</item>
     /// <item><see cref="DiffService"/> as Scoped for state comparison.</item>
     /// <item><see cref="DevToolsMiddleware{TState}"/> as Scoped (open generic, closed per-store by Bustand core).</item>
     /// </list>
     /// </remarks>
     private static IServiceCollection RegisterDevToolsServices(this IServiceCollection services)
     {
-        // Register DevToolsStore as Scoped (one per circuit/user)
-        // This ensures each user gets their own state history
-        services.AddScoped<IDevToolsStore, DevToolsStore>();
+        // Register DevToolsStore as Singleton (shared across all circuits)
+        // In development, this allows DevTools to track state changes across page navigations
+        // and see history from all active stores, which is essential for debugging
+        services.AddSingleton<IDevToolsStore, DevToolsStore>();
 
         // Register DiffService for state comparison in diff viewer panel
         services.AddScoped<DiffService>();
