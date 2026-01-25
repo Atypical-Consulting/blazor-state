@@ -6,7 +6,6 @@ using Bustand.Core;
 using Bustand.Detection;
 using Bustand.Middleware;
 using Bustand.Persistence;
-using Microsoft.AspNetCore.Components.Server.Circuits;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.JSInterop;
@@ -233,17 +232,56 @@ public static class ServiceCollectionExtensions
         IServiceCollection services,
         BustandOptions options)
     {
-        // Register IBrowserStorage as scoped (one per circuit/user)
-        services.TryAddScoped<IBrowserStorage>(sp =>
+        // Register IBrowserStorage
+        // - In WASM: Singleton (matches store lifetime, avoids scoped-from-root errors)
+        // - In Server: Scoped (per-circuit isolation)
+        if (BlazorModeDetector.IsWebAssembly)
         {
-            var jsRuntime = sp.GetRequiredService<IJSRuntime>();
-            return new BrowserStorageService(jsRuntime, options.JsonSerializerOptions);
-        });
+            services.TryAddSingleton<IBrowserStorage>(sp =>
+            {
+                var jsRuntime = sp.GetRequiredService<IJSRuntime>();
+                return new BrowserStorageService(jsRuntime, options.JsonSerializerOptions);
+            });
+        }
+        else
+        {
+            services.TryAddScoped<IBrowserStorage>(sp =>
+            {
+                var jsRuntime = sp.GetRequiredService<IJSRuntime>();
+                return new BrowserStorageService(jsRuntime, options.JsonSerializerOptions);
+            });
+        }
 
         // Register circuit handler for Blazor Server reconnect handling
-        // Note: In WASM, CircuitHandler services are never resolved, so this registration
-        // is harmless but unused. In Server mode, this enables reconnect detection.
-        services.TryAddScoped<CircuitHandler, BustandCircuitHandler>();
+        // Only register if CircuitHandler type is available (Server mode only)
+        // In WASM, CircuitHandler type doesn't exist, so this registration is skipped
+        TryRegisterCircuitHandler(services);
+    }
+
+    private static void TryRegisterCircuitHandler(IServiceCollection services)
+    {
+        try
+        {
+            // Try to load CircuitHandler type - this will only succeed in Server environments
+            var circuitHandlerType = Type.GetType(
+                "Microsoft.AspNetCore.Components.Server.Circuits.CircuitHandler, Microsoft.AspNetCore.Components.Server");
+
+            if (circuitHandlerType != null)
+            {
+                // CircuitHandler is available, try to load BustandCircuitHandler
+                // Use Type.GetType to avoid compile-time dependency
+                var bustandHandlerType = Type.GetType("Bustand.Blazor.BustandCircuitHandler, Bustand");
+
+                if (bustandHandlerType != null)
+                {
+                    services.TryAddScoped(circuitHandlerType, bustandHandlerType);
+                }
+            }
+        }
+        catch
+        {
+            // CircuitHandler not available (WASM mode) - silently skip
+        }
     }
 
     private static object CreateStoreWithPipeline(
