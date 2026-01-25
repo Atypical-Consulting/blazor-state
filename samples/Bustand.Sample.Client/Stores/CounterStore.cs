@@ -1,3 +1,4 @@
+using Bustand.Attributes;
 using Bustand.Core;
 using Bustand.Persistence;
 
@@ -19,6 +20,7 @@ namespace Bustand.Sample.Client.Stores;
 ///
 /// This is the simplest possible store - perfect for learning the basics.
 /// </summary>
+[BustandStore]
 [Persist(StorageType.Local, Key = "counter")]
 public class CounterStore : ZustandStore<CounterState>
 {

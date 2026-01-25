@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using Bustand.Attributes;
 using Bustand.Core;
 using Bustand.Persistence;
 
@@ -23,6 +24,7 @@ namespace Bustand.Sample.Client.Stores;
 /// This is the most advanced example - study after understanding Counter and TodoList.
 /// </para>
 /// </remarks>
+[BustandStore]
 [Persist(StorageType.Session, Key = "cart")]  // Session storage - cart clears when browser closes
 public class ShoppingCartStore : ZustandStore<ShoppingCartState>
 {

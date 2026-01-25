@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using Bustand.Attributes;
 using Bustand.Core;
 using Bustand.Persistence;
 
@@ -22,6 +23,7 @@ namespace Bustand.Sample.Client.Stores;
 /// Both Server and WASM/Auto pages can use this store.
 /// </para>
 /// </remarks>
+[BustandStore]
 [Persist(StorageType.Local, Key = "todos")]
 public class TodoStore : ZustandStore<TodoState>
 {
