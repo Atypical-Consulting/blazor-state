@@ -1,5 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk.Razor">
 
+  <!-- Package-specific metadata -->
+  <PropertyGroup>
+    <PackageId>Bustand</PackageId>
+    <Description>Zustand-inspired state management for Blazor. Minimal boilerplate, immutable state with records, middleware architecture, persistence support. Works across Server, WebAssembly, and Auto rendering modes.</Description>
+    <PackageTags>blazor;state-management;zustand;store;flux;wasm;blazor-server;dotnet;middleware</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageReleaseNotes>Initial release with core store functionality, middleware architecture, persistence support, and DevTools integration.</PackageReleaseNotes>
+  </PropertyGroup>
+
   <PropertyGroup>
     <RootNamespace>Bustand</RootNamespace>
   </PropertyGroup>
@@ -22,6 +32,12 @@
   <ItemGroup>
     <PackageReference Include="CompareNETObjects" Version="4.84.0" />
     <PackageReference Include="Scrutor" Version="7.0.0" />
+  </ItemGroup>
+
+  <!-- Package README and icon (to be created in Plan 02) -->
+  <ItemGroup>
+    <None Include="../../README.md" Pack="true" PackagePath="" />
+    <None Include="../../icon.png" Pack="true" PackagePath="" />
   </ItemGroup>
 
 </Project>
