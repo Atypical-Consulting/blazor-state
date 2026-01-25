@@ -22,6 +22,11 @@
     <SupportedPlatform Include="browser" />
   </ItemGroup>
 
+  <!-- Reference ASP.NET Core framework for Blazor component support -->
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
   <!-- For development: use ProjectReference -->
   <ItemGroup Condition="'$(Configuration)' != 'Release'">
     <ProjectReference Include="..\Bustand\Bustand.csproj" />
