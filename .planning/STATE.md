@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Phase: 6 of 6 (Distribution)
-Plan: 5 of 9 in current phase
+Plan: 6 of 9 in current phase
 Status: In progress
-Last activity: 2026-01-25 - Completed 06-05-PLAN.md (Counter Pages)
+Last activity: 2026-01-25 - Completed 06-06-PLAN.md (Sample Pages)
 
-Progress: [██████████] 100% (35/34 plans)
+Progress: [██████████] 100% (36/34 plans)
 
 ## Performance Metrics
 
@@ -145,6 +145,9 @@ Recent decisions affecting current work:
 - [06-04]: SessionStorage for cart (clears on browser close)
 - [06-05]: UseState pattern with sliced state for Counter pages
 - [06-05]: RenderMode static using in _Imports.razor for clean syntax
+- [06-06]: UseState() pattern with .Value access for state in Razor components
+- [06-06]: Home page placed in Server project for root routing via @page "/"
+- [06-06]: Added @using static Microsoft.AspNetCore.Components.Web.RenderMode for cleaner syntax
 
 ### Pending Todos
 
@@ -156,6 +159,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-01-25T09:40:20Z
-Stopped at: Completed 06-05-PLAN.md (Counter Pages)
+Last session: 2026-01-25T09:41:00Z
+Stopped at: Completed 06-06-PLAN.md (Sample Pages)
 Resume file: None
