@@ -1,5 +1,5 @@
 ---
-status: complete
+status: diagnosed
 phase: 06-distribution
 source:
   - 06-01-SUMMARY.md
@@ -93,27 +93,45 @@ skipped: 0
   reason: "User reported: we've dropped the support for .net8"
   severity: major
   test: 1
-  root_cause: ""
-  artifacts: []
-  missing: []
-  debug_session: ""
+  root_cause: "UAT test expectation is outdated. Implementation already targets net10.0 only (Directory.Build.props uses TargetFramework singular). Package only contains lib/net10.0/. Issue is in test documentation, not code."
+  artifacts:
+    - path: ".planning/phases/06-distribution/06-distribution-UAT.md"
+      issue: "Test 1 expectation incorrectly expects net8.0 support"
+    - path: ".planning/phases/06-distribution/06-01-SUMMARY.md"
+      issue: "Multiple incorrect claims about net8.0 multi-targeting"
+  missing:
+    - "Update UAT Test 1 expected to specify net10.0 only"
+    - "Update 06-01-SUMMARY.md to remove net8 references"
+  debug_session: ".planning/debug/gap1-net8-target.md"
 
 - truth: "Counter persists across page reload in Server mode"
   status: failed
   reason: "User reported: it does not persist"
   severity: major
   test: 5
-  root_cause: ""
-  artifacts: []
-  missing: []
-  debug_session: ""
+  root_cause: "BustandInitializer component missing from App.razor. Without it, IBrowserStorage.IsAvailable remains false and persistence operations skip silently. OnAvailabilityChanged event has no subscribers for state restoration."
+  artifacts:
+    - path: "samples/Bustand.Sample/Components/App.razor"
+      issue: "Missing <BustandInitializer /> component"
+    - path: "samples/Bustand.Sample/Components/_Imports.razor"
+      issue: "Missing @using Bustand.Blazor directive"
+  missing:
+    - "Add @using Bustand.Blazor to _Imports.razor"
+    - "Add <BustandInitializer /> after <Routes /> in App.razor"
+  debug_session: ".planning/debug/counter-server-persistence.md"
 
 - truth: "Counter persists across page reload in WASM mode"
   status: failed
   reason: "User reported: it does not persist"
   severity: major
   test: 6
-  root_cause: ""
-  artifacts: []
-  missing: []
-  debug_session: ""
+  root_cause: "BustandInitializer component missing from App.razor. Without it, IBrowserStorage.IsAvailable remains false and persistence operations skip silently."
+  artifacts:
+    - path: "samples/Bustand.Sample/Components/App.razor"
+      issue: "Missing <BustandInitializer /> component"
+    - path: "samples/Bustand.Sample/Components/_Imports.razor"
+      issue: "Missing @using Bustand.Blazor directive"
+  missing:
+    - "Add @using Bustand.Blazor to _Imports.razor"
+    - "Add <BustandInitializer /> after <Routes /> in App.razor"
+  debug_session: ".planning/debug/wasm-persistence-gap3.md"
