@@ -348,6 +348,13 @@ public static class ServiceCollectionExtensions
 
                 // Try to restore state (if storage is available)
                 TryRestoreState(store, persistenceMiddleware!, stateType);
+
+                // Subscribe to storage availability changes to restore state when it becomes available
+                // This handles Server mode where storage isn't available during prerender
+                storage.OnAvailabilityChanged += () =>
+                {
+                    TryRestoreState(store, persistenceMiddleware!, stateType);
+                };
             }
         }
 
@@ -377,21 +384,56 @@ public static class ServiceCollectionExtensions
             if (task == null)
                 return;
 
-            // We can't await in a factory, but we can try to get the result if storage is immediately available
-            // This works for WASM where storage is synchronous-ish
-            // For Server mode during prerender, this will return null (which is fine - InitialState is used)
+            // Try to get the result
+            // During initial construction (prerender), this check prevents blocking
+            // When called from OnAvailabilityChanged, we can wait since storage is ready
+            object? restoredState = null;
+
             if (task.IsCompleted)
             {
+                // Task already completed - get result immediately
                 var resultProperty = task.GetType().GetProperty("Result");
-                var restoredState = resultProperty?.GetValue(task);
-
-                if (restoredState != null)
+                restoredState = resultProperty?.GetValue(task);
+            }
+            else
+            {
+                // Task not complete yet - try waiting briefly
+                // This handles the case when called from OnAvailabilityChanged callback
+                // where storage is available but RestoreStateAsync hasn't completed yet
+                try
                 {
-                    // Call SetRestoredState on the store
-                    var setRestoredMethod = store.GetType().GetMethod(
-                        "SetRestoredState",
-                        BindingFlags.Instance | BindingFlags.NonPublic);
-                    setRestoredMethod?.Invoke(store, new[] { restoredState });
+                    task.Wait(TimeSpan.FromMilliseconds(500));
+                    if (task.IsCompleted)
+                    {
+                        var resultProperty = task.GetType().GetProperty("Result");
+                        restoredState = resultProperty?.GetValue(task);
+                    }
+                }
+                catch
+                {
+                    // Wait failed - continue with null state
+                }
+            }
+
+            if (restoredState != null)
+            {
+                // Try SetRestoredState first (works during construction)
+                var setRestoredMethod = store.GetType().GetMethod(
+                    "SetRestoredState",
+                    BindingFlags.Instance | BindingFlags.NonPublic);
+                setRestoredMethod?.Invoke(store, new[] { restoredState });
+
+                // Also call Set() to handle post-construction restoration (from OnAvailabilityChanged)
+                // This triggers proper state update and component notifications
+                var setMethod = store.GetType().GetMethod("Set", new[] { stateType });
+                if (setMethod != null)
+                {
+                    setMethod.Invoke(store, new[] { restoredState });
+                    System.Diagnostics.Debug.WriteLine($"[Bustand] Successfully restored state via Set() for store");
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine($"[Bustand] Successfully restored state via SetRestoredState for store");
                 }
             }
         }

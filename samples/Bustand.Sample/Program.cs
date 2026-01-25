@@ -47,6 +47,7 @@ app.MapRazorComponents<App>()
     .AddInteractiveWebAssemblyRenderMode()
     .AddAdditionalAssemblies(
         typeof(Bustand.Sample.Client._Imports).Assembly,
+        typeof(Bustand.Blazor.BustandInitializer).Assembly,
         typeof(Bustand.DevTools.Components.DevToolsPage).Assembly);
 
 app.Run();
