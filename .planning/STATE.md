@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Phase: 6 of 6 (Distribution)
-Plan: 9 of 9 in current phase
+Plan: 3 of 9 in current phase
 Status: In progress
-Last activity: 2026-01-25 - Completed 06-07-PLAN.md (API Documentation)
+Last activity: 2026-01-25 - Completed 06-03-PLAN.md (Sample App Structure)
 
 Progress: [██████████] 97% (33/34 plans)
 
@@ -135,6 +135,10 @@ Recent decisions affecting current work:
 - [06-07]: DefaultDocumentation 1.2.2 with PrivateAssets=all (no runtime dependency)
 - [06-07]: Generated docs gitignored as regeneratable build artifacts
 - [06-07]: IsPackable condition ensures only library projects generate docs
+- [06-03]: PrivateAssets=all on FrameworkReference prevents WASM consumer build failures
+- [06-03]: samples/Directory.Build.props isolates samples to net10.0 TFM
+- [06-03]: DevTools needs explicit FrameworkReference due to PrivateAssets propagation block
+- [06-03]: Server project needs WebAssembly.Server package for Auto render mode
 
 ### Pending Todos
 
@@ -146,6 +150,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-01-25T09:20:34Z
-Stopped at: Completed 06-07-PLAN.md (API Documentation)
+Last session: 2026-01-25T09:28:16Z
+Stopped at: Completed 06-03-PLAN.md (Sample App Structure)
 Resume file: None
