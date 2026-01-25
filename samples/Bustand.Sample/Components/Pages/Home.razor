@@ -1,0 +1,172 @@
+@page "/"
+
+@*
+    Home Page - Landing/Overview Page
+
+    ROUTING NOTE:
+    - This page uses @page "/" which makes it the default route
+    - Routes.razor (Plan 06-03) sets DefaultLayout="typeof(Layout.MainLayout)"
+    - The Router in Routes.razor includes both Server and Client assemblies
+    - This page will be found by the router and rendered with MainLayout
+*@
+
+<PageTitle>Bustand Sample App</PageTitle>
+
+<div class="welcome">
+    <h1>Welcome to the Bustand Sample App</h1>
+    <p class="lead">
+        Explore these examples to learn Bustand patterns from simple to advanced.
+    </p>
+</div>
+
+<div class="row mt-4">
+    @* Counter Examples *@
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0">Counter Examples</h3>
+            </div>
+            <div class="card-body">
+                <p><strong>Difficulty:</strong> Beginner</p>
+                <p>
+                    The simplest Bustand example. Learn:
+                </p>
+                <ul>
+                    <li>Creating a store</li>
+                    <li>Defining state with records</li>
+                    <li>Using Set() for updates</li>
+                    <li>Basic persistence</li>
+                </ul>
+                <p class="mt-3"><strong>Render Modes:</strong></p>
+                <ul class="list-unstyled">
+                    <li><a href="counter-server">Counter (Server)</a></li>
+                    <li><a href="counter-wasm">Counter (WASM)</a></li>
+                    <li><a href="counter-auto">Counter (Auto)</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    @* TodoList Example *@
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-success text-white">
+                <h3 class="mb-0">TodoList</h3>
+            </div>
+            <div class="card-body">
+                <p><strong>Difficulty:</strong> Intermediate</p>
+                <p>
+                    Working with lists and collections. Learn:
+                </p>
+                <ul>
+                    <li>ImmutableList operations</li>
+                    <li>Add, remove, update items</li>
+                    <li>Derived/computed state</li>
+                    <li>Filter state management</li>
+                </ul>
+                <a href="todolist" class="btn btn-success mt-3">Try TodoList</a>
+            </div>
+        </div>
+    </div>
+
+    @* Shopping Cart Example *@
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-warning">
+                <h3 class="mb-0">Shopping Cart</h3>
+            </div>
+            <div class="card-body">
+                <p><strong>Difficulty:</strong> Advanced</p>
+                <p>
+                    Complex nested state patterns. Learn:
+                </p>
+                <ul>
+                    <li>Nested records (CartItem > Product)</li>
+                    <li>ImmutableDictionary usage</li>
+                    <li>Async operations</li>
+                    <li>Session storage</li>
+                </ul>
+                <a href="shopping-cart" class="btn btn-warning mt-3">Try Shopping Cart</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    @* DevTools *@
+    <div class="col-12">
+        <div class="card border-info">
+            <div class="card-header bg-info text-white">
+                <h3 class="mb-0">DevTools</h3>
+            </div>
+            <div class="card-body">
+                <p>
+                    Bustand includes a powerful DevTools page for debugging state. Features:
+                </p>
+                <div class="row">
+                    <div class="col-md-3">
+                        <h5>State Inspector</h5>
+                        <p>View current state of all stores in real-time.</p>
+                    </div>
+                    <div class="col-md-3">
+                        <h5>Action History</h5>
+                        <p>See every state change with timestamps.</p>
+                    </div>
+                    <div class="col-md-3">
+                        <h5>Time Travel</h5>
+                        <p>Rewind and replay state changes.</p>
+                    </div>
+                    <div class="col-md-3">
+                        <h5>Diff View</h5>
+                        <p>See exactly what changed between states.</p>
+                    </div>
+                </div>
+                <a href="bustand-devtools" class="btn btn-info mt-3">Open DevTools</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-5">
+    <h2>Quick Start</h2>
+    <ol>
+        <li>
+            <strong>Install packages:</strong>
+            <pre><code>dotnet add package Bustand
+dotnet add package Bustand.DevTools</code></pre>
+        </li>
+        <li>
+            <strong>Create a store:</strong>
+            <pre><code>public record CounterState(int Count);
+
+public class CounterStore : ZustandStore&lt;CounterState&gt;
+{
+    public override CounterState InitialState => new(0);
+
+    public void Increment() =>
+        Set(s => s with { Count = s.Count + 1 });
+}</code></pre>
+        </li>
+        <li>
+            <strong>Register in Program.cs:</strong>
+            <pre><code>builder.Services.AddBustand();
+builder.Services.AddBustandDevTools(); // Dev only</code></pre>
+        </li>
+        <li>
+            <strong>Use in component:</strong>
+            <pre><code>@@inherits ZustandComponent&lt;CounterStore, CounterState&gt;
+
+&lt;p&gt;Count: @@State.Count&lt;/p&gt;
+&lt;button @@onclick="Store.Increment"&gt;+&lt;/button&gt;</code></pre>
+        </li>
+    </ol>
+</div>
+
+<div class="mt-5">
+    <h2>Learn More</h2>
+    <ul>
+        <li><a href="https://github.com/phmatray/Bustand" target="_blank">GitHub Repository</a></li>
+        <li><a href="https://github.com/phmatray/Bustand/wiki" target="_blank">Documentation</a></li>
+        <li><a href="https://www.nuget.org/packages/Bustand" target="_blank">NuGet Package</a></li>
+    </ul>
+</div>
