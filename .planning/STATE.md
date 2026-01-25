@@ -121,6 +121,10 @@ Recent decisions affecting current work:
 - [05-08]: MockStore pattern for time-travel testing (minimal mock with required methods)
 - [05-08]: NSubstitute for IDevToolsStore mocking (simpler API over Moq)
 - [05-08]: 16 DevTools-specific tests verify core functionality
+- [06-01]: Suppress CS1591/CS0419/CS1574 for XML docs until full documentation
+- [06-01]: Test project targets net10.0 to avoid static web asset conflicts
+- [06-01]: MSBuild target removes duplicate WebAssembly.Authentication assets
+- [06-01]: DevTools uses ProjectReference (Debug) and PackageReference [$(Version)] (Release)
 - [06-02]: Python PIL for icon generation (ImageMagick not available)
 - [06-02]: Blazor purple (#512BD4) for icon background color
 - [06-02]: TodoList example in Quick Start (more realistic than Counter)
