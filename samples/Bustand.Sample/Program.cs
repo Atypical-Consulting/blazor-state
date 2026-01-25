@@ -39,6 +39,8 @@ app.UseAntiforgery();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()
     .AddInteractiveWebAssemblyRenderMode()
-    .AddAdditionalAssemblies(typeof(Bustand.Sample.Client._Imports).Assembly);
+    .AddAdditionalAssemblies(
+        typeof(Bustand.Sample.Client._Imports).Assembly,
+        typeof(Bustand.DevTools.Components.DevToolsPage).Assembly);
 
 app.Run();
