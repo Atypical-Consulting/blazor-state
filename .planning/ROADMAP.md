@@ -126,18 +126,19 @@ Plans:
   3. Sample app demonstrates DevTools usage at /bustand-devtools
   4. README includes getting started guide that works from zero to running in under 5 minutes
   5. Test coverage for core library is >= 80%
-**Plans**: 9 plans
+**Plans**: 10 plans
 
 Plans:
-- [ ] 06-01-PLAN.md - NuGet package configuration (metadata, multi-targeting, symbols)
-- [ ] 06-02-PLAN.md - Package icon and README documentation
-- [ ] 06-03-PLAN.md - Sample app foundation (Server and Client projects)
-- [ ] 06-04-PLAN.md - Sample app stores (Counter, TodoList, ShoppingCart)
-- [ ] 06-05-PLAN.md - Counter pages demonstrating all render modes
-- [ ] 06-06-PLAN.md - TodoList, ShoppingCart, and Home pages
-- [ ] 06-07-PLAN.md - API documentation generation with DefaultDocumentation
-- [ ] 06-08-PLAN.md - Test coverage to >= 80%
-- [ ] 06-09-PLAN.md - Final verification and NuGet package creation
+- [x] 06-01-PLAN.md - NuGet package configuration (metadata, symbols)
+- [x] 06-02-PLAN.md - Package icon and README documentation
+- [x] 06-03-PLAN.md - Sample app foundation (Server and Client projects)
+- [x] 06-04-PLAN.md - Sample app stores (Counter, TodoList, ShoppingCart)
+- [x] 06-05-PLAN.md - Counter pages demonstrating all render modes
+- [x] 06-06-PLAN.md - TodoList, ShoppingCart, and Home pages
+- [x] 06-07-PLAN.md - API documentation generation with DefaultDocumentation
+- [x] 06-08-PLAN.md - Test coverage to >= 80%
+- [x] 06-09-PLAN.md - Final verification and NuGet package creation
+- [ ] 06-10-PLAN.md - Gap closure: persistence fix and documentation updates (UAT)
 
 ## Progress
 
@@ -151,4 +152,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | 3. Middleware & DX | 4/4 | Complete | 2026-01-24 |
 | 4. Persistence | 5/5 | Complete | 2026-01-24 |
 | 5. DevTools | 8/8 | Complete | 2026-01-25 |
-| 6. Distribution | 0/9 | Not started | - |
+| 6. Distribution | 9/10 | In Progress | - |
