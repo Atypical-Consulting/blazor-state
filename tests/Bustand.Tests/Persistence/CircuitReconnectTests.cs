@@ -1,5 +1,6 @@
 using Bustand.Blazor;
 using Bustand.Persistence;
+using Microsoft.AspNetCore.Components.Server.Circuits;
 using Microsoft.JSInterop;
 using NSubstitute;
 
@@ -225,5 +226,34 @@ public class CircuitReconnectTests
         // Assert
         Assert.NotNull(result);
         Assert.Equal(42, result.Value);
+    }
+
+    // Note: BustandCircuitHandler lifecycle methods are tested indirectly through
+    // the IBrowserStorage interface behavior since Circuit is a sealed class with
+    // internal constructors that cannot be mocked or instantiated directly.
+    // The behavior is verified through the storage availability tests above.
+
+    [Fact]
+    public void CircuitHandler_IsCircuitHandler_ImplementsBaseClass()
+    {
+        // Arrange
+        var storage = Substitute.For<IBrowserStorage>();
+        var handler = new BustandCircuitHandler(storage);
+
+        // Assert - verify handler is a proper CircuitHandler
+        Assert.IsAssignableFrom<CircuitHandler>(handler);
+    }
+
+    [Fact]
+    public void CircuitHandler_CanBeCreated_WithValidStorage()
+    {
+        // Arrange
+        var storage = Substitute.For<IBrowserStorage>();
+
+        // Act
+        var handler = new BustandCircuitHandler(storage);
+
+        // Assert
+        Assert.NotNull(handler);
     }
 }
