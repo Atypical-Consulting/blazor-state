@@ -21,10 +21,8 @@ updated: 2026-01-25T10:08:00Z
 ## Tests
 
 ### 1. NuGet Package Build
-expected: Running `dotnet pack src/Bustand/Bustand.csproj` produces a .nupkg file with version 0.1.0 containing assemblies for both net8.0 and net10.0
-result: issue
-reported: "we've dropped the support for .net8"
-severity: major
+expected: Running `dotnet pack src/Bustand/Bustand.csproj` produces a .nupkg file with version 0.1.0 containing assemblies for net10.0
+result: pass
 
 ### 2. DevTools Package Dependency
 expected: Bustand.DevTools package has exact version-locked dependency on Bustand core package (uses [$(Version)] pattern)
@@ -81,28 +79,12 @@ result: pass
 ## Summary
 
 total: 13
-passed: 10
-issues: 3
+passed: 11
+issues: 2
 pending: 0
 skipped: 0
 
 ## Gaps
-
-- truth: "NuGet package contains assemblies for both net8.0 and net10.0"
-  status: failed
-  reason: "User reported: we've dropped the support for .net8"
-  severity: major
-  test: 1
-  root_cause: "UAT test expectation is outdated. Implementation already targets net10.0 only (Directory.Build.props uses TargetFramework singular). Package only contains lib/net10.0/. Issue is in test documentation, not code."
-  artifacts:
-    - path: ".planning/phases/06-distribution/06-distribution-UAT.md"
-      issue: "Test 1 expectation incorrectly expects net8.0 support"
-    - path: ".planning/phases/06-distribution/06-01-SUMMARY.md"
-      issue: "Multiple incorrect claims about net8.0 multi-targeting"
-  missing:
-    - "Update UAT Test 1 expected to specify net10.0 only"
-    - "Update 06-01-SUMMARY.md to remove net8 references"
-  debug_session: ".planning/debug/gap1-net8-target.md"
 
 - truth: "Counter persists across page reload in Server mode"
   status: failed

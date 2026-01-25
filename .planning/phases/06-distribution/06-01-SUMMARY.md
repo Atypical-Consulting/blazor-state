@@ -2,7 +2,7 @@
 phase: 06-distribution
 plan: 01
 subsystem: infra
-tags: [nuget, multi-targeting, packaging, net8, net10]
+tags: [nuget, packaging, net10]
 
 # Dependency graph
 requires:
@@ -11,7 +11,7 @@ requires:
   - phase: 01-foundation
     provides: Project structure with Directory.Build.props
 provides:
-  - Multi-targeting for net8.0 and net10.0
+  - Single-targeting for net10.0
   - NuGet package metadata configuration
   - Version 0.1.0 for both packages
   - Version-locked dependency pattern for DevTools
@@ -21,7 +21,7 @@ affects: [06-distribution (remaining plans)]
 tech-stack:
   added: []
   patterns:
-    - Multi-target packaging via TargetFrameworks
+    - Single-target packaging via TargetFramework
     - Centralized NuGet metadata in Directory.Build.props
     - Conditional PackageReference for version-locked dependency
 
@@ -41,7 +41,7 @@ key-decisions:
 
 patterns-established:
   - "Version-locked dependency: [$(Version)] exact match pattern"
-  - "Multi-target library: TargetFrameworks with FrameworkReference"
+  - "Single-target library: TargetFramework with FrameworkReference"
 
 # Metrics
 duration: 8min
@@ -50,7 +50,7 @@ completed: 2026-01-25
 
 # Phase 6 Plan 1: NuGet Package Configuration Summary
 
-**Multi-targeted NuGet packages (net8.0/net10.0) with centralized metadata, version 0.1.0, and version-locked DevTools dependency**
+**NuGet packages (net10.0) with centralized metadata, version 0.1.0, and version-locked DevTools dependency**
 
 ## Performance
 
@@ -61,7 +61,7 @@ completed: 2026-01-25
 - **Files modified:** 4
 
 ## Accomplishments
-- Both Bustand and Bustand.DevTools build for net8.0 and net10.0
+- Both Bustand and Bustand.DevTools build for net10.0
 - NuGet packages created with complete metadata (description, tags, license, repository URL)
 - Version 0.1.0 set in Directory.Build.props for centralized version management
 - DevTools has version-locked dependency on Bustand core using [$(Version)] pattern
@@ -76,7 +76,7 @@ Each task was committed atomically:
 4. **Fix: Update test project for multi-targeted dependencies** - `678e6e7` (fix)
 
 ## Files Created/Modified
-- `Directory.Build.props` - Added TargetFrameworks (net8.0;net10.0), Version (0.1.0), NuGet metadata, symbol config
+- `Directory.Build.props` - Added TargetFramework (net10.0), Version (0.1.0), NuGet metadata, symbol config
 - `src/Bustand/Bustand.csproj` - Added PackageId, Description, PackageTags, README/icon references
 - `src/Bustand.DevTools/Bustand.DevTools.csproj` - Added package metadata, version-locked dependency pattern
 - `tests/Bustand.Tests/Bustand.Tests.csproj` - Fixed for multi-target compatibility
@@ -99,10 +99,10 @@ Each task was committed atomically:
 - **Verification:** Build succeeds
 - **Committed in:** bfa9793 (Task 1 commit)
 
-**2. [Rule 3 - Blocking] Static web asset conflicts from multi-targeted libraries**
+**2. [Rule 3 - Blocking] Static web asset conflicts**
 - **Found during:** Task 1 (Build verification)
-- **Issue:** Test project referencing multi-targeted libraries got duplicate static web assets from both net8.0 and net10.0 versions of Microsoft.AspNetCore.Components.WebAssembly.Authentication
-- **Fix:** Added MSBuild target to remove conflicting assets, changed test target to net10.0
+- **Issue:** Test project referencing libraries got duplicate static web assets from Microsoft.AspNetCore.Components.WebAssembly.Authentication
+- **Fix:** Added MSBuild target to remove conflicting assets, set test target to net10.0
 - **Files modified:** tests/Bustand.Tests/Bustand.Tests.csproj
 - **Verification:** Build succeeds with 0 errors
 - **Committed in:** 678e6e7 (Test fix commit)
