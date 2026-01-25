@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>Bustand.Sample</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Server-side WebAssembly hosting support -->
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="10.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Bustand\Bustand.csproj" />
+    <ProjectReference Include="..\..\src\Bustand.DevTools\Bustand.DevTools.csproj" />
+    <ProjectReference Include="..\Bustand.Sample.Client\Bustand.Sample.Client.csproj" />
+  </ItemGroup>
+</Project>
