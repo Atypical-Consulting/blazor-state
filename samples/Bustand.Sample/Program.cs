@@ -32,7 +32,7 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseStaticFiles();
+app.MapStaticAssets();  // CRITICAL: Must be before AddInteractiveWebAssemblyRenderMode
 app.UseAntiforgery();
 
 // Map Razor components with all render modes
