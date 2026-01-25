@@ -352,6 +352,9 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 
+# Generated API documentation (DefaultDocumentation output)
+docs/api/*.md
+
 # Mac
 .DS_Store
 
