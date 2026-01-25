@@ -1,0 +1,90 @@
+@page "/counter-server"
+@rendermode InteractiveServer
+
+@*
+    Counter Page - Interactive Server Rendering
+
+    KEY CONCEPTS:
+    - @rendermode InteractiveServer means UI interactions are processed on the SERVER
+    - User clicks button -> SignalR sends event to server -> server updates state -> SignalR sends UI update back
+    - State lives in server memory, persisted to browser's LocalStorage via middleware
+    - Good for: apps that need server resources, database access, secure operations
+    - Tradeoff: requires constant connection, slight latency on interactions
+
+    BUSTAND PATTERN:
+    - Inherit from ZustandComponent<TStore, TState> for automatic subscriptions
+    - Call UseState() in OnInitialized to subscribe to state changes
+    - Access Store property to call methods
+    - Access count.Value (or just count via implicit conversion) for current value
+
+    ARCHITECTURE NOTE:
+    - CounterStore is in the Client project (Bustand.Sample.Client.Stores)
+    - Server project references Client project, so we can use Client stores here
+    - This enables the same store to work across ALL render modes
+    - The @using is handled by _Imports.razor (updated in Plan 06-04)
+*@
+
+@inherits ZustandComponent<CounterStore, CounterState>
+
+<PageTitle>Counter (Server)</PageTitle>
+
+<h1>Counter (Server)</h1>
+
+<p class="render-mode-info">
+    <strong>Render Mode:</strong> Interactive Server
+    <br />
+    <small>State changes are processed on the server via SignalR.</small>
+</p>
+
+<div class="counter-display">
+    <p>Current count: <strong>@count</strong></p>
+</div>
+
+<div class="counter-buttons">
+    @* Call store methods directly - they trigger Set() which notifies subscribers *@
+    <button class="btn btn-primary" @onclick="Store.Increment">
+        Increment
+    </button>
+
+    <button class="btn btn-secondary" @onclick="Store.Decrement">
+        Decrement
+    </button>
+
+    <button class="btn btn-outline-secondary" @onclick="Store.Reset">
+        Reset
+    </button>
+</div>
+
+<div class="counter-custom">
+    <h4>Increment by custom amount:</h4>
+    <input type="number" @bind="customAmount" min="1" />
+    <button class="btn btn-info" @onclick="() => Store.IncrementBy(customAmount)">
+        Add @customAmount
+    </button>
+</div>
+
+<div class="explanation">
+    <h4>How it works:</h4>
+    <ol>
+        <li>This page uses <code>@("@")rendermode InteractiveServer</code></li>
+        <li>The CounterStore is registered in DI on the server</li>
+        <li>When you click a button, SignalR sends the event to the server</li>
+        <li>The store's Set() method updates state and notifies subscribers</li>
+        <li>The component re-renders and SignalR sends the new HTML diff to the browser</li>
+        <li>Persistence middleware saves to browser's LocalStorage via JS interop</li>
+    </ol>
+    <p><em>Refresh the page - your count persists!</em></p>
+</div>
+
+@code {
+    // Subscribe to the Count slice of state
+    // UseStateResult<int> has implicit conversion to int, so we can use @count in markup
+    private UseStateResult<int> count;
+    private int customAmount = 5;
+
+    protected override void OnInitialized()
+    {
+        // UseState subscribes to state changes and triggers re-render automatically
+        count = UseState(state => state.Count);
+    }
+}
