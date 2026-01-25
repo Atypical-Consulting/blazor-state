@@ -25,8 +25,10 @@
 
   <!-- Reference ASP.NET Core shared framework for CircuitHandler support -->
   <!-- This provides Components.Web, Logging, and Server-specific types -->
+  <!-- For WASM consumers: PrivateAssets prevents FrameworkReference from propagating -->
+  <!-- WASM projects should add their own Microsoft.AspNetCore.Components.WebAssembly reference -->
   <ItemGroup>
-    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <FrameworkReference Include="Microsoft.AspNetCore.App" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
