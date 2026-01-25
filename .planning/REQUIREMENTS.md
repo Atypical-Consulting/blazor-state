@@ -49,7 +49,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **MIDL-06**: Logging middleware logs state changes to console
 - [ ] **MIDL-07**: Persistence middleware saves state to LocalStorage
 - [ ] **MIDL-08**: Persistence middleware restores state on initialization
-- [ ] **MIDL-09**: DevTools middleware captures state changes for DevTools page
+- [x] **MIDL-09**: DevTools middleware captures state changes for DevTools page
 
 ### Auto-Discovery
 
@@ -70,20 +70,20 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### DevTools
 
-- [ ] **DEVO-01**: Developer can enable DevTools via AddBustandDevTools() in dev environment
-- [ ] **DEVO-02**: DevTools page accessible at /bustand-devtools route
-- [ ] **DEVO-03**: DevTools page shows list of all registered stores
-- [ ] **DEVO-04**: DevTools page shows current state of selected store (state inspector)
-- [ ] **DEVO-05**: DevTools page shows history of state changes (action log)
-- [ ] **DEVO-06**: DevTools page shows timestamp for each state change
-- [ ] **DEVO-07**: DevTools page supports time-travel (rewind to previous state)
-- [ ] **DEVO-08**: DevTools page supports replay (forward through state history)
-- [ ] **DEVO-09**: DevTools page shows diff between consecutive states
-- [ ] **DEVO-10**: DevTools page highlights what changed in state (diff view)
-- [ ] **DEVO-11**: DevTools page updates in real-time when state changes
-- [ ] **DEVO-12**: DevTools UI built with plain HTML/CSS (no framework dependencies)
-- [ ] **DEVO-13**: DevTools packaged as separate NuGet (Bustand.DevTools)
-- [ ] **DEVO-14**: DevTools registration fails/warns in production environment
+- [x] **DEVO-01**: Developer can enable DevTools via AddBustandDevTools() in dev environment
+- [x] **DEVO-02**: DevTools page accessible at /bustand-devtools route
+- [x] **DEVO-03**: DevTools page shows list of all registered stores
+- [x] **DEVO-04**: DevTools page shows current state of selected store (state inspector)
+- [x] **DEVO-05**: DevTools page shows history of state changes (action log)
+- [x] **DEVO-06**: DevTools page shows timestamp for each state change
+- [x] **DEVO-07**: DevTools page supports time-travel (rewind to previous state)
+- [x] **DEVO-08**: DevTools page supports replay (forward through state history)
+- [x] **DEVO-09**: DevTools page shows diff between consecutive states
+- [x] **DEVO-10**: DevTools page highlights what changed in state (diff view)
+- [x] **DEVO-11**: DevTools page updates in real-time when state changes
+- [x] **DEVO-12**: DevTools UI built with plain HTML/CSS (no framework dependencies)
+- [x] **DEVO-13**: DevTools packaged as separate NuGet (Bustand.DevTools)
+- [x] **DEVO-14**: DevTools registration fails/warns in production environment
 
 ### Distribution
 
@@ -180,7 +180,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | MIDL-06 | Phase 3 | Pending |
 | MIDL-07 | Complete | 4 |
 | MIDL-08 | Complete | 4 |
-| MIDL-09 | Phase 5 | Pending |
+| MIDL-09 | Phase 5 | Complete |
 | DISC-01 | Phase 3 | Pending |
 | DISC-02 | Phase 3 | Pending |
 | DISC-03 | Phase 3 | Pending |
@@ -192,20 +192,20 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PERS-04 | Complete | 4 |
 | PERS-05 | Complete | 4 |
 | PERS-06 | Complete | 4 |
-| DEVO-01 | Phase 5 | Pending |
-| DEVO-02 | Phase 5 | Pending |
-| DEVO-03 | Phase 5 | Pending |
-| DEVO-04 | Phase 5 | Pending |
-| DEVO-05 | Phase 5 | Pending |
-| DEVO-06 | Phase 5 | Pending |
-| DEVO-07 | Phase 5 | Pending |
-| DEVO-08 | Phase 5 | Pending |
-| DEVO-09 | Phase 5 | Pending |
-| DEVO-10 | Phase 5 | Pending |
-| DEVO-11 | Phase 5 | Pending |
-| DEVO-12 | Phase 5 | Pending |
-| DEVO-13 | Phase 5 | Pending |
-| DEVO-14 | Phase 5 | Pending |
+| DEVO-01 | Phase 5 | Complete |
+| DEVO-02 | Phase 5 | Complete |
+| DEVO-03 | Phase 5 | Complete |
+| DEVO-04 | Phase 5 | Complete |
+| DEVO-05 | Phase 5 | Complete |
+| DEVO-06 | Phase 5 | Complete |
+| DEVO-07 | Phase 5 | Complete |
+| DEVO-08 | Phase 5 | Complete |
+| DEVO-09 | Phase 5 | Complete |
+| DEVO-10 | Phase 5 | Complete |
+| DEVO-11 | Phase 5 | Complete |
+| DEVO-12 | Phase 5 | Complete |
+| DEVO-13 | Phase 5 | Complete |
+| DEVO-14 | Phase 5 | Complete |
 | DIST-01 | Phase 6 | Pending |
 | DIST-02 | Phase 6 | Pending |
 | DIST-03 | Phase 6 | Pending |
