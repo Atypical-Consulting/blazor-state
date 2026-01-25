@@ -22,4 +22,9 @@ public readonly struct UseStateResult<T>
     /// Implicit conversion to T for ergonomic usage.
     /// </summary>
     public static implicit operator T(UseStateResult<T> result) => result.Value;
+
+    /// <summary>
+    /// Returns the string representation of the current value.
+    /// </summary>
+    public override string? ToString() => Value?.ToString();
 }
