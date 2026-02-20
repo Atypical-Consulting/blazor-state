@@ -38,10 +38,6 @@ jobs:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - name: Setup .NET 9 runtime
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '9.0.x'
       - name: 'Cache: .nuke/temp, ~/.nuget/packages'
         uses: actions/cache@v5
         with:
@@ -49,6 +45,12 @@ jobs:
             .nuke/temp
             ~/.nuget/packages
           key: ${{ runner.os }}-${{ hashFiles('**/global.json', '**/*.csproj', '**/Directory.Packages.props') }}
+      - name: Setup .NET 9 runtime
+        run: |
+          # Install .NET 9 runtime to NUKE's dotnet location after it's been set up
+          DOTNET_INSTALL_DIR=".nuke/temp/dotnet-unix"
+          mkdir -p "$DOTNET_INSTALL_DIR"
+          curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --runtime dotnet --channel 9.0 --install-dir "$DOTNET_INSTALL_DIR"
       - name: 'Run: Pack'
         run: ./build.cmd Pack
         env:
