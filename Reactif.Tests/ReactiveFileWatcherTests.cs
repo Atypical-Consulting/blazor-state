@@ -47,7 +47,7 @@ public class ReactiveFileWatcherTests : IDisposable
         var initialFiles = await watcher.InitialFiles.ToList().ToTask();
 
         // Assert
-        initialFiles.Should().BeEquivalentTo(expectedFiles);
+        initialFiles.ShouldBe(expectedFiles);
     }
     
     [Fact]
@@ -63,7 +63,7 @@ public class ReactiveFileWatcherTests : IDisposable
         await File.WriteAllTextAsync(Path.Combine(path, "test.md"), "hello world");
         
         var result = await fileChangeEvent;
-        result.FullPath.Should().Be(Path.Combine(path, "test.md"));
+        result.FullPath.ShouldBe(Path.Combine(path, "test.md"));
     }
 
     private static string GetTestDirectory()
