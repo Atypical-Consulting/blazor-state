@@ -1,5 +1,5 @@
 using System.Linq;
-using FluentAssertions;
+using Shouldly;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
@@ -23,8 +23,8 @@ public class OneDotPerLineAnalyzerTests
         var memberAccessNode = root.DescendantNodes().OfType<MemberAccessExpressionSyntax>().First();
 
         // use fluent assertions instead of the above two lines
-        OneDotPerLineAnalyzer.IsValidMemberAccess(memberAccessNode, out var memberAccess).Should().BeTrue();
-        memberAccess.Should().NotBeNull();
+        OneDotPerLineAnalyzer.IsValidMemberAccess(memberAccessNode, out var memberAccess).ShouldBeTrue();
+        memberAccess.ShouldNotBeNull();
     }
     
     [Fact]
@@ -44,10 +44,10 @@ public class OneDotPerLineAnalyzerTests
 
         // Assert that all member accesses are collected, including nested ones.
         // Adjust the expected count according to the number of member accesses in your test code.
-        memberAccesses.Should().HaveCount(3);
-        memberAccesses[0].ToString().Should().Be("someObject.First()");
-        memberAccesses[1].ToString().Should().Be("someObject.First().Second");
-        memberAccesses[2].ToString().Should().Be("someObject.First().Second.Third()");
+        memberAccesses.Count().ShouldBe(3);
+        memberAccesses[0].ToString().ShouldBe("someObject.First()");
+        memberAccesses[1].ToString().ShouldBe("someObject.First().Second");
+        memberAccesses[2].ToString().ShouldBe("someObject.First().Second.Third()");
     }
 
     
