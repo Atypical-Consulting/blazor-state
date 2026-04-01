@@ -31,7 +31,7 @@ internal sealed class SliceIncrementalGenerator : IIncrementalGenerator
         context.RegisterSourceOutput(collected, Execute);
     }
 
-    private static FieldInfo? ExtractFieldInfo(GeneratorAttributeSyntaxContext ctx, CancellationToken ct)
+    private static FieldData? ExtractFieldInfo(GeneratorAttributeSyntaxContext ctx, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
 
@@ -78,74 +78,175 @@ internal sealed class SliceIncrementalGenerator : IIncrementalGenerator
         // Check if the variable declarator has an initializer
         bool hasInitializer = variableDeclarator.Initializer != null;
 
-        return new FieldInfo(
-            fieldSymbol: fieldSymbol,
-            fieldName: fieldSymbol.Name,
-            fieldLocation: fieldSymbol.Locations.FirstOrDefault() ?? Location.None,
-            containingClass: containingType,
-            timeToLive: timeToLive,
-            allowUpdatesOnNavigation: allowUpdatesOnNavigation,
-            hasInitializer: hasInitializer);
-    }
+        // Extract field type info
+        var fieldType = fieldSymbol.Type;
+        string fieldTypeDisplayString = fieldType.ToDisplayString();
+        string? fieldTypeOriginalDefinitionDisplayString = null;
+        string? typeArgumentName = null;
+        string? typeArgumentFullyQualified = null;
+        bool isGenericType = false;
 
-    private static void Execute(SourceProductionContext spc, ImmutableArray<FieldInfo?> fields)
-    {
-        if (fields.IsDefaultOrEmpty)
-            return;
-
-        // Group by containing class
-        var grouped = new Dictionary<INamedTypeSymbol, List<FieldInfo>>(SymbolEqualityComparer.Default);
-        foreach (var field in fields)
+        if (fieldType is INamedTypeSymbol { IsGenericType: true } namedType)
         {
-            if (field == null) continue;
-
-            if (!grouped.TryGetValue(field.ContainingClass, out var list))
+            isGenericType = true;
+            fieldTypeOriginalDefinitionDisplayString = namedType.OriginalDefinition.ToDisplayString();
+            if (namedType.TypeArguments.Length > 0)
             {
-                list = new List<FieldInfo>();
-                grouped[field.ContainingClass] = list;
+                var typeArg = namedType.TypeArguments[0];
+                typeArgumentName = typeArg.Name;
+                typeArgumentFullyQualified = typeArg.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
             }
-            list.Add(field);
         }
 
-        foreach (var kvp in grouped)
-        {
-            ProcessClass(spc, kvp.Key, kvp.Value);
-        }
-    }
+        // Field location
+        var fieldLoc = fieldSymbol.Locations.FirstOrDefault();
+        string? filePath = fieldLoc?.SourceTree?.FilePath;
+        int spanStart = fieldLoc?.SourceSpan.Start ?? 0;
+        int spanLength = fieldLoc?.SourceSpan.Length ?? 0;
 
-    private static void ProcessClass(SourceProductionContext spc, INamedTypeSymbol classSymbol, List<FieldInfo> fields)
-    {
-        var className = classSymbol.Name;
-        var classLocation = classSymbol.Locations.FirstOrDefault() ?? Location.None;
-
-        // --- Validation ---
+        // Class-level checks (done here while we have symbols)
 
         // 1. Check partial
-        bool isPartial = false;
-        foreach (var syntaxRef in classSymbol.DeclaringSyntaxReferences)
+        bool isPartialClass = false;
+        foreach (var syntaxRef in containingType.DeclaringSyntaxReferences)
         {
-            var syntax = syntaxRef.GetSyntax();
+            var syntax = syntaxRef.GetSyntax(ct);
             if (syntax is ClassDeclarationSyntax classDecl)
             {
                 foreach (var modifier in classDecl.Modifiers)
                 {
                     if (modifier.IsKind(SyntaxKind.PartialKeyword))
                     {
-                        isPartial = true;
+                        isPartialClass = true;
                         break;
                     }
                 }
             }
-            if (isPartial) break;
+            if (isPartialClass) break;
         }
 
-        if (!isPartial)
+        // 2. Check ComponentBase inheritance
+        bool inheritsFromComponentBase = false;
+        var current = containingType.BaseType;
+        while (current != null)
+        {
+            if (current.ToDisplayString() == "Microsoft.AspNetCore.Components.ComponentBase")
+            {
+                inheritsFromComponentBase = true;
+                break;
+            }
+            current = current.BaseType;
+        }
+
+        // 3. Check user implements IDisposable
+        bool userImplementsDisposable = false;
+        foreach (var member in containingType.GetMembers())
+        {
+            if (member is IMethodSymbol { Name: "Dispose", Parameters.Length: 0, IsAbstract: false })
+            {
+                userImplementsDisposable = true;
+                break;
+            }
+        }
+
+        // 4. Check user overrides OnInitialized / OnInitializedAsync
+        bool userOverridesOnInitialized = false;
+        bool userOverridesOnInitializedAsync = false;
+        foreach (var member in containingType.GetMembers())
+        {
+            if (member is IMethodSymbol method)
+            {
+                if (method is { Name: "OnInitialized", Parameters.Length: 0, IsOverride: true })
+                {
+                    userOverridesOnInitialized = true;
+                }
+                else if (method is { Name: "OnInitializedAsync", Parameters.Length: 0, IsOverride: true })
+                {
+                    userOverridesOnInitializedAsync = true;
+                }
+            }
+        }
+
+        // Class location
+        var classLoc = containingType.Locations.FirstOrDefault();
+        string? classFilePath = classLoc?.SourceTree?.FilePath;
+        int classSpanStart = classLoc?.SourceSpan.Start ?? 0;
+        int classSpanLength = classLoc?.SourceSpan.Length ?? 0;
+
+        // Containing class info
+        string containingClassName = containingType.Name;
+        string containingClassNamespace = containingType.ContainingNamespace.IsGlobalNamespace
+            ? ""
+            : containingType.ContainingNamespace.ToDisplayString();
+
+        return new FieldData(
+            fieldName: fieldSymbol.Name,
+            containingClassName: containingClassName,
+            containingClassNamespace: containingClassNamespace,
+            fieldTypeDisplayString: fieldTypeDisplayString,
+            fieldTypeOriginalDefinitionDisplayString: fieldTypeOriginalDefinitionDisplayString,
+            typeArgumentName: typeArgumentName,
+            typeArgumentFullyQualified: typeArgumentFullyQualified,
+            isStatic: fieldSymbol.IsStatic,
+            isGenericType: isGenericType,
+            timeToLive: timeToLive,
+            allowUpdatesOnNavigation: allowUpdatesOnNavigation,
+            hasInitializer: hasInitializer,
+            filePath: filePath,
+            spanStart: spanStart,
+            spanLength: spanLength,
+            isPartialClass: isPartialClass,
+            inheritsFromComponentBase: inheritsFromComponentBase,
+            userImplementsDisposable: userImplementsDisposable,
+            userOverridesOnInitialized: userOverridesOnInitialized,
+            userOverridesOnInitializedAsync: userOverridesOnInitializedAsync,
+            classFilePath: classFilePath,
+            classSpanStart: classSpanStart,
+            classSpanLength: classSpanLength);
+    }
+
+    private static void Execute(SourceProductionContext spc, ImmutableArray<FieldData?> fields)
+    {
+        if (fields.IsDefaultOrEmpty)
+            return;
+
+        // Group by containing class (using primitives)
+        var grouped = new Dictionary<(string ClassName, string Namespace), List<FieldData>>();
+        foreach (var field in fields)
+        {
+            if (field == null) continue;
+
+            var key = (field.ContainingClassName, field.ContainingClassNamespace);
+            if (!grouped.TryGetValue(key, out var list))
+            {
+                list = new List<FieldData>();
+                grouped[key] = list;
+            }
+            list.Add(field);
+        }
+
+        foreach (var kvp in grouped)
+        {
+            ProcessClass(spc, kvp.Value);
+        }
+    }
+
+    private static void ProcessClass(SourceProductionContext spc, List<FieldData> fields)
+    {
+        var first = fields[0];
+        var className = first.ContainingClassName;
+        var ns = first.ContainingClassNamespace;
+
+        // --- Validation ---
+
+        // 1. Check partial (same for all fields in the class)
+        if (!first.IsPartialClass)
         {
             foreach (var field in fields)
             {
                 spc.ReportDiagnostic(Diagnostic.Create(
                     DiagnosticDescriptors.NonPartialClass,
-                    field.FieldLocation,
+                    Location.None,
                     field.FieldName,
                     className));
             }
@@ -153,11 +254,11 @@ internal sealed class SliceIncrementalGenerator : IIncrementalGenerator
         }
 
         // 2. Check ComponentBase inheritance
-        if (!InheritsFromComponentBase(classSymbol))
+        if (!first.InheritsFromComponentBase)
         {
             spc.ReportDiagnostic(Diagnostic.Create(
                 DiagnosticDescriptors.NotComponentBase,
-                classLocation,
+                Location.None,
                 className));
             return;
         }
@@ -169,37 +270,32 @@ internal sealed class SliceIncrementalGenerator : IIncrementalGenerator
         foreach (var field in fields)
         {
             // Check static
-            if (field.FieldSymbol.IsStatic)
+            if (field.IsStatic)
             {
                 spc.ReportDiagnostic(Diagnostic.Create(
                     DiagnosticDescriptors.StaticField,
-                    field.FieldLocation,
+                    Location.None,
                     field.FieldName));
                 hasErrors = true;
                 continue;
             }
 
             // Check IStateSlice<T>
-            var fieldType = field.FieldSymbol.Type;
             string? typeArgument = null;
             string? fullTypeArgument = null;
 
-            if (fieldType is INamedTypeSymbol { IsGenericType: true } namedType)
+            if (field.IsGenericType &&
+                field.FieldTypeOriginalDefinitionDisplayString == "BlazorStatePlus.Abstractions.IStateSlice<T>")
             {
-                var originalDef = namedType.OriginalDefinition;
-                if (originalDef.ToDisplayString() == "BlazorStatePlus.Abstractions.IStateSlice<T>")
-                {
-                    var typeArg = namedType.TypeArguments[0];
-                    typeArgument = typeArg.Name;
-                    fullTypeArgument = typeArg.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
-                }
+                typeArgument = field.TypeArgumentName;
+                fullTypeArgument = field.TypeArgumentFullyQualified;
             }
 
             if (typeArgument == null)
             {
                 spc.ReportDiagnostic(Diagnostic.Create(
                     DiagnosticDescriptors.InvalidFieldType,
-                    field.FieldLocation,
+                    Location.None,
                     field.FieldName));
                 hasErrors = true;
                 continue;
@@ -212,7 +308,7 @@ internal sealed class SliceIncrementalGenerator : IIncrementalGenerator
                 {
                     spc.ReportDiagnostic(Diagnostic.Create(
                         DiagnosticDescriptors.InvalidTimeToLive,
-                        field.FieldLocation,
+                        Location.None,
                         field.TimeToLive,
                         field.FieldName));
                     hasErrors = true;
@@ -225,7 +321,7 @@ internal sealed class SliceIncrementalGenerator : IIncrementalGenerator
             {
                 spc.ReportDiagnostic(Diagnostic.Create(
                     DiagnosticDescriptors.FieldHasInitializer,
-                    field.FieldLocation,
+                    Location.None,
                     field.FieldName));
             }
 
@@ -245,7 +341,7 @@ internal sealed class SliceIncrementalGenerator : IIncrementalGenerator
                 TimeToLive = field.TimeToLive,
                 AllowUpdatesOnNavigation = field.AllowUpdatesOnNavigation,
                 BaseKey = baseKey,
-                FieldLocation = field.FieldLocation
+                FieldLocation = Location.None
             });
         }
 
@@ -270,56 +366,30 @@ internal sealed class SliceIncrementalGenerator : IIncrementalGenerator
             }
         }
 
-        // 5. Detect user-implemented IDisposable (Dispose method directly on the class)
-        bool userImplementsDisposable = false;
-        foreach (var member in classSymbol.GetMembers())
-        {
-            if (member is IMethodSymbol { Name: "Dispose", Parameters.Length: 0, IsAbstract: false })
-            {
-                userImplementsDisposable = true;
-                break;
-            }
-        }
+        // 5. Detect user-implemented IDisposable (pre-extracted)
+        bool userImplementsDisposable = first.UserImplementsDisposable;
 
         if (userImplementsDisposable)
         {
             spc.ReportDiagnostic(Diagnostic.Create(
                 DiagnosticDescriptors.ExistingDisposable,
-                classLocation,
+                Location.None,
                 className));
         }
 
-        // 6. Detect user overrides of OnInitialized
-        bool userOverridesOnInitialized = false;
-        bool userOverridesOnInitializedAsync = false;
-        foreach (var member in classSymbol.GetMembers())
-        {
-            if (member is IMethodSymbol method)
-            {
-                if (method is { Name: "OnInitialized", Parameters.Length: 0, IsOverride: true })
-                {
-                    userOverridesOnInitialized = true;
-                }
-                else if (method is { Name: "OnInitializedAsync", Parameters.Length: 0, IsOverride: true })
-                {
-                    userOverridesOnInitializedAsync = true;
-                }
-            }
-        }
+        // 6. Detect user overrides of OnInitialized (pre-extracted)
+        bool userOverridesOnInitialized = first.UserOverridesOnInitialized;
+        bool userOverridesOnInitializedAsync = first.UserOverridesOnInitializedAsync;
 
         if (userOverridesOnInitialized)
         {
             spc.ReportDiagnostic(Diagnostic.Create(
                 DiagnosticDescriptors.ExistingOnInitialized,
-                classLocation,
+                Location.None,
                 className));
         }
 
         // Build the model
-        var ns = classSymbol.ContainingNamespace.IsGlobalNamespace
-            ? ""
-            : classSymbol.ContainingNamespace.ToDisplayString();
-
         var model = new ComponentModel
         {
             Namespace = ns,
@@ -328,24 +398,15 @@ internal sealed class SliceIncrementalGenerator : IIncrementalGenerator
             UserImplementsDisposable = userImplementsDisposable,
             UserOverridesOnInitialized = userOverridesOnInitialized,
             UserOverridesOnInitializedAsync = userOverridesOnInitializedAsync,
-            ClassLocation = classLocation
+            ClassLocation = Location.None
         };
 
-        // Emit source
+        // Emit source with namespace-qualified hint name
         string source = Emitter.Emit(model);
-        spc.AddSource($"{className}.g.cs", source);
-    }
-
-    private static bool InheritsFromComponentBase(INamedTypeSymbol classSymbol)
-    {
-        var current = classSymbol.BaseType;
-        while (current != null)
-        {
-            if (current.ToDisplayString() == "Microsoft.AspNetCore.Components.ComponentBase")
-                return true;
-            current = current.BaseType;
-        }
-        return false;
+        string hintName = string.IsNullOrEmpty(ns)
+            ? $"{className}.g.cs"
+            : $"{ns}.{className}.g.cs";
+        spc.AddSource(hintName, source);
     }
 
     private static string ConvertFieldNameToPropertyName(string fieldName)
@@ -367,34 +428,134 @@ internal sealed class SliceIncrementalGenerator : IIncrementalGenerator
     }
 
     /// <summary>
-    /// Intermediate data extracted per field during the transform phase.
+    /// Value-equatable data class containing only primitives and strings — no Roslyn symbols.
+    /// This ensures the incremental pipeline's caching works correctly across phases.
     /// </summary>
-    private sealed class FieldInfo
+    private sealed class FieldData : IEquatable<FieldData>
     {
-        public IFieldSymbol FieldSymbol { get; }
         public string FieldName { get; }
-        public Location FieldLocation { get; }
-        public INamedTypeSymbol ContainingClass { get; }
+        public string ContainingClassName { get; }
+        public string ContainingClassNamespace { get; }
+        public string FieldTypeDisplayString { get; }
+        public string? FieldTypeOriginalDefinitionDisplayString { get; }
+        public string? TypeArgumentName { get; }
+        public string? TypeArgumentFullyQualified { get; }
+        public bool IsStatic { get; }
+        public bool IsGenericType { get; }
         public string? TimeToLive { get; }
         public bool AllowUpdatesOnNavigation { get; }
         public bool HasInitializer { get; }
+        public string? FilePath { get; }
+        public int SpanStart { get; }
+        public int SpanLength { get; }
+        // Class-level data (same for all fields in same class)
+        public bool IsPartialClass { get; }
+        public bool InheritsFromComponentBase { get; }
+        public bool UserImplementsDisposable { get; }
+        public bool UserOverridesOnInitialized { get; }
+        public bool UserOverridesOnInitializedAsync { get; }
+        public string? ClassFilePath { get; }
+        public int ClassSpanStart { get; }
+        public int ClassSpanLength { get; }
 
-        public FieldInfo(
-            IFieldSymbol fieldSymbol,
+        public FieldData(
             string fieldName,
-            Location fieldLocation,
-            INamedTypeSymbol containingClass,
+            string containingClassName,
+            string containingClassNamespace,
+            string fieldTypeDisplayString,
+            string? fieldTypeOriginalDefinitionDisplayString,
+            string? typeArgumentName,
+            string? typeArgumentFullyQualified,
+            bool isStatic,
+            bool isGenericType,
             string? timeToLive,
             bool allowUpdatesOnNavigation,
-            bool hasInitializer)
+            bool hasInitializer,
+            string? filePath,
+            int spanStart,
+            int spanLength,
+            bool isPartialClass,
+            bool inheritsFromComponentBase,
+            bool userImplementsDisposable,
+            bool userOverridesOnInitialized,
+            bool userOverridesOnInitializedAsync,
+            string? classFilePath,
+            int classSpanStart,
+            int classSpanLength)
         {
-            FieldSymbol = fieldSymbol;
             FieldName = fieldName;
-            FieldLocation = fieldLocation;
-            ContainingClass = containingClass;
+            ContainingClassName = containingClassName;
+            ContainingClassNamespace = containingClassNamespace;
+            FieldTypeDisplayString = fieldTypeDisplayString;
+            FieldTypeOriginalDefinitionDisplayString = fieldTypeOriginalDefinitionDisplayString;
+            TypeArgumentName = typeArgumentName;
+            TypeArgumentFullyQualified = typeArgumentFullyQualified;
+            IsStatic = isStatic;
+            IsGenericType = isGenericType;
             TimeToLive = timeToLive;
             AllowUpdatesOnNavigation = allowUpdatesOnNavigation;
             HasInitializer = hasInitializer;
+            FilePath = filePath;
+            SpanStart = spanStart;
+            SpanLength = spanLength;
+            IsPartialClass = isPartialClass;
+            InheritsFromComponentBase = inheritsFromComponentBase;
+            UserImplementsDisposable = userImplementsDisposable;
+            UserOverridesOnInitialized = userOverridesOnInitialized;
+            UserOverridesOnInitializedAsync = userOverridesOnInitializedAsync;
+            ClassFilePath = classFilePath;
+            ClassSpanStart = classSpanStart;
+            ClassSpanLength = classSpanLength;
+        }
+
+        public bool Equals(FieldData? other)
+        {
+            if (other is null) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return FieldName == other.FieldName
+                && ContainingClassName == other.ContainingClassName
+                && ContainingClassNamespace == other.ContainingClassNamespace
+                && FieldTypeDisplayString == other.FieldTypeDisplayString
+                && FieldTypeOriginalDefinitionDisplayString == other.FieldTypeOriginalDefinitionDisplayString
+                && TypeArgumentName == other.TypeArgumentName
+                && TypeArgumentFullyQualified == other.TypeArgumentFullyQualified
+                && IsStatic == other.IsStatic
+                && IsGenericType == other.IsGenericType
+                && TimeToLive == other.TimeToLive
+                && AllowUpdatesOnNavigation == other.AllowUpdatesOnNavigation
+                && HasInitializer == other.HasInitializer
+                && FilePath == other.FilePath
+                && SpanStart == other.SpanStart
+                && SpanLength == other.SpanLength
+                && IsPartialClass == other.IsPartialClass
+                && InheritsFromComponentBase == other.InheritsFromComponentBase
+                && UserImplementsDisposable == other.UserImplementsDisposable
+                && UserOverridesOnInitialized == other.UserOverridesOnInitialized
+                && UserOverridesOnInitializedAsync == other.UserOverridesOnInitializedAsync
+                && ClassFilePath == other.ClassFilePath
+                && ClassSpanStart == other.ClassSpanStart
+                && ClassSpanLength == other.ClassSpanLength;
+        }
+
+        public override bool Equals(object? obj) => Equals(obj as FieldData);
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int hash = 17;
+                hash = hash * 31 + (FieldName?.GetHashCode() ?? 0);
+                hash = hash * 31 + (ContainingClassName?.GetHashCode() ?? 0);
+                hash = hash * 31 + (ContainingClassNamespace?.GetHashCode() ?? 0);
+                hash = hash * 31 + (FieldTypeDisplayString?.GetHashCode() ?? 0);
+                hash = hash * 31 + (TypeArgumentName?.GetHashCode() ?? 0);
+                hash = hash * 31 + IsStatic.GetHashCode();
+                hash = hash * 31 + IsGenericType.GetHashCode();
+                hash = hash * 31 + HasInitializer.GetHashCode();
+                hash = hash * 31 + SpanStart;
+                hash = hash * 31 + SpanLength;
+                return hash;
+            }
         }
     }
 }
