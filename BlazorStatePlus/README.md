@@ -1,8 +1,10 @@
 # BlazorStatePlus
 
-Ergonomic helpers for Blazor prerendered state persistence (.NET 10+).
+Zero-boilerplate prerender-to-interactive state handoff for Blazor components (.NET 10+).
 
-Wraps `PersistentComponentState` with a friendlier API that eliminates boilerplate, adds change notifications, staleness detection, and state grouping.
+> **What this is:** A source-generator-powered library that wraps `PersistentComponentState` to eliminate the manual `TryTakeFromJson` / `RegisterOnPersisting` / `IDisposable` ceremony.
+>
+> **What this is NOT:** This library does **not** persist state across page refreshes, navigation, browser sessions, or server restarts. It handles the prerender-to-interactive handoff only — the moment between when the server renders HTML and when the interactive runtime takes over.
 
 ## Setup
 
@@ -11,7 +13,7 @@ Wraps `PersistentComponentState` with a friendlier API that eliminates boilerpla
 builder.Services.AddBlazorStatePlus();
 ```
 
-## Quick comparison
+## Quick Comparison
 
 ### Before (raw Blazor API)
 
@@ -19,8 +21,6 @@ builder.Services.AddBlazorStatePlus();
 @page "/weather"
 @implements IDisposable
 @inject PersistentComponentState ApplicationState
-
-<p>@forecasts?.Length forecasts loaded</p>
 
 @code {
     private WeatherForecast[]? forecasts;
@@ -52,113 +52,105 @@ builder.Services.AddBlazorStatePlus();
 ### After (with BlazorStatePlus)
 
 ```csharp
-@page "/weather"
-@inherits PersistentComponentBase
-
-<p>@Forecasts.Value?.Length forecasts loaded</p>
-
-@code {
-    private IStateSlice<WeatherForecast[]?> Forecasts = default!;
-
-    protected override async Task OnInitializedAsync()
-    {
-        Forecasts = await State.CreateAndInitAsync<WeatherForecast[]?>(
-            "forecasts",
-            () => Http.GetFromJsonAsync<WeatherForecast[]>("/api/weather"));
-    }
-}
-```
-
-No `IDisposable`, no manual `TryTakeFromJson`, no `RegisterOnPersisting` callback. The base class handles it all.
-
----
-
-## Core concepts
-
-### 1. StateSlice<T>
-
-A reactive wrapper around a single persistent value.
-
-```csharp
-@inherits PersistentComponentBase
-
-@code {
-    private IStateSlice<int> Counter = default!;
-
-    protected override void OnInitialized()
-    {
-        base.OnInitialized();
-
-        // UseSlice creates, restores, and subscribes to changes in one call.
-        // The factory is only invoked when no restored value exists.
-        Counter = UseSlice("counter", () => Random.Shared.Next(100));
-    }
-
-    private void Increment() => Counter.Value++;
-    // StateHasChanged is called automatically when Value changes.
-}
-```
-
-Key properties:
-- `Value` — get/set the current value
-- `WasRestored` — true if the value came from prerender
-- `IsDirty` — true if the value was modified since restore
-- `IsStale` — true if the value has exceeded its TTL
-- `OnChanged` — event fired on every change
-
-### 2. Staleness / TTL
-
-Flag state as stale after a duration, prompting a re-fetch:
-
-```csharp
-protected override async Task OnInitializedAsync()
+public partial class Weather : ComponentBase
 {
-    base.OnInitialized();
+    [Inject] private WeatherService WeatherSvc { get; set; } = null!;
 
-    var prices = UseSlice<PriceData[]>("prices", configure: o =>
+    [Slice(TimeToLive = "00:05:00")]
+    private IStateSlice<WeatherForecast[]> _forecasts = null!;
+
+    partial void OnInitializeSlices(SliceInitContext ctx)
     {
-        o.TimeToLive = TimeSpan.FromMinutes(5);
-    });
-
-    // InitializeIfNeededAsync skips the call when restored AND not stale.
-    // If TTL expired, the factory runs again.
-    await prices.InitializeIfNeededAsync(
-        () => PricingService.GetCurrentPricesAsync());
-}
-```
-
-### 3. State groups
-
-Bundle related properties into one serialization unit to avoid multiple keys:
-
-```csharp
-public class ProductPageState : IStateGroup
-{
-    public ProductDetail? Product { get; set; }
-    public ReviewSummary? Reviews { get; set; }
-    public bool IsInWishlist { get; set; }
-}
-
-@code {
-    private IStateSlice<ProductPageState> PageState = default!;
-
-    protected override void OnInitialized()
-    {
-        base.OnInitialized();
-
-        // One key, one serialization, all three properties restored together.
-        PageState = UseGroup<ProductPageState>("product-page");
+        ctx.Forecasts.InitializeFrom(() => WeatherSvc.GetForecastAsync());
     }
 }
 ```
 
-### 4. Using StateManager directly (without the base class)
+No `IDisposable`, no manual `TryTakeFromJson`, no `RegisterOnPersisting` callback. The source generator handles it all.
 
-If you can't inherit from `PersistentComponentBase`, inject `StateManager`:
+## How It Works
+
+1. Mark fields with `[Slice]` on a `partial class` that extends `ComponentBase`
+2. The source generator emits `OnInitialized` / `OnInitializedAsync` / `Dispose` overrides
+3. On prerender: `StateManager` registers an `OnPersisting` callback that serializes each slice's value as JSON into the prerendered HTML
+4. On interactive boot: `StateManager` calls `TryTakeFromJson` to restore each slice's value from the embedded JSON
+
+## Core Concepts
+
+### The `[Slice]` Attribute
+
+Marks a field of type `IStateSlice<T>` for automatic wiring:
 
 ```csharp
-@implements IDisposable
+public partial class Counter : ComponentBase
+{
+    [Slice]
+    private IStateSlice<int> _counter = null!;
+
+    partial void OnInitializeSlices(SliceInitContext ctx)
+    {
+        ctx.Counter.DefaultValue(Random.Shared.Next(100));
+    }
+
+    private void Increment() => _counter.Value++;
+}
+```
+
+### Runtime Configuration via `OnInitializeSlices`
+
+The generated `SliceInitContext` provides a fluent builder per field:
+
+```csharp
+partial void OnInitializeSlices(SliceInitContext ctx)
+{
+    ctx.Page
+       .KeySuffix(ProductId)          // Dynamic key: "ProductDetail.page:42"
+       .InitializeFrom(async () =>    // Async factory (skipped if restored)
+           new ProductPageState
+           {
+               Product = await Products.GetAsync(ProductId),
+               Reviews = await Reviews.GetSummaryAsync(ProductId)
+           });
+}
+```
+
+**Builder methods:**
+| Method | Description |
+|--------|-------------|
+| `DefaultValue(T value)` | Fallback value when nothing is restored |
+| `KeySuffix(params object[] parts)` | Append dynamic segments to the auto-derived key |
+| `KeyOverride(string key)` | Replace the auto-derived key entirely |
+| `InitializeFrom(Func<Task<T>> factory)` | Async factory called only when no restored value exists (or when stale) |
+
+### Staleness / TTL
+
+Flag state as stale after a duration. When the prerendered data is older than the TTL (e.g., cached by a CDN or delayed by a slow connection), the library falls back to the default and the `InitializeFrom` factory runs instead:
+
+```csharp
+[Slice(TimeToLive = "00:05:00")]
+private IStateSlice<WeatherForecast[]> _forecasts = null!;
+```
+
+### IStateSlice&lt;T&gt; Properties
+
+| Property | Description |
+|----------|-------------|
+| `Value` | Get/set the current value. Fires `OnChanged` on mutation. |
+| `WasRestored` | `true` if the value was restored from prerendered state |
+| `IsDirty` | `true` if the value was modified after creation |
+| `IsStale` | `true` if the value has exceeded its configured TTL |
+| `LastUpdated` | UTC timestamp of last value change |
+| `OnChanged` | Event fired on every value change |
+| `InitializeIfNeeded(T)` | Sets value only if not restored (sync) |
+| `InitializeIfNeededAsync(Func<Task<T>>)` | Calls factory only if not restored (async) |
+
+### Direct `StateManager` Usage
+
+If you cannot use `[Slice]` (e.g., non-partial class), inject `StateManager` directly:
+
+```csharp
 @inject StateManager State
+@implements IDisposable
 
 @code {
     private IStateSlice<string> UserName = default!;
@@ -172,31 +164,22 @@ If you can't inherit from `PersistentComponentBase`, inject `StateManager`:
 }
 ```
 
----
+## Security
 
-## API reference
+Slice values are serialized as JSON into the prerendered HTML response and are visible in the page source. **Do not store sensitive data** (auth tokens, PII, secrets, role information) in state slices.
 
-### StateManager
+## Diagnostics
 
-| Method | Description |
-|--------|-------------|
-| `CreateSlice<T>(key, default?, configure?)` | Create a slice, restore if available |
-| `CreateAndInit<T>(key, factory, configure?)` | Create + sync initialize if not restored |
-| `CreateAndInitAsync<T>(key, factory, configure?)` | Create + async initialize if not restored |
-| `CreateGroup<T>(key, default?, configure?)` | Create a group slice (single serialization unit) |
+The source generator emits compile-time diagnostics:
 
-### PersistentComponentBase
-
-| Method | Description |
-|--------|-------------|
-| `UseSlice<T>(key, default?, configure?)` | CreateSlice + auto StateHasChanged on change |
-| `UseSlice<T>(key, factory, configure?)` | CreateAndInit + auto StateHasChanged |
-| `UseGroup<T>(key, default?, configure?)` | CreateGroup + auto StateHasChanged |
-
-### StateSliceOptions
-
-| Property | Default | Description |
-|----------|---------|-------------|
-| `Key` | parameter name | Override the persistence key |
-| `TimeToLive` | `null` | Duration before `IsStale` returns true |
-| `AllowUpdatesOnNavigation` | `false` | Accept new values during enhanced nav |
+| ID | Severity | Description |
+|---|---|---|
+| BSP001 | Error | `[Slice]` on non-partial class |
+| BSP002 | Error | Field type is not `IStateSlice<T>` |
+| BSP003 | Error | Class doesn't inherit `ComponentBase` |
+| BSP005 | Error | Invalid `TimeToLive` format |
+| BSP006 | Warning | Class already implements `IDisposable` — call `__DisposeSlices()` manually |
+| BSP007 | Error | Duplicate slice keys |
+| BSP008 | Error | `[Slice]` on static field |
+| BSP011 | Warning | Class overrides `OnInitialized` — use `OnAfterSlicesCreated` instead |
+| BSP012 | Warning | Field has initializer (will be overwritten by generator) |
