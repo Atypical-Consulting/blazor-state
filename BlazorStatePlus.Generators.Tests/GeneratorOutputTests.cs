@@ -55,4 +55,57 @@ public class GeneratorOutputTests
         Assert.Contains("OnInitializeSlices", generatedSource);
         Assert.Contains("Dispose", generatedSource);
     }
+
+    [Fact]
+    public void UserOverridesOnInitializedAsync_EmitsPartialHook()
+    {
+        var source = """
+            using BlazorStatePlus.Abstractions;
+            using BlazorStatePlus.Attributes;
+            using Microsoft.AspNetCore.Components;
+            using System.Threading.Tasks;
+
+            namespace TestApp;
+
+            public partial class MyComponent : ComponentBase
+            {
+                [Slice]
+                private IStateSlice<int> _counter;
+
+                protected override async Task OnInitializedAsync()
+                {
+                    await Task.CompletedTask;
+                }
+            }
+            """;
+
+        var (diagnostics, generatedSource) = TestHelper.RunGenerator(source);
+
+        Assert.NotNull(generatedSource);
+        Assert.Contains("OnAfterSlicesInitializedAsync", generatedSource);
+        Assert.Contains("base.OnInitializedAsync()", generatedSource);
+    }
+
+    [Fact]
+    public void NoUserOverride_OnInitializedAsync_CallsBase()
+    {
+        var source = """
+            using BlazorStatePlus.Abstractions;
+            using BlazorStatePlus.Attributes;
+            using Microsoft.AspNetCore.Components;
+
+            namespace TestApp;
+
+            public partial class MyComponent : ComponentBase
+            {
+                [Slice]
+                private IStateSlice<int> _counter;
+            }
+            """;
+
+        var (diagnostics, generatedSource) = TestHelper.RunGenerator(source);
+
+        Assert.NotNull(generatedSource);
+        Assert.Contains("await base.OnInitializedAsync()", generatedSource);
+    }
 }

@@ -72,16 +72,25 @@ internal static class Emitter
         // --- OnInitializedAsync override ---
         sb.AppendLine("    protected override async global::System.Threading.Tasks.Task OnInitializedAsync()");
         sb.AppendLine("    {");
-        sb.AppendLine("        if (__ctx is null)");
-        sb.AppendLine("            return;");
+        sb.AppendLine("        await base.OnInitializedAsync();");
         sb.AppendLine();
-        sb.AppendLine("        var __ctxLocal = __ctx;");
-        sb.AppendLine("        __ctx = null;");
+        sb.AppendLine("        if (__ctx is not null)");
+        sb.AppendLine("        {");
+        sb.AppendLine("            var __ctxLocal = __ctx;");
+        sb.AppendLine("            __ctx = null;");
         sb.AppendLine();
 
         foreach (var field in model.Fields)
         {
-            sb.AppendLine($"        await __ctxLocal.{field.PropertyName}.InitializeAsync({field.FieldName});");
+            sb.AppendLine($"            await __ctxLocal.{field.PropertyName}.InitializeAsync({field.FieldName});");
+        }
+
+        sb.AppendLine("        }");
+
+        if (model.UserOverridesOnInitializedAsync)
+        {
+            sb.AppendLine();
+            sb.AppendLine("        await OnAfterSlicesInitializedAsync();");
         }
 
         sb.AppendLine("    }");
@@ -95,6 +104,13 @@ internal static class Emitter
         if (model.UserOverridesOnInitialized)
         {
             sb.AppendLine("    partial void OnAfterSlicesCreated();");
+            sb.AppendLine();
+        }
+
+        // --- partial Task OnAfterSlicesInitializedAsync (only if user overrides OnInitializedAsync) ---
+        if (model.UserOverridesOnInitializedAsync)
+        {
+            sb.AppendLine("    partial global::System.Threading.Tasks.Task OnAfterSlicesInitializedAsync();");
             sb.AppendLine();
         }
 
