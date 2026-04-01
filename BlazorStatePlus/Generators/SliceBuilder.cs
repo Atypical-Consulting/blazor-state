@@ -58,12 +58,6 @@ public sealed class SliceBuilder<T>
     public bool HasAsyncFactory => _asyncFactory is not null;
 
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public Action<StateSliceOptions>? BuildOptions(Action<StateSliceOptions>? attributeDefaults = null)
-    {
-        return attributeDefaults;
-    }
-
-    [EditorBrowsable(EditorBrowsableState.Never)]
     public async Task InitializeAsync(IStateSlice<T> slice)
     {
         if (_asyncFactory is not null)

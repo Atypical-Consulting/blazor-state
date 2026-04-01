@@ -184,25 +184,12 @@ internal static class Emitter
         return sb.ToString();
     }
 
-    /// <summary>
-    /// Builds the options argument (3rd param to CreateSlice).
-    /// If TimeToLive is not set on the attribute, passes null so the builder
-    /// returns null (no options configure lambda). If set, passes the attribute
-    /// default TTL lambda as a straight pass-through to BuildOptions — no merging occurs.
-    /// </summary>
     private static string BuildOptionsArg(SliceFieldModel field)
     {
-        bool hasTtl = !string.IsNullOrEmpty(field.TimeToLive);
+        if (string.IsNullOrEmpty(field.TimeToLive))
+            return "null";
 
-        if (!hasTtl)
-        {
-            // No attribute-level defaults — let the builder decide (may be null)
-            return $"__ctxLocal.{field.PropertyName}.BuildOptions()";
-        }
-
-        // Build an attribute-defaults lambda
-        var lambda = $"__o => {{ __o.TimeToLive = global::System.TimeSpan.Parse(\"{EscapeString(field.TimeToLive!)}\"); }}";
-        return $"__ctxLocal.{field.PropertyName}.BuildOptions({lambda})";
+        return $"__o => {{ __o.TimeToLive = global::System.TimeSpan.Parse(\"{EscapeString(field.TimeToLive!)}\"); }}";
     }
 
     private static string EscapeString(string value)

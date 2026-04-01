@@ -68,18 +68,6 @@ public class SliceBuilderTests
     }
 
     [Fact]
-    public void BuildOptions_AppliesAttributeDefaults()
-    {
-        var builder = new SliceBuilder<int>();
-        var options = new StateSliceOptions();
-
-        var configure = builder.BuildOptions(o => o.TimeToLive = TimeSpan.FromMinutes(5));
-        configure?.Invoke(options);
-
-        options.TimeToLive.ShouldBe(TimeSpan.FromMinutes(5));
-    }
-
-    [Fact]
     public void FluentApi_ReturnsSameInstance()
     {
         var builder = new SliceBuilder<int>();
