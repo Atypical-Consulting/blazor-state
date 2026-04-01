@@ -74,19 +74,6 @@ public sealed class StateManager(PersistentComponentState persistence) : IDispos
     }
 
     /// <summary>
-    /// Persists and restores an entire <see cref="IStateGroup"/> as a single unit.
-    /// Reduces the number of serialization keys and avoids partial-state issues.
-    /// </summary>
-    public IStateSlice<TGroup> CreateGroup<TGroup>(
-        string key,
-        TGroup? defaultValue = null,
-        Action<StateSliceOptions>? configure = null)
-        where TGroup : class, IStateGroup, new()
-    {
-        return CreateSlice(key, defaultValue ?? new TGroup(), configure);
-    }
-
-    /// <summary>
     /// Convenience overload: creates a slice and immediately initializes it
     /// with a synchronous factory if no restored value exists.
     /// Combines <c>CreateSlice</c> + <c>InitializeIfNeeded</c> in one call.
