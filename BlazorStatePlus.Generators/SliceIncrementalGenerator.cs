@@ -61,17 +61,12 @@ internal sealed class SliceIncrementalGenerator : IIncrementalGenerator
 
         // Extract attribute properties
         string? timeToLive = null;
-        bool allowUpdatesOnNavigation = false;
 
         foreach (var namedArg in sliceAttr.NamedArguments)
         {
             if (namedArg is { Key: "TimeToLive", Value.Value: string ttl })
             {
                 timeToLive = ttl;
-            }
-            else if (namedArg is { Key: "AllowUpdatesOnNavigation", Value.Value: bool allow })
-            {
-                allowUpdatesOnNavigation = allow;
             }
         }
 
@@ -190,7 +185,6 @@ internal sealed class SliceIncrementalGenerator : IIncrementalGenerator
             isStatic: fieldSymbol.IsStatic,
             isGenericType: isGenericType,
             timeToLive: timeToLive,
-            allowUpdatesOnNavigation: allowUpdatesOnNavigation,
             hasInitializer: hasInitializer,
             filePath: filePath,
             spanStart: spanStart,
@@ -339,7 +333,6 @@ internal sealed class SliceIncrementalGenerator : IIncrementalGenerator
                 TypeArgument = typeArgument,
                 FullTypeArgument = fullTypeArgument!,
                 TimeToLive = field.TimeToLive,
-                AllowUpdatesOnNavigation = field.AllowUpdatesOnNavigation,
                 BaseKey = baseKey,
                 FieldLocation = Location.None
             });
@@ -443,7 +436,6 @@ internal sealed class SliceIncrementalGenerator : IIncrementalGenerator
         public bool IsStatic { get; }
         public bool IsGenericType { get; }
         public string? TimeToLive { get; }
-        public bool AllowUpdatesOnNavigation { get; }
         public bool HasInitializer { get; }
         public string? FilePath { get; }
         public int SpanStart { get; }
@@ -469,7 +461,6 @@ internal sealed class SliceIncrementalGenerator : IIncrementalGenerator
             bool isStatic,
             bool isGenericType,
             string? timeToLive,
-            bool allowUpdatesOnNavigation,
             bool hasInitializer,
             string? filePath,
             int spanStart,
@@ -493,7 +484,6 @@ internal sealed class SliceIncrementalGenerator : IIncrementalGenerator
             IsStatic = isStatic;
             IsGenericType = isGenericType;
             TimeToLive = timeToLive;
-            AllowUpdatesOnNavigation = allowUpdatesOnNavigation;
             HasInitializer = hasInitializer;
             FilePath = filePath;
             SpanStart = spanStart;
@@ -522,7 +512,6 @@ internal sealed class SliceIncrementalGenerator : IIncrementalGenerator
                 && IsStatic == other.IsStatic
                 && IsGenericType == other.IsGenericType
                 && TimeToLive == other.TimeToLive
-                && AllowUpdatesOnNavigation == other.AllowUpdatesOnNavigation
                 && HasInitializer == other.HasInitializer
                 && FilePath == other.FilePath
                 && SpanStart == other.SpanStart

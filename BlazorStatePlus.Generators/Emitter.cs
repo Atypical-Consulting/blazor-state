@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Text;
 
 namespace BlazorStatePlus.Generators;
@@ -187,36 +186,22 @@ internal static class Emitter
 
     /// <summary>
     /// Builds the options argument (3rd param to CreateSlice).
-    /// If neither TimeToLive nor AllowUpdatesOnNavigation is set on the attribute,
-    /// we delegate fully to the builder (which may return null).
-    /// If either is set, we bake the attribute defaults as a lambda and merge with
-    /// the builder's user-supplied overrides.
+    /// If TimeToLive is not set on the attribute, we delegate fully to the builder
+    /// (which may return null). If set, we bake the attribute default as a lambda
+    /// and merge with the builder's user-supplied overrides.
     /// </summary>
     private static string BuildOptionsArg(SliceFieldModel field)
     {
         bool hasTtl = !string.IsNullOrEmpty(field.TimeToLive);
-        bool hasAllow = field.AllowUpdatesOnNavigation;
 
-        if (!hasTtl && !hasAllow)
+        if (!hasTtl)
         {
             // No attribute-level defaults — let the builder decide (may be null)
             return $"__ctxLocal.{field.PropertyName}.BuildOptions()";
         }
 
         // Build an attribute-defaults lambda
-        var lambdaParts = new List<string>();
-
-        if (hasTtl)
-        {
-            lambdaParts.Add($"__o.TimeToLive = global::System.TimeSpan.Parse(\"{EscapeString(field.TimeToLive!)}\")");
-        }
-
-        if (hasAllow)
-        {
-            lambdaParts.Add("__o.AllowUpdatesOnNavigation = true");
-        }
-
-        var lambda = $"__o => {{ {string.Join("; ", lambdaParts)}; }}";
+        var lambda = $"__o => {{ __o.TimeToLive = global::System.TimeSpan.Parse(\"{EscapeString(field.TimeToLive!)}\"); }}";
         return $"__ctxLocal.{field.PropertyName}.BuildOptions({lambda})";
     }
 

@@ -13,7 +13,6 @@ public sealed class SliceBuilder<T>
     private object[]? _suffixParts;
     private string? _keyOverride;
     private T _defaultValue = default!;
-    private bool _hasDefault;
     private Func<Task<T>>? _asyncFactory;
 
     public SliceBuilder<T> KeySuffix(params object[] parts)
@@ -31,7 +30,6 @@ public sealed class SliceBuilder<T>
     public SliceBuilder<T> DefaultValue(T value)
     {
         _defaultValue = value;
-        _hasDefault = true;
         return this;
     }
 

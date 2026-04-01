@@ -21,7 +21,6 @@ internal sealed class SliceFieldModel
     public string TypeArgument { get; set; } = null!;
     public string FullTypeArgument { get; set; } = null!;
     public string? TimeToLive { get; set; }
-    public bool AllowUpdatesOnNavigation { get; set; }
     public string BaseKey { get; set; } = null!;
     public Location FieldLocation { get; set; } = null!;
 }

@@ -24,12 +24,6 @@ internal static class DiagnosticDescriptors
         "Class '{0}' has [Slice] fields but does not inherit from ComponentBase",
         Category, DiagnosticSeverity.Error, isEnabledByDefault: true);
 
-    public static readonly DiagnosticDescriptor OrphanInitMethod = new(
-        "BSP004",
-        "OnInitializeSlices without [Slice] fields",
-        "Class '{0}' defines OnInitializeSlices but has no [Slice] fields",
-        Category, DiagnosticSeverity.Warning, isEnabledByDefault: true);
-
     public static readonly DiagnosticDescriptor InvalidTimeToLive = new(
         "BSP005",
         "Invalid TimeToLive format",
@@ -54,18 +48,6 @@ internal static class DiagnosticDescriptors
         "Field '{0}' is static; [Slice] fields must be instance fields",
         Category, DiagnosticSeverity.Error, isEnabledByDefault: true);
 
-    public static readonly DiagnosticDescriptor PropertyNotField = new(
-        "BSP009",
-        "[Slice] on property instead of field",
-        "'{0}' is a property; [Slice] must be applied to fields",
-        Category, DiagnosticSeverity.Error, isEnabledByDefault: true);
-
-    public static readonly DiagnosticDescriptor InvalidInitSignature = new(
-        "BSP010",
-        "OnInitializeSlices has wrong signature",
-        "OnInitializeSlices in '{0}' must be 'partial void OnInitializeSlices(SliceInitContext ctx)'",
-        Category, DiagnosticSeverity.Error, isEnabledByDefault: true);
-
     public static readonly DiagnosticDescriptor ExistingOnInitialized = new(
         "BSP011",
         "Component overrides OnInitialized",
@@ -78,9 +60,4 @@ internal static class DiagnosticDescriptors
         "Field '{0}' has an initializer that will be overwritten by the generator",
         Category, DiagnosticSeverity.Warning, isEnabledByDefault: true);
 
-    public static readonly DiagnosticDescriptor NotSerializable = new(
-        "BSP013",
-        "Slice type not JSON-serializable",
-        "Type '{0}' on field '{1}' may not be JSON-serializable",
-        Category, DiagnosticSeverity.Error, isEnabledByDefault: true);
 }

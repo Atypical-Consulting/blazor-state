@@ -123,15 +123,8 @@ public sealed class StateManager(PersistentComponentState persistence) : IDispos
     private static StateSliceOptions BuildOptions(string key, Action<StateSliceOptions>? configure)
     {
         var options = new StateSliceOptions { Key = key };
-
-        if (configure is not null)
-        {
-            // Rebuild with overrides via the configure action
-            var mutable = new MutableSliceOptions(options);
-            configure(mutable);
-            options = mutable.Build(key);
-        }
-
+        configure?.Invoke(options);
+        options.Key ??= key;
         return options;
     }
 
@@ -157,21 +150,4 @@ public sealed class StateManager(PersistentComponentState persistence) : IDispos
         public DateTimeOffset PersistedAt { get; init; }
     }
 
-    /// <summary>
-    /// Mutable helper so users can use the <c>Action&lt;StateSliceOptions&gt;</c>
-    /// configure pattern despite <see cref="StateSliceOptions"/> being a record with init-only props.
-    /// </summary>
-    private sealed class MutableSliceOptions(StateSliceOptions seed) : StateSliceOptions
-    {
-        public new string? Key { get; set; } = seed.Key;
-        public new TimeSpan? TimeToLive { get; set; } = seed.TimeToLive;
-        public new bool AllowUpdatesOnNavigation { get; set; } = seed.AllowUpdatesOnNavigation;
-
-        public StateSliceOptions Build(string fallbackKey) => new()
-        {
-            Key = Key ?? fallbackKey,
-            TimeToLive = TimeToLive,
-            AllowUpdatesOnNavigation = AllowUpdatesOnNavigation
-        };
-    }
 }

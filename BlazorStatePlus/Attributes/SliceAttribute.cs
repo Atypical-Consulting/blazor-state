@@ -13,10 +13,4 @@ public sealed class SliceAttribute : Attribute
     /// Null means the value never goes stale.
     /// </summary>
     public string? TimeToLive { get; set; }
-
-    /// <summary>
-    /// If true, this slice accepts updated values during enhanced navigation.
-    /// Default is false.
-    /// </summary>
-    public bool AllowUpdatesOnNavigation { get; set; }
 }

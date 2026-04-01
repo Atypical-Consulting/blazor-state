@@ -18,11 +18,4 @@ public class StateSliceOptions
     /// Null means the value never goes stale.
     /// </summary>
     public TimeSpan? TimeToLive { get; set; }
-
-    /// <summary>
-    /// If true, this slice will accept updated values during enhanced navigation
-    /// (equivalent to <c>[PersistentState(AllowUpdates = true)]</c>).
-    /// Default is false to protect form data from being overwritten.
-    /// </summary>
-    public bool AllowUpdatesOnNavigation { get; set; }
 }
