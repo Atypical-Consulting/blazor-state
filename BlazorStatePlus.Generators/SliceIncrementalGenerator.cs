@@ -70,8 +70,22 @@ internal sealed class SliceIncrementalGenerator : IIncrementalGenerator
             }
         }
 
-        // Check if the variable declarator has an initializer
-        bool hasInitializer = variableDeclarator.Initializer != null;
+        // Check if the variable declarator has an initializer (skip null! which is just CS8618 suppression)
+        bool hasInitializer = false;
+        if (variableDeclarator.Initializer is EqualsValueClauseSyntax initializer)
+        {
+            var initValue = initializer.Value;
+            if (initValue is PostfixUnaryExpressionSyntax { RawKind: var kind, Operand: LiteralExpressionSyntax literal }
+                && kind == (int)SyntaxKind.SuppressNullableWarningExpression
+                && literal.IsKind(SyntaxKind.NullLiteralExpression))
+            {
+                hasInitializer = false;
+            }
+            else
+            {
+                hasInitializer = true;
+            }
+        }
 
         // Extract field type info
         var fieldType = fieldSymbol.Type;

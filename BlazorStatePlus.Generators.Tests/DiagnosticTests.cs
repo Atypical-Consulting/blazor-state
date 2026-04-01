@@ -112,6 +112,48 @@ public class DiagnosticTests
     }
 
     [Fact]
+    public void BSP012_NullForgivingInitializer_NoDiagnostic()
+    {
+        var source = """
+            using BlazorStatePlus.Abstractions;
+            using BlazorStatePlus.Attributes;
+            using Microsoft.AspNetCore.Components;
+
+            namespace TestApp;
+
+            public partial class MyComponent : ComponentBase
+            {
+                [Slice]
+                private IStateSlice<int> _counter = null!;
+            }
+            """;
+
+        var diagnostics = TestHelper.GetDiagnostics(source);
+        diagnostics.ShouldNotContain(d => d.Id == "BSP012");
+    }
+
+    [Fact]
+    public void BSP012_RealInitializer_ReportsDiagnostic()
+    {
+        var source = """
+            using BlazorStatePlus.Abstractions;
+            using BlazorStatePlus.Attributes;
+            using Microsoft.AspNetCore.Components;
+
+            namespace TestApp;
+
+            public partial class MyComponent : ComponentBase
+            {
+                [Slice]
+                private IStateSlice<int> _counter = default!;
+            }
+            """;
+
+        var diagnostics = TestHelper.GetDiagnostics(source);
+        diagnostics.ShouldContain(d => d.Id == "BSP012");
+    }
+
+    [Fact]
     public void ValidComponent_NoDiagnosticErrors()
     {
         var source = """
