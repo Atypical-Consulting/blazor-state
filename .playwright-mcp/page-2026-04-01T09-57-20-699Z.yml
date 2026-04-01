@@ -1,0 +1,28 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - link "BlazorStatePlus Demo" [ref=e6] [cursor=pointer]:
+      - /url: ""
+    - navigation [ref=e8]:
+      - link "Home" [ref=e10] [cursor=pointer]:
+        - /url: ""
+        - text: Home
+      - link "Counter" [ref=e13] [cursor=pointer]:
+        - /url: counter
+        - text: Counter
+      - link "Weather" [ref=e16] [cursor=pointer]:
+        - /url: weather
+        - text: Weather
+      - link "Product" [ref=e19] [cursor=pointer]:
+        - /url: product/1
+        - text: Product
+  - main [ref=e21]:
+    - link "About" [ref=e23] [cursor=pointer]:
+      - /url: https://learn.microsoft.com/aspnet/core/
+    - article [ref=e39]:
+      - heading "Blazor State Widget" [level=1] [ref=e73]
+      - paragraph [ref=e74]: A premium state management widget for Blazor apps.
+      - paragraph [ref=e75]:
+        - strong [ref=e76]: $29.99
+      - button "Remove from wishlist" [active] [ref=e80] [cursor=pointer]
+      - heading "Reviews (42)" [level=2] [ref=e78]
+      - paragraph [ref=e79]: "Average: 4.3 / 5"
