@@ -14,7 +14,7 @@ public partial class ProductDetail : ComponentBase
     public int ProductId { get; set; }
 
     [Slice(TimeToLive = "00:05:00")]
-    private IStateSlice<ProductPageState> _page;
+    private IStateSlice<ProductPageState> _page = null!;
 
     partial void OnInitializeSlices(SliceInitContext ctx)
     {

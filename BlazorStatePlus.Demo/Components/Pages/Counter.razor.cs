@@ -7,7 +7,7 @@ namespace BlazorStatePlus.Demo.Components.Pages;
 public partial class Counter : ComponentBase
 {
     [Slice]
-    private IStateSlice<int> _counter;
+    private IStateSlice<int> _counter = null!;
 
     partial void OnInitializeSlices(SliceInitContext ctx)
     {

@@ -12,7 +12,7 @@ public class WeatherService
     private static readonly string[] Summaries =
         ["Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"];
 
-    public Task<WeatherForecast[]?> GetForecastAsync()
+    public Task<WeatherForecast[]> GetForecastAsync()
     {
         var startDate = DateOnly.FromDateTime(DateTime.Now);
         var forecasts = Enumerable.Range(1, 5).Select(index => new WeatherForecast
@@ -22,6 +22,6 @@ public class WeatherService
             Summary = Summaries[Random.Shared.Next(Summaries.Length)]
         }).ToArray();
 
-        return Task.FromResult<WeatherForecast[]?>(forecasts);
+        return Task.FromResult(forecasts);
     }
 }

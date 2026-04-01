@@ -4,8 +4,14 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
-  <Project Path="BlazorStatePlus.Demo/BlazorStatePlus.Demo.csproj" />
-  <Project Path="BlazorStatePlus.Generators.Tests/BlazorStatePlus.Generators.Tests.csproj" />
-  <Project Path="BlazorStatePlus.Generators/BlazorStatePlus.Generators.csproj" />
-  <Project Path="BlazorStatePlus/BlazorStatePlus.csproj" />
+  <Folder Name="/src/">
+    <Project Path="BlazorStatePlus/BlazorStatePlus.csproj" />
+    <Project Path="BlazorStatePlus.Generators/BlazorStatePlus.Generators.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="BlazorStatePlus.Generators.Tests/BlazorStatePlus.Generators.Tests.csproj" />
+  </Folder>
+  <Folder Name="/samples/">
+    <Project Path="BlazorStatePlus.Demo/BlazorStatePlus.Demo.csproj" />
+  </Folder>
 </Solution>

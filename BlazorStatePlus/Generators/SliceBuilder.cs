@@ -60,9 +60,6 @@ public sealed class SliceBuilder<T>
     [EditorBrowsable(EditorBrowsableState.Never)]
     public Action<StateSliceOptions>? BuildOptions(Action<StateSliceOptions>? attributeDefaults = null)
     {
-        if (attributeDefaults is null)
-            return null;
-
         return attributeDefaults;
     }
 
