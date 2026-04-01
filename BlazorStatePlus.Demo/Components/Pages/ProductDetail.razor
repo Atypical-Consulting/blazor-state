@@ -1,9 +1,7 @@
-@*
-    Example 3: Product detail page using a state group.
-    All related data (product, reviews, wishlist status) is persisted as one unit.
-*@
-
 @page "/product/{ProductId:int}"
+@rendermode InteractiveServer
+
+<PageTitle>Product</PageTitle>
 
 <h1>@(_page.Value.Product?.Name ?? "Loading...")</h1>
 

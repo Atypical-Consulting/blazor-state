@@ -1,8 +1,10 @@
 using BlazorStatePlus.Abstractions;
+using BlazorStatePlus.Attributes;
+using Microsoft.AspNetCore.Components;
 
-namespace BlazorStatePlus.Examples;
+namespace BlazorStatePlus.Demo.Components.Pages;
 
-public partial class PersistentCounter : ComponentBase
+public partial class Counter : ComponentBase
 {
     [Slice]
     private IStateSlice<int> _counter;

@@ -1,7 +1,9 @@
 using BlazorStatePlus.Abstractions;
 using BlazorStatePlus.Attributes;
+using BlazorStatePlus.Demo.Services;
+using Microsoft.AspNetCore.Components;
 
-namespace BlazorStatePlus.Examples;
+namespace BlazorStatePlus.Demo.Components.Pages;
 
 public partial class ProductDetail : ComponentBase
 {

@@ -4,6 +4,7 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
+  <Project Path="BlazorStatePlus.Demo/BlazorStatePlus.Demo.csproj" />
   <Project Path="BlazorStatePlus.Generators.Tests/BlazorStatePlus.Generators.Tests.csproj" />
   <Project Path="BlazorStatePlus.Generators/BlazorStatePlus.Generators.csproj" />
   <Project Path="BlazorStatePlus/BlazorStatePlus.csproj" />
