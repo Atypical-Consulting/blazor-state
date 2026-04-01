@@ -18,4 +18,8 @@
                       ReferenceOutputAssembly="false" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="BlazorStatePlus.Generators.Tests" />
+  </ItemGroup>
+
 </Project>

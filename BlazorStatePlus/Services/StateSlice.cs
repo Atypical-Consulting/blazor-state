@@ -51,7 +51,7 @@ internal sealed class StateSlice<T> : IStateSlice<T>
 
     public bool InitializeIfNeeded(T value)
     {
-        if (WasRestored)
+        if (WasRestored && !IsStale)
             return false;
 
         Value = value;
