@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("BlazorStatePlus.Generators")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d9011248fa324bd4e3f5be37802339b5121ed65f")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+885ed01704217a1109934eb7bcf7d668289f1ebd")]
 [assembly: System.Reflection.AssemblyProductAttribute("BlazorStatePlus.Generators")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BlazorStatePlus.Generators")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

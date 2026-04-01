@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyDescriptionAttribute("Ergonomic helpers for Blazor prerendered state persistence (.NET 10+)")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+cd98cd49a832b70e8014eda8175c52f3459ab6fb")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+885ed01704217a1109934eb7bcf7d668289f1ebd")]
 [assembly: System.Reflection.AssemblyProductAttribute("BlazorStatePlus")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BlazorStatePlus")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
