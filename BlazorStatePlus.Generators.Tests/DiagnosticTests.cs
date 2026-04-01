@@ -1,4 +1,5 @@
 using Microsoft.CodeAnalysis;
+using Shouldly;
 using Xunit;
 
 namespace BlazorStatePlus.Generators.Tests;
@@ -23,7 +24,7 @@ public class DiagnosticTests
             """;
 
         var diagnostics = TestHelper.GetDiagnostics(source);
-        Assert.Contains(diagnostics, d => d.Id == "BSP001");
+        diagnostics.ShouldContain(d => d.Id == "BSP001");
     }
 
     [Fact]
@@ -44,7 +45,7 @@ public class DiagnosticTests
             """;
 
         var diagnostics = TestHelper.GetDiagnostics(source);
-        Assert.Contains(diagnostics, d => d.Id == "BSP002");
+        diagnostics.ShouldContain(d => d.Id == "BSP002");
     }
 
     [Fact]
@@ -65,7 +66,7 @@ public class DiagnosticTests
             """;
 
         var diagnostics = TestHelper.GetDiagnostics(source);
-        Assert.Contains(diagnostics, d => d.Id == "BSP003");
+        diagnostics.ShouldContain(d => d.Id == "BSP003");
     }
 
     [Fact]
@@ -86,7 +87,7 @@ public class DiagnosticTests
             """;
 
         var diagnostics = TestHelper.GetDiagnostics(source);
-        Assert.Contains(diagnostics, d => d.Id == "BSP005");
+        diagnostics.ShouldContain(d => d.Id == "BSP005");
     }
 
     [Fact]
@@ -107,7 +108,7 @@ public class DiagnosticTests
             """;
 
         var diagnostics = TestHelper.GetDiagnostics(source);
-        Assert.Contains(diagnostics, d => d.Id == "BSP008");
+        diagnostics.ShouldContain(d => d.Id == "BSP008");
     }
 
     [Fact]
@@ -128,6 +129,6 @@ public class DiagnosticTests
             """;
 
         var diagnostics = TestHelper.GetDiagnostics(source);
-        Assert.DoesNotContain(diagnostics, d => d.Severity == DiagnosticSeverity.Error);
+        diagnostics.ShouldNotContain(d => d.Severity == DiagnosticSeverity.Error);
     }
 }

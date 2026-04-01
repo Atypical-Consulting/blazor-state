@@ -1,4 +1,5 @@
 using Microsoft.CodeAnalysis;
+using Shouldly;
 using Xunit;
 
 namespace BlazorStatePlus.Generators.Tests;
@@ -25,8 +26,8 @@ public class GeneratorOutputTests
         var (diag1, output1) = TestHelper.RunGenerator(source);
         var (diag2, output2) = TestHelper.RunGenerator(source);
 
-        Assert.Equal(output1, output2);
-        Assert.DoesNotContain(diag1, d => d.Severity == Microsoft.CodeAnalysis.DiagnosticSeverity.Error);
+        output1.ShouldBe(output2);
+        diag1.ShouldNotContain(d => d.Severity == DiagnosticSeverity.Error);
     }
 
     [Fact]
@@ -48,12 +49,12 @@ public class GeneratorOutputTests
 
         var (diagnostics, generatedSource) = TestHelper.RunGenerator(source);
 
-        Assert.DoesNotContain(diagnostics, d => d.Severity == DiagnosticSeverity.Error);
-        Assert.NotNull(generatedSource);
-        Assert.Contains("CreateSlice", generatedSource);
-        Assert.Contains("SliceInitContext", generatedSource);
-        Assert.Contains("OnInitializeSlices", generatedSource);
-        Assert.Contains("Dispose", generatedSource);
+        diagnostics.ShouldNotContain(d => d.Severity == DiagnosticSeverity.Error);
+        generatedSource.ShouldNotBeNull();
+        generatedSource.ShouldContain("CreateSlice");
+        generatedSource.ShouldContain("SliceInitContext");
+        generatedSource.ShouldContain("OnInitializeSlices");
+        generatedSource.ShouldContain("Dispose");
     }
 
     [Fact]
@@ -81,9 +82,9 @@ public class GeneratorOutputTests
 
         var (diagnostics, generatedSource) = TestHelper.RunGenerator(source);
 
-        Assert.NotNull(generatedSource);
-        Assert.Contains("OnAfterSlicesInitializedAsync", generatedSource);
-        Assert.Contains("base.OnInitializedAsync()", generatedSource);
+        generatedSource.ShouldNotBeNull();
+        generatedSource.ShouldContain("OnAfterSlicesInitializedAsync");
+        generatedSource.ShouldContain("base.OnInitializedAsync()");
     }
 
     [Fact]
@@ -105,8 +106,8 @@ public class GeneratorOutputTests
 
         var (diagnostics, generatedSource) = TestHelper.RunGenerator(source);
 
-        Assert.NotNull(generatedSource);
-        Assert.Contains("await base.OnInitializedAsync()", generatedSource);
+        generatedSource.ShouldNotBeNull();
+        generatedSource.ShouldContain("await base.OnInitializedAsync()");
     }
 
     [Fact]
@@ -126,7 +127,7 @@ public class GeneratorOutputTests
 
         var (diagnostics, generatedSource) = TestHelper.RunGenerator(source);
 
-        Assert.NotNull(generatedSource);
-        Assert.DoesNotContain("namespace ;", generatedSource);
+        generatedSource.ShouldNotBeNull();
+        generatedSource.ShouldNotContain("namespace ;");
     }
 }

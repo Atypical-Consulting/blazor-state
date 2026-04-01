@@ -1,4 +1,5 @@
 using BlazorStatePlus.Abstractions;
+using Shouldly;
 using Xunit;
 
 namespace BlazorStatePlus.Generators.Tests;
@@ -9,7 +10,7 @@ public class SliceBuilderTests
     public void ResolveKey_NoOverride_ReturnsBaseKey()
     {
         var builder = new SliceBuilder<int>();
-        Assert.Equal("Component.counter", builder.ResolveKey("Component.counter"));
+        builder.ResolveKey("Component.counter").ShouldBe("Component.counter");
     }
 
     [Fact]
@@ -17,7 +18,7 @@ public class SliceBuilderTests
     {
         var builder = new SliceBuilder<int>();
         builder.KeySuffix(42);
-        Assert.Equal("Component.counter:42", builder.ResolveKey("Component.counter"));
+        builder.ResolveKey("Component.counter").ShouldBe("Component.counter:42");
     }
 
     [Fact]
@@ -25,7 +26,7 @@ public class SliceBuilderTests
     {
         var builder = new SliceBuilder<string>();
         builder.KeySuffix(1, "en");
-        Assert.Equal("Component.name:1:en", builder.ResolveKey("Component.name"));
+        builder.ResolveKey("Component.name").ShouldBe("Component.name:1:en");
     }
 
     [Fact]
@@ -33,14 +34,14 @@ public class SliceBuilderTests
     {
         var builder = new SliceBuilder<int>();
         builder.KeyOverride("custom-key");
-        Assert.Equal("custom-key", builder.ResolveKey("Component.counter"));
+        builder.ResolveKey("Component.counter").ShouldBe("custom-key");
     }
 
     [Fact]
     public void GetDefaultValue_ReturnsDefault_WhenNotSet()
     {
         var builder = new SliceBuilder<int>();
-        Assert.Equal(0, builder.GetDefaultValue());
+        builder.GetDefaultValue().ShouldBe(0);
     }
 
     [Fact]
@@ -48,14 +49,14 @@ public class SliceBuilderTests
     {
         var builder = new SliceBuilder<int>();
         builder.DefaultValue(42);
-        Assert.Equal(42, builder.GetDefaultValue());
+        builder.GetDefaultValue().ShouldBe(42);
     }
 
     [Fact]
     public void HasAsyncFactory_FalseByDefault()
     {
         var builder = new SliceBuilder<int>();
-        Assert.False(builder.HasAsyncFactory);
+        builder.HasAsyncFactory.ShouldBeFalse();
     }
 
     [Fact]
@@ -63,7 +64,7 @@ public class SliceBuilderTests
     {
         var builder = new SliceBuilder<int>();
         builder.InitializeFrom(() => Task.FromResult(99));
-        Assert.True(builder.HasAsyncFactory);
+        builder.HasAsyncFactory.ShouldBeTrue();
     }
 
     [Fact]
@@ -75,7 +76,7 @@ public class SliceBuilderTests
         var configure = builder.BuildOptions(o => o.TimeToLive = TimeSpan.FromMinutes(5));
         configure?.Invoke(options);
 
-        Assert.Equal(TimeSpan.FromMinutes(5), options.TimeToLive);
+        options.TimeToLive.ShouldBe(TimeSpan.FromMinutes(5));
     }
 
     [Fact]
@@ -83,6 +84,6 @@ public class SliceBuilderTests
     {
         var builder = new SliceBuilder<int>();
         var same = builder.KeySuffix(1).DefaultValue(0).KeyOverride("x");
-        Assert.Same(builder, same);
+        same.ShouldBeSameAs(builder);
     }
 }

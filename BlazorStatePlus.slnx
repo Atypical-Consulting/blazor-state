@@ -10,6 +10,7 @@
   </Folder>
   <Folder Name="/tests/">
     <Project Path="BlazorStatePlus.Generators.Tests/BlazorStatePlus.Generators.Tests.csproj" />
+    <Project Path="BlazorStatePlus.Tests/BlazorStatePlus.Tests.csproj" />
   </Folder>
   <Folder Name="/samples/">
     <Project Path="BlazorStatePlus.Demo/BlazorStatePlus.Demo.csproj" />

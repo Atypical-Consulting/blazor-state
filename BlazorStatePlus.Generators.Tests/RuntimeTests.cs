@@ -1,5 +1,6 @@
 using BlazorStatePlus.Abstractions;
 using BlazorStatePlus.Services;
+using Shouldly;
 using Xunit;
 
 namespace BlazorStatePlus.Generators.Tests;
@@ -16,20 +17,20 @@ public class StateSliceTests
     public void InitializeIfNeeded_WhenRestoredAndStale_ReturnsTrue()
     {
         var slice = CreateSlice(42, wasRestored: true, ttl: TimeSpan.Zero);
-        Assert.True(slice.IsStale);
+        slice.IsStale.ShouldBeTrue();
         var result = slice.InitializeIfNeeded(99);
-        Assert.True(result);
-        Assert.Equal(99, slice.Value);
+        result.ShouldBeTrue();
+        slice.Value.ShouldBe(99);
     }
 
     [Fact]
     public void InitializeIfNeeded_WhenRestoredAndFresh_ReturnsFalse()
     {
         var slice = CreateSlice(42, wasRestored: true, ttl: TimeSpan.FromHours(1));
-        Assert.False(slice.IsStale);
+        slice.IsStale.ShouldBeFalse();
         var result = slice.InitializeIfNeeded(99);
-        Assert.False(result);
-        Assert.Equal(42, slice.Value);
+        result.ShouldBeFalse();
+        slice.Value.ShouldBe(42);
     }
 
     [Fact]
@@ -37,8 +38,8 @@ public class StateSliceTests
     {
         var slice = CreateSlice(0, wasRestored: false);
         var result = slice.InitializeIfNeeded(99);
-        Assert.True(result);
-        Assert.Equal(99, slice.Value);
+        result.ShouldBeTrue();
+        slice.Value.ShouldBe(99);
     }
 
     [Fact]
@@ -46,7 +47,7 @@ public class StateSliceTests
     {
         var slice = CreateSlice(42, wasRestored: false);
         slice.Dispose();
-        Assert.Throws<ObjectDisposedException>(() => slice.Value = 99);
+        Should.Throw<ObjectDisposedException>(() => slice.Value = 99);
     }
 
     [Fact]
@@ -55,7 +56,7 @@ public class StateSliceTests
         var slice = CreateSlice(42, wasRestored: false);
         slice.Value = 10;
         slice.Dispose();
-        Assert.Equal(10, slice.Value);
+        slice.Value.ShouldBe(10);
     }
 
     [Fact]
@@ -65,7 +66,7 @@ public class StateSliceTests
         bool fired = false;
         slice.OnChanged += () => fired = true;
         slice.Value = 42;
-        Assert.True(fired);
+        fired.ShouldBeTrue();
     }
 
     [Fact]
@@ -75,35 +76,35 @@ public class StateSliceTests
         bool fired = false;
         slice.OnChanged += () => fired = true;
         slice.Value = 42;
-        Assert.False(fired);
+        fired.ShouldBeFalse();
     }
 
     [Fact]
     public void IsStale_NoTTL_ReturnsFalse()
     {
         var slice = CreateSlice(42, wasRestored: true, ttl: null);
-        Assert.False(slice.IsStale);
+        slice.IsStale.ShouldBeFalse();
     }
 
     [Fact]
     public void IsStale_ZeroTTL_ReturnsTrue()
     {
         var slice = CreateSlice(42, wasRestored: true, ttl: TimeSpan.Zero);
-        Assert.True(slice.IsStale);
+        slice.IsStale.ShouldBeTrue();
     }
 
     [Fact]
     public void IsStale_LargeTTL_ReturnsFalse()
     {
         var slice = CreateSlice(42, wasRestored: true, ttl: TimeSpan.FromHours(1));
-        Assert.False(slice.IsStale);
+        slice.IsStale.ShouldBeFalse();
     }
 
     [Fact]
     public void IsDirty_InitiallyFalse()
     {
         var slice = CreateSlice(0, wasRestored: false);
-        Assert.False(slice.IsDirty);
+        slice.IsDirty.ShouldBeFalse();
     }
 
     [Fact]
@@ -111,7 +112,7 @@ public class StateSliceTests
     {
         var slice = CreateSlice(0, wasRestored: false);
         slice.Value = 42;
-        Assert.True(slice.IsDirty);
+        slice.IsDirty.ShouldBeTrue();
     }
 
     [Fact]
@@ -119,8 +120,8 @@ public class StateSliceTests
     {
         var restored = CreateSlice(42, wasRestored: true);
         var fresh = CreateSlice(0, wasRestored: false);
-        Assert.True(restored.WasRestored);
-        Assert.False(fresh.WasRestored);
+        restored.WasRestored.ShouldBeTrue();
+        fresh.WasRestored.ShouldBeFalse();
     }
 
     [Fact]
@@ -131,7 +132,7 @@ public class StateSliceTests
         slice.OnChanged += () => fired = true;
         slice.Dispose();
         // OnChanged should be null now, verify no handler remains
-        Assert.False(fired);
+        fired.ShouldBeFalse();
     }
 
     [Fact]
@@ -152,8 +153,8 @@ public class StateSliceTests
             factoryCalled = true;
             return 99;
         });
-        Assert.True(factoryCalled);
-        Assert.Equal(99, slice.Value);
+        factoryCalled.ShouldBeTrue();
+        slice.Value.ShouldBe(99);
     }
 
     [Fact]
@@ -166,8 +167,8 @@ public class StateSliceTests
             factoryCalled = true;
             return 99;
         });
-        Assert.False(factoryCalled);
-        Assert.Equal(42, slice.Value);
+        factoryCalled.ShouldBeFalse();
+        slice.Value.ShouldBe(42);
     }
 
     [Fact]
@@ -175,6 +176,6 @@ public class StateSliceTests
     {
         var slice = CreateSlice(42, wasRestored: true, ttl: TimeSpan.Zero);
         await slice.InitializeIfNeededAsync(async () => 99);
-        Assert.Equal(99, slice.Value);
+        slice.Value.ShouldBe(99);
     }
 }
