@@ -2,6 +2,8 @@
 
 Roslyn incremental source generator that eliminates boilerplate for Blazor persistent state management.
 
+> **Scope:** This generator supports `PersistentComponentState` — the prerender-to-interactive handoff mechanism. State managed by this generator does **not** survive page refreshes, navigation, or browser sessions.
+
 ## What it does
 
 Finds `[Slice]`-annotated `IStateSlice<T>` fields on partial `ComponentBase` classes and generates the other partial half with:
