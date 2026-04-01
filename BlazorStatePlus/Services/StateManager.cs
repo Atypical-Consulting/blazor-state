@@ -1,4 +1,5 @@
 using BlazorStatePlus.Abstractions;
+using Microsoft.Extensions.Logging;
 
 namespace BlazorStatePlus.Services;
 
@@ -8,7 +9,9 @@ namespace BlazorStatePlus.Services;
 /// 
 /// Inject this into components instead of using <c>PersistentComponentState</c> directly.
 /// </summary>
-public sealed class StateManager(PersistentComponentState persistence) : IDisposable
+public sealed class StateManager(
+    PersistentComponentState persistence,
+    ILogger<StateManager> logger) : IDisposable
 {
     private readonly List<PersistingComponentStateSubscription> _subscriptions = [];
     private readonly List<Func<Task>> _persistCallbacks = [];
@@ -57,6 +60,13 @@ public sealed class StateManager(PersistentComponentState persistence) : IDispos
             restoredValue = defaultValue;
             effectivelyRestored = false;
         }
+
+        if (effectivelyRestored)
+            logger.LogDebug("Slice '{Key}': restored from prerender", options.Key);
+        else if (wasRestored && envelope is not null)
+            logger.LogDebug("Slice '{Key}': restored value discarded (TTL expired)", options.Key);
+        else
+            logger.LogDebug("Slice '{Key}': no persisted value, using default", options.Key);
 
         var slice = new StateSlice<T>(restoredValue, effectivelyRestored, options);
 

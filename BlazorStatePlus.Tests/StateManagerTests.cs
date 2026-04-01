@@ -4,6 +4,7 @@ using Bunit;
 using Bunit.TestDoubles;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging.Abstractions;
 using Shouldly;
 using Xunit;
 
@@ -21,7 +22,7 @@ public class StateManagerTests : BunitContext
     private StateManager CreateManager()
     {
         var pcs = Services.GetRequiredService<PersistentComponentState>();
-        return new StateManager(pcs);
+        return new StateManager(pcs, NullLogger<StateManager>.Instance);
     }
 
     // -- CreateSlice ----------------------------------------------------------
