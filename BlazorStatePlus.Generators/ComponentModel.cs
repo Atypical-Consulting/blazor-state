@@ -6,23 +6,23 @@ namespace BlazorStatePlus.Generators;
 
 internal sealed class ComponentModel
 {
-    public string Namespace { get; set; }
-    public string ClassName { get; set; }
-    public List<SliceFieldModel> Fields { get; set; }
+    public string Namespace { get; set; } = null!;
+    public string ClassName { get; set; } = null!;
+    public List<SliceFieldModel> Fields { get; set; } = null!;
     public bool UserImplementsDisposable { get; set; }
     public bool UserOverridesOnInitialized { get; set; }
     public bool UserOverridesOnInitializedAsync { get; set; }
-    public Location ClassLocation { get; set; }
+    public Location ClassLocation { get; set; } = null!;
 }
 
 internal sealed class SliceFieldModel
 {
-    public string FieldName { get; set; }
-    public string PropertyName { get; set; }
-    public string TypeArgument { get; set; }
-    public string FullTypeArgument { get; set; }
-    public string TimeToLive { get; set; }
+    public string FieldName { get; set; } = null!;
+    public string PropertyName { get; set; } = null!;
+    public string TypeArgument { get; set; } = null!;
+    public string FullTypeArgument { get; set; } = null!;
+    public string? TimeToLive { get; set; }
     public bool AllowUpdatesOnNavigation { get; set; }
-    public string BaseKey { get; set; }
-    public Location FieldLocation { get; set; }
+    public string BaseKey { get; set; } = null!;
+    public Location FieldLocation { get; set; } = null!;
 }

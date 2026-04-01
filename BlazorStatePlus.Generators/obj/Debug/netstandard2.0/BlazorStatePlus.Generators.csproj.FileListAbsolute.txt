@@ -1,0 +1,10 @@
+C:\repo\POC\BlazorStatePlus\BlazorStatePlus.Generators\bin\Debug\netstandard2.0\BlazorStatePlus.Generators.deps.json
+C:\repo\POC\BlazorStatePlus\BlazorStatePlus.Generators\bin\Debug\netstandard2.0\BlazorStatePlus.Generators.dll
+C:\repo\POC\BlazorStatePlus\BlazorStatePlus.Generators\bin\Debug\netstandard2.0\BlazorStatePlus.Generators.pdb
+C:\repo\POC\BlazorStatePlus\BlazorStatePlus.Generators\obj\Debug\netstandard2.0\BlazorStatePlus.Generators.csproj.AssemblyReference.cache
+C:\repo\POC\BlazorStatePlus\BlazorStatePlus.Generators\obj\Debug\netstandard2.0\BlazorStatePlus.Generators.GeneratedMSBuildEditorConfig.editorconfig
+C:\repo\POC\BlazorStatePlus\BlazorStatePlus.Generators\obj\Debug\netstandard2.0\BlazorStatePlus.Generators.AssemblyInfoInputs.cache
+C:\repo\POC\BlazorStatePlus\BlazorStatePlus.Generators\obj\Debug\netstandard2.0\BlazorStatePlus.Generators.AssemblyInfo.cs
+C:\repo\POC\BlazorStatePlus\BlazorStatePlus.Generators\obj\Debug\netstandard2.0\BlazorStatePlus.Generators.csproj.CoreCompileInputs.cache
+C:\repo\POC\BlazorStatePlus\BlazorStatePlus.Generators\obj\Debug\netstandard2.0\BlazorStatePlus.Generators.dll
+C:\repo\POC\BlazorStatePlus\BlazorStatePlus.Generators\obj\Debug\netstandard2.0\BlazorStatePlus.Generators.pdb
