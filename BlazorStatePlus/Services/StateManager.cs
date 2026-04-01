@@ -117,7 +117,8 @@ public sealed class StateManager(PersistentComponentState persistence) : IDispos
             _registered = true;
             _subscriptions.Add(persistence.RegisterOnPersisting(async () =>
             {
-                foreach (var cb in _persistCallbacks)
+                var snapshot = _persistCallbacks.ToArray();
+                foreach (var cb in snapshot)
                     await cb();
             }));
         }
