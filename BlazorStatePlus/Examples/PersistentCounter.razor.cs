@@ -1,5 +1,4 @@
 using BlazorStatePlus.Abstractions;
-using BlazorStatePlus.Attributes;
 
 namespace BlazorStatePlus.Examples;
 

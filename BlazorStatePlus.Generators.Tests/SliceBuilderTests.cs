@@ -1,5 +1,4 @@
 using BlazorStatePlus.Abstractions;
-using BlazorStatePlus.Generators;
 using Xunit;
 
 namespace BlazorStatePlus.Generators.Tests;

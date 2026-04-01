@@ -1,3 +1,7 @@
+C:\repo\POC\BlazorStatePlus\BlazorStatePlus\bin\Debug\net10.0\BlazorStatePlus.staticwebassets.endpoints.json
+C:\repo\POC\BlazorStatePlus\BlazorStatePlus\bin\Debug\net10.0\BlazorStatePlus.deps.json
+C:\repo\POC\BlazorStatePlus\BlazorStatePlus\bin\Debug\net10.0\BlazorStatePlus.dll
+C:\repo\POC\BlazorStatePlus\BlazorStatePlus\bin\Debug\net10.0\BlazorStatePlus.pdb
 C:\repo\POC\BlazorStatePlus\BlazorStatePlus\obj\Debug\net10.0\EmbeddedAttribute.cs
 C:\repo\POC\BlazorStatePlus\BlazorStatePlus\obj\Debug\net10.0\ValidatableTypeAttribute.cs
 C:\repo\POC\BlazorStatePlus\BlazorStatePlus\obj\Debug\net10.0\rpswa.dswa.cache.json
@@ -5,10 +9,6 @@ C:\repo\POC\BlazorStatePlus\BlazorStatePlus\obj\Debug\net10.0\BlazorStatePlus.Ge
 C:\repo\POC\BlazorStatePlus\BlazorStatePlus\obj\Debug\net10.0\BlazorStatePlus.AssemblyInfoInputs.cache
 C:\repo\POC\BlazorStatePlus\BlazorStatePlus\obj\Debug\net10.0\BlazorStatePlus.AssemblyInfo.cs
 C:\repo\POC\BlazorStatePlus\BlazorStatePlus\obj\Debug\net10.0\BlazorStatePlus.csproj.CoreCompileInputs.cache
-C:\repo\POC\BlazorStatePlus\BlazorStatePlus\bin\Debug\net10.0\BlazorStatePlus.staticwebassets.endpoints.json
-C:\repo\POC\BlazorStatePlus\BlazorStatePlus\bin\Debug\net10.0\BlazorStatePlus.deps.json
-C:\repo\POC\BlazorStatePlus\BlazorStatePlus\bin\Debug\net10.0\BlazorStatePlus.dll
-C:\repo\POC\BlazorStatePlus\BlazorStatePlus\bin\Debug\net10.0\BlazorStatePlus.pdb
 C:\repo\POC\BlazorStatePlus\BlazorStatePlus\obj\Debug\net10.0\rjimswa.dswa.cache.json
 C:\repo\POC\BlazorStatePlus\BlazorStatePlus\obj\Debug\net10.0\rjsmrazor.dswa.cache.json
 C:\repo\POC\BlazorStatePlus\BlazorStatePlus\obj\Debug\net10.0\rjsmcshtml.dswa.cache.json

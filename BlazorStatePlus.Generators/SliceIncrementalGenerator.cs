@@ -28,10 +28,7 @@ internal sealed class SliceIncrementalGenerator : IIncrementalGenerator
         var collected = fieldInfos.Collect();
 
         // Step 3: Combine with compilation and emit
-        context.RegisterSourceOutput(collected, static (spc, fields) =>
-        {
-            Execute(spc, fields!);
-        });
+        context.RegisterSourceOutput(collected, Execute);
     }
 
     private static FieldInfo? ExtractFieldInfo(GeneratorAttributeSyntaxContext ctx, CancellationToken ct)
