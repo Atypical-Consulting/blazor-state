@@ -84,7 +84,10 @@ public sealed class StateManager(PersistentComponentState persistence) : IDispos
         Action<StateSliceOptions>? configure = null)
     {
         var slice = CreateSlice<T>(key, default!, configure);
-        slice.InitializeIfNeeded(factory());
+        if (!slice.WasRestored || slice.IsStale)
+        {
+            slice.InitializeIfNeeded(factory());
+        }
         return slice;
     }
 
