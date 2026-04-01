@@ -65,11 +65,11 @@ internal sealed class SliceIncrementalGenerator : IIncrementalGenerator
 
         foreach (var namedArg in sliceAttr.NamedArguments)
         {
-            if (namedArg.Key == "TimeToLive" && namedArg.Value.Value is string ttl)
+            if (namedArg is { Key: "TimeToLive", Value.Value: string ttl })
             {
                 timeToLive = ttl;
             }
-            else if (namedArg.Key == "AllowUpdatesOnNavigation" && namedArg.Value.Value is bool allow)
+            else if (namedArg is { Key: "AllowUpdatesOnNavigation", Value.Value: bool allow })
             {
                 allowUpdatesOnNavigation = allow;
             }
@@ -184,7 +184,7 @@ internal sealed class SliceIncrementalGenerator : IIncrementalGenerator
             string? typeArgument = null;
             string? fullTypeArgument = null;
 
-            if (fieldType is INamedTypeSymbol namedType && namedType.IsGenericType)
+            if (fieldType is INamedTypeSymbol { IsGenericType: true } namedType)
             {
                 var originalDef = namedType.OriginalDefinition;
                 if (originalDef.ToDisplayString() == "BlazorStatePlus.Abstractions.IStateSlice<T>")
@@ -274,10 +274,7 @@ internal sealed class SliceIncrementalGenerator : IIncrementalGenerator
         bool userImplementsDisposable = false;
         foreach (var member in classSymbol.GetMembers())
         {
-            if (member is IMethodSymbol method &&
-                method.Name == "Dispose" &&
-                method.Parameters.Length == 0 &&
-                !method.IsAbstract)
+            if (member is IMethodSymbol { Name: "Dispose", Parameters.Length: 0, IsAbstract: false })
             {
                 userImplementsDisposable = true;
                 break;
@@ -299,11 +296,11 @@ internal sealed class SliceIncrementalGenerator : IIncrementalGenerator
         {
             if (member is IMethodSymbol method)
             {
-                if (method.Name == "OnInitialized" && method.Parameters.Length == 0 && method.IsOverride)
+                if (method is { Name: "OnInitialized", Parameters.Length: 0, IsOverride: true })
                 {
                     userOverridesOnInitialized = true;
                 }
-                else if (method.Name == "OnInitializedAsync" && method.Parameters.Length == 0 && method.IsOverride)
+                else if (method is { Name: "OnInitializedAsync", Parameters.Length: 0, IsOverride: true })
                 {
                     userOverridesOnInitializedAsync = true;
                 }
