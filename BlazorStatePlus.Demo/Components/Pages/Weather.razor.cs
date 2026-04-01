@@ -11,7 +11,7 @@ public partial class Weather : ComponentBase
     [Inject] private ILogger<Weather> Logger { get; set; } = null!;
 
     [Slice(TimeToLive = "00:05:00")]
-    private IStateSlice<WeatherForecast[]?> _forecasts = null!;
+    private IStateSlice<WeatherForecast[]> _forecasts = null!;
 
     partial void OnInitializeSlices(SliceInitContext ctx)
     {
