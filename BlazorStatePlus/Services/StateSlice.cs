@@ -11,12 +11,13 @@ internal sealed class StateSlice<T> : IStateSlice<T>
     private T _value;
     private bool _disposed;
 
-    public StateSlice(T restoredValue, bool wasRestored, StateSliceOptions options)
+    public StateSlice(T restoredValue, bool wasRestored, StateSliceOptions options,
+        DateTimeOffset? persistedAt = null)
     {
         _value = restoredValue;
         WasRestored = wasRestored;
         Options = options;
-        LastUpdated = DateTimeOffset.UtcNow;
+        LastUpdated = persistedAt ?? DateTimeOffset.UtcNow;
     }
 
     internal StateSliceOptions Options { get; }

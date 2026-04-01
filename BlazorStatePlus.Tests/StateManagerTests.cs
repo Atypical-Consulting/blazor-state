@@ -163,6 +163,34 @@ public class StateManagerTests : BunitContext
         Should.Throw<ObjectDisposedException>(() => manager.CreateSlice<int>("counter"));
     }
 
+    [Fact]
+    public void CreateSlice_RestoredSlice_IsStaleReflectsPersistedAt()
+    {
+        // Persisted 4 minutes ago, TTL is 5 minutes
+        FakeState.Persist("data", new StateManager.PersistedEnvelope<string>
+        {
+            Value = "old",
+            PersistedAt = DateTimeOffset.UtcNow.AddMinutes(-4)
+        });
+
+        using var manager = CreateManager();
+        var slice = manager.CreateSlice<string>("data", defaultValue: "new",
+            configure: o => o.TimeToLive = TimeSpan.FromMinutes(5));
+
+        // Value should be restored (4 min < 5 min TTL)
+        slice.Value.ShouldBe("old");
+        slice.WasRestored.ShouldBeTrue();
+
+        // But IsStale should reflect the ORIGINAL data age (4 min into a 5 min TTL),
+        // not reset to fresh. After 1 more minute, this should go stale.
+        // For now, 4 min < 5 min, so not yet stale.
+        slice.IsStale.ShouldBeFalse();
+
+        // The key assertion: LastUpdated should be close to PersistedAt, not UtcNow
+        var age = DateTimeOffset.UtcNow - slice.LastUpdated;
+        age.TotalMinutes.ShouldBeGreaterThan(3.5); // Should be ~4 minutes old
+    }
+
     // -- Dispose --------------------------------------------------------------
 
     [Fact]

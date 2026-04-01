@@ -43,6 +43,7 @@ public sealed class StateManager(
 
         T restoredValue;
         bool effectivelyRestored;
+        DateTimeOffset? persistedAt = null;
 
         try
         {
@@ -62,6 +63,7 @@ public sealed class StateManager(
                 {
                     restoredValue = envelope.Value;
                     effectivelyRestored = true;
+                    persistedAt = envelope.PersistedAt;
                     logger.LogDebug("Slice '{Key}': restored from prerender", options.Key);
                 }
             }
@@ -79,7 +81,7 @@ public sealed class StateManager(
             logger.LogWarning(ex, "Slice '{Key}': deserialization failed, using default", options.Key);
         }
 
-        var slice = new StateSlice<T>(restoredValue, effectivelyRestored, options);
+        var slice = new StateSlice<T>(restoredValue, effectivelyRestored, options, persistedAt);
 
         RegisterPersistCallback(() =>
         {
