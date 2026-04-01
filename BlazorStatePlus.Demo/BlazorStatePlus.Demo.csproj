@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="BlazorStatePlus.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\BlazorStatePlus\BlazorStatePlus.csproj" />
     <ProjectReference Include="..\BlazorStatePlus.Generators\BlazorStatePlus.Generators.csproj"
                       OutputItemType="Analyzer"

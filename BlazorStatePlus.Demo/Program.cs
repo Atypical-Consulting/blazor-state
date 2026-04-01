@@ -26,3 +26,6 @@ app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 
 app.Run();
+
+// Required for WebApplicationFactory<Program> in integration tests
+namespace BlazorStatePlus.Demo { public partial class Program { } }
