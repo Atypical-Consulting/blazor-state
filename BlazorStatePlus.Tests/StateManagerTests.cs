@@ -119,6 +119,50 @@ public class StateManagerTests : BunitContext
         env2!.Value.ShouldBe("world");
     }
 
+    [Fact]
+    public void CreateSlice_DeserializationMismatch_FallsBackToDefault()
+    {
+        // Persist an int envelope under a key, then try to restore as string
+        FakeState.Persist("counter", new StateManager.PersistedEnvelope<int>
+        {
+            Value = 42,
+            PersistedAt = DateTimeOffset.UtcNow
+        });
+
+        using var manager = CreateManager();
+        // Restoring as string when an int was persisted — type mismatch
+        var slice = manager.CreateSlice<string>("counter", defaultValue: "fallback");
+
+        // Should fall back to default rather than crash
+        slice.Value.ShouldBe("fallback");
+        slice.WasRestored.ShouldBeFalse();
+    }
+
+    [Fact]
+    public void CreateSlice_NullKey_ThrowsArgumentException()
+    {
+        using var manager = CreateManager();
+
+        Should.Throw<ArgumentException>(() => manager.CreateSlice<int>(null!));
+    }
+
+    [Fact]
+    public void CreateSlice_EmptyKey_ThrowsArgumentException()
+    {
+        using var manager = CreateManager();
+
+        Should.Throw<ArgumentException>(() => manager.CreateSlice<int>(""));
+    }
+
+    [Fact]
+    public void CreateSlice_AfterDispose_ThrowsObjectDisposedException()
+    {
+        var manager = CreateManager();
+        manager.Dispose();
+
+        Should.Throw<ObjectDisposedException>(() => manager.CreateSlice<int>("counter"));
+    }
+
     // -- Dispose --------------------------------------------------------------
 
     [Fact]

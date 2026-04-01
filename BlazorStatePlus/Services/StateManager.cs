@@ -27,46 +27,57 @@ public sealed class StateManager(
     /// <param name="key">Unique key for this slice within the component.</param>
     /// <param name="defaultValue">Fallback value when nothing is restored.</param>
     /// <param name="configure">Optional configuration (TTL, AllowUpdates, etc.).</param>
+    /// <remarks>
+    /// <b>Security:</b> Slice values are serialized as JSON into the prerendered HTML response
+    /// and are visible in the page source. Do not store sensitive data (auth tokens, PII, secrets)
+    /// in state slices.
+    /// </remarks>
     public IStateSlice<T> CreateSlice<T>(
         string key,
         T defaultValue = default!,
         Action<StateSliceOptions>? configure = null)
     {
+        ObjectDisposedException.ThrowIf(_disposed, this);
+        ArgumentException.ThrowIfNullOrWhiteSpace(key);
         var options = BuildOptions(key, configure);
-
-        var wasRestored = persistence.TryTakeFromJson<PersistedEnvelope<T>>(
-            options.Key!, out var envelope);
 
         T restoredValue;
         bool effectivelyRestored;
 
-        if (wasRestored && envelope is not null)
+        try
         {
-            // Check if the persisted value has exceeded TTL
-            if (options.TimeToLive.HasValue
-                && DateTimeOffset.UtcNow - envelope.PersistedAt > options.TimeToLive.Value)
+            var wasRestored = persistence.TryTakeFromJson<PersistedEnvelope<T>>(
+                options.Key!, out var envelope);
+
+            if (wasRestored && envelope is not null)
             {
-                restoredValue = defaultValue;
-                effectivelyRestored = false;
+                if (options.TimeToLive.HasValue
+                    && DateTimeOffset.UtcNow - envelope.PersistedAt > options.TimeToLive.Value)
+                {
+                    restoredValue = defaultValue;
+                    effectivelyRestored = false;
+                    logger.LogDebug("Slice '{Key}': restored value discarded (TTL expired)", options.Key);
+                }
+                else
+                {
+                    restoredValue = envelope.Value;
+                    effectivelyRestored = true;
+                    logger.LogDebug("Slice '{Key}': restored from prerender", options.Key);
+                }
             }
             else
             {
-                restoredValue = envelope.Value;
-                effectivelyRestored = true;
+                restoredValue = defaultValue;
+                effectivelyRestored = false;
+                logger.LogDebug("Slice '{Key}': no persisted value, using default", options.Key);
             }
         }
-        else
+        catch (Exception ex)
         {
             restoredValue = defaultValue;
             effectivelyRestored = false;
+            logger.LogWarning(ex, "Slice '{Key}': deserialization failed, using default", options.Key);
         }
-
-        if (effectivelyRestored)
-            logger.LogDebug("Slice '{Key}': restored from prerender", options.Key);
-        else if (wasRestored && envelope is not null)
-            logger.LogDebug("Slice '{Key}': restored value discarded (TTL expired)", options.Key);
-        else
-            logger.LogDebug("Slice '{Key}': no persisted value, using default", options.Key);
 
         var slice = new StateSlice<T>(restoredValue, effectivelyRestored, options);
 
