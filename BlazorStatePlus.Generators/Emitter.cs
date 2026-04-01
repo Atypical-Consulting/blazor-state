@@ -186,9 +186,9 @@ internal static class Emitter
 
     /// <summary>
     /// Builds the options argument (3rd param to CreateSlice).
-    /// If TimeToLive is not set on the attribute, we delegate fully to the builder
-    /// (which may return null). If set, we bake the attribute default as a lambda
-    /// and merge with the builder's user-supplied overrides.
+    /// If TimeToLive is not set on the attribute, passes null so the builder
+    /// returns null (no options configure lambda). If set, passes the attribute
+    /// default TTL lambda as a straight pass-through to BuildOptions — no merging occurs.
     /// </summary>
     private static string BuildOptionsArg(SliceFieldModel field)
     {
