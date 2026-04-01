@@ -73,39 +73,6 @@ public sealed class StateManager(PersistentComponentState persistence) : IDispos
         return slice;
     }
 
-    /// <summary>
-    /// Convenience overload: creates a slice and immediately initializes it
-    /// with a synchronous factory if no restored value exists.
-    /// Combines <c>CreateSlice</c> + <c>InitializeIfNeeded</c> in one call.
-    /// </summary>
-    public IStateSlice<T> CreateAndInit<T>(
-        string key,
-        Func<T> factory,
-        Action<StateSliceOptions>? configure = null)
-    {
-        var slice = CreateSlice<T>(key, default!, configure);
-        if (!slice.WasRestored || slice.IsStale)
-        {
-            slice.InitializeIfNeeded(factory());
-        }
-        return slice;
-    }
-
-    /// <summary>
-    /// Convenience overload: creates a slice and immediately initializes it
-    /// with an async factory if no restored value exists.
-    /// The factory is NOT called when a value was successfully restored.
-    /// </summary>
-    public async Task<IStateSlice<T>> CreateAndInitAsync<T>(
-        string key,
-        Func<Task<T>> factory,
-        Action<StateSliceOptions>? configure = null)
-    {
-        var slice = CreateSlice<T>(key, default!, configure);
-        await slice.InitializeIfNeededAsync(factory);
-        return slice;
-    }
-
     private void RegisterPersistCallback(Func<Task> callback)
     {
         _persistCallbacks.Add(callback);
@@ -128,7 +95,6 @@ public sealed class StateManager(PersistentComponentState persistence) : IDispos
     {
         var options = new StateSliceOptions { Key = key };
         configure?.Invoke(options);
-        options.Key ??= key;
         return options;
     }
 
