@@ -31,7 +31,7 @@ internal sealed class SliceIncrementalGenerator : IIncrementalGenerator
         context.RegisterSourceOutput(collected, Execute);
     }
 
-    private static FieldData? ExtractFieldInfo(GeneratorAttributeSyntaxContext ctx, CancellationToken ct)
+    private static (FieldData Data, FieldLocationData Location)? ExtractFieldInfo(GeneratorAttributeSyntaxContext ctx, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
 
@@ -107,11 +107,9 @@ internal sealed class SliceIncrementalGenerator : IIncrementalGenerator
             }
         }
 
-        // Field location
-        var fieldLoc = fieldSymbol.Locations.FirstOrDefault();
-        string? filePath = fieldLoc?.SourceTree?.FilePath;
-        int spanStart = fieldLoc?.SourceSpan.Start ?? 0;
-        int spanLength = fieldLoc?.SourceSpan.Length ?? 0;
+        // Capture locations for diagnostics (excluded from equality)
+        var fieldLocation = fieldSymbol.Locations.FirstOrDefault();
+        var classLocation = containingType.Locations.FirstOrDefault();
 
         // Class-level checks (done here while we have symbols)
 
@@ -176,61 +174,57 @@ internal sealed class SliceIncrementalGenerator : IIncrementalGenerator
             }
         }
 
-        // Class location
-        var classLoc = containingType.Locations.FirstOrDefault();
-        string? classFilePath = classLoc?.SourceTree?.FilePath;
-        int classSpanStart = classLoc?.SourceSpan.Start ?? 0;
-        int classSpanLength = classLoc?.SourceSpan.Length ?? 0;
-
         // Containing class info
         string containingClassName = containingType.Name;
         string containingClassNamespace = containingType.ContainingNamespace.IsGlobalNamespace
             ? ""
             : containingType.ContainingNamespace.ToDisplayString();
 
-        return new FieldData(
-            fieldName: fieldSymbol.Name,
-            containingClassName: containingClassName,
-            containingClassNamespace: containingClassNamespace,
-            fieldTypeDisplayString: fieldTypeDisplayString,
-            fieldTypeOriginalDefinitionDisplayString: fieldTypeOriginalDefinitionDisplayString,
-            typeArgumentName: typeArgumentName,
-            typeArgumentFullyQualified: typeArgumentFullyQualified,
-            isStatic: fieldSymbol.IsStatic,
-            isGenericType: isGenericType,
-            timeToLive: timeToLive,
-            hasInitializer: hasInitializer,
-            filePath: filePath,
-            spanStart: spanStart,
-            spanLength: spanLength,
-            isPartialClass: isPartialClass,
-            inheritsFromComponentBase: inheritsFromComponentBase,
-            userImplementsDisposable: userImplementsDisposable,
-            userOverridesOnInitialized: userOverridesOnInitialized,
-            userOverridesOnInitializedAsync: userOverridesOnInitializedAsync,
-            classFilePath: classFilePath,
-            classSpanStart: classSpanStart,
-            classSpanLength: classSpanLength);
+        var fieldData = new FieldData(
+            FieldName: fieldSymbol.Name,
+            ContainingClassName: containingClassName,
+            ContainingClassNamespace: containingClassNamespace,
+            FieldTypeDisplayString: fieldTypeDisplayString,
+            FieldTypeOriginalDefinitionDisplayString: fieldTypeOriginalDefinitionDisplayString,
+            TypeArgumentName: typeArgumentName,
+            TypeArgumentFullyQualified: typeArgumentFullyQualified,
+            IsStatic: fieldSymbol.IsStatic,
+            IsGenericType: isGenericType,
+            TimeToLive: timeToLive,
+            HasInitializer: hasInitializer,
+            IsPartialClass: isPartialClass,
+            InheritsFromComponentBase: inheritsFromComponentBase,
+            UserImplementsDisposable: userImplementsDisposable,
+            UserOverridesOnInitialized: userOverridesOnInitialized,
+            UserOverridesOnInitializedAsync: userOverridesOnInitializedAsync);
+
+        var locationData = new FieldLocationData
+        {
+            FieldLocation = fieldLocation ?? Location.None,
+            ClassLocation = classLocation ?? Location.None
+        };
+
+        return (fieldData, locationData);
     }
 
-    private static void Execute(SourceProductionContext spc, ImmutableArray<FieldData?> fields)
+    private static void Execute(SourceProductionContext spc, ImmutableArray<(FieldData Data, FieldLocationData Location)?> fields)
     {
         if (fields.IsDefaultOrEmpty)
             return;
 
         // Group by containing class (using primitives)
-        var grouped = new Dictionary<(string ClassName, string Namespace), List<FieldData>>();
+        var grouped = new Dictionary<(string ClassName, string Namespace), List<(FieldData Data, FieldLocationData Location)>>();
         foreach (var field in fields)
         {
             if (field == null) continue;
 
-            var key = (field.ContainingClassName, field.ContainingClassNamespace);
+            var key = (field.Value.Data.ContainingClassName, field.Value.Data.ContainingClassNamespace);
             if (!grouped.TryGetValue(key, out var list))
             {
-                list = new List<FieldData>();
+                list = new List<(FieldData Data, FieldLocationData Location)>();
                 grouped[key] = list;
             }
-            list.Add(field);
+            list.Add(field.Value);
         }
 
         foreach (var kvp in grouped)
@@ -239,34 +233,34 @@ internal sealed class SliceIncrementalGenerator : IIncrementalGenerator
         }
     }
 
-    private static void ProcessClass(SourceProductionContext spc, List<FieldData> fields)
+    private static void ProcessClass(SourceProductionContext spc, List<(FieldData Data, FieldLocationData Location)> fields)
     {
         var first = fields[0];
-        var className = first.ContainingClassName;
-        var ns = first.ContainingClassNamespace;
+        var className = first.Data.ContainingClassName;
+        var ns = first.Data.ContainingClassNamespace;
 
         // --- Validation ---
 
         // 1. Check partial (same for all fields in the class)
-        if (!first.IsPartialClass)
+        if (!first.Data.IsPartialClass)
         {
             foreach (var field in fields)
             {
                 spc.ReportDiagnostic(Diagnostic.Create(
                     DiagnosticDescriptors.NonPartialClass,
-                    Location.None,
-                    field.FieldName,
+                    field.Location.FieldLocation,
+                    field.Data.FieldName,
                     className));
             }
             return; // Can't generate for non-partial
         }
 
         // 2. Check ComponentBase inheritance
-        if (!first.InheritsFromComponentBase)
+        if (!first.Data.InheritsFromComponentBase)
         {
             spc.ReportDiagnostic(Diagnostic.Create(
                 DiagnosticDescriptors.NotComponentBase,
-                Location.None,
+                first.Location.ClassLocation,
                 className));
             return;
         }
@@ -278,12 +272,12 @@ internal sealed class SliceIncrementalGenerator : IIncrementalGenerator
         foreach (var field in fields)
         {
             // Check static
-            if (field.IsStatic)
+            if (field.Data.IsStatic)
             {
                 spc.ReportDiagnostic(Diagnostic.Create(
                     DiagnosticDescriptors.StaticField,
-                    Location.None,
-                    field.FieldName));
+                    field.Location.FieldLocation,
+                    field.Data.FieldName));
                 hasErrors = true;
                 continue;
             }
@@ -292,63 +286,63 @@ internal sealed class SliceIncrementalGenerator : IIncrementalGenerator
             string? typeArgument = null;
             string? fullTypeArgument = null;
 
-            if (field.IsGenericType &&
-                field.FieldTypeOriginalDefinitionDisplayString == "BlazorStatePlus.Abstractions.IStateSlice<T>")
+            if (field.Data.IsGenericType &&
+                field.Data.FieldTypeOriginalDefinitionDisplayString == "BlazorStatePlus.Abstractions.IStateSlice<T>")
             {
-                typeArgument = field.TypeArgumentName;
-                fullTypeArgument = field.TypeArgumentFullyQualified;
+                typeArgument = field.Data.TypeArgumentName;
+                fullTypeArgument = field.Data.TypeArgumentFullyQualified;
             }
 
             if (typeArgument == null)
             {
                 spc.ReportDiagnostic(Diagnostic.Create(
                     DiagnosticDescriptors.InvalidFieldType,
-                    Location.None,
-                    field.FieldName));
+                    field.Location.FieldLocation,
+                    field.Data.FieldName));
                 hasErrors = true;
                 continue;
             }
 
             // Validate TimeToLive
-            if (field.TimeToLive != null)
+            if (field.Data.TimeToLive != null)
             {
-                if (!TimeSpan.TryParse(field.TimeToLive, out _))
+                if (!TimeSpan.TryParse(field.Data.TimeToLive, out _))
                 {
                     spc.ReportDiagnostic(Diagnostic.Create(
                         DiagnosticDescriptors.InvalidTimeToLive,
-                        Location.None,
-                        field.TimeToLive,
-                        field.FieldName));
+                        field.Location.FieldLocation,
+                        field.Data.TimeToLive,
+                        field.Data.FieldName));
                     hasErrors = true;
                     continue;
                 }
             }
 
             // Warn about initializer
-            if (field.HasInitializer)
+            if (field.Data.HasInitializer)
             {
                 spc.ReportDiagnostic(Diagnostic.Create(
                     DiagnosticDescriptors.FieldHasInitializer,
-                    Location.None,
-                    field.FieldName));
+                    field.Location.FieldLocation,
+                    field.Data.FieldName));
             }
 
             // Convert field name to property name
-            string propertyName = ConvertFieldNameToPropertyName(field.FieldName);
+            string propertyName = ConvertFieldNameToPropertyName(field.Data.FieldName);
 
             // Build base key
-            string fieldNameWithoutUnderscore = field.FieldName.TrimStart('_');
+            string fieldNameWithoutUnderscore = field.Data.FieldName.TrimStart('_');
             string baseKey = className + "." + fieldNameWithoutUnderscore;
 
             validFields.Add(new SliceFieldModel
             {
-                FieldName = field.FieldName,
+                FieldName = field.Data.FieldName,
                 PropertyName = propertyName,
                 TypeArgument = typeArgument,
                 FullTypeArgument = fullTypeArgument!,
-                TimeToLive = field.TimeToLive,
+                TimeToLive = field.Data.TimeToLive,
                 BaseKey = baseKey,
-                FieldLocation = Location.None
+                FieldLocation = field.Location.FieldLocation
             });
         }
 
@@ -374,25 +368,25 @@ internal sealed class SliceIncrementalGenerator : IIncrementalGenerator
         }
 
         // 5. Detect user-implemented IDisposable (pre-extracted)
-        bool userImplementsDisposable = first.UserImplementsDisposable;
+        bool userImplementsDisposable = first.Data.UserImplementsDisposable;
 
         if (userImplementsDisposable)
         {
             spc.ReportDiagnostic(Diagnostic.Create(
                 DiagnosticDescriptors.ExistingDisposable,
-                Location.None,
+                first.Location.ClassLocation,
                 className));
         }
 
         // 6. Detect user overrides of OnInitialized (pre-extracted)
-        bool userOverridesOnInitialized = first.UserOverridesOnInitialized;
-        bool userOverridesOnInitializedAsync = first.UserOverridesOnInitializedAsync;
+        bool userOverridesOnInitialized = first.Data.UserOverridesOnInitialized;
+        bool userOverridesOnInitializedAsync = first.Data.UserOverridesOnInitializedAsync;
 
         if (userOverridesOnInitialized)
         {
             spc.ReportDiagnostic(Diagnostic.Create(
                 DiagnosticDescriptors.ExistingOnInitialized,
-                Location.None,
+                first.Location.ClassLocation,
                 className));
         }
 
@@ -405,7 +399,7 @@ internal sealed class SliceIncrementalGenerator : IIncrementalGenerator
             UserImplementsDisposable = userImplementsDisposable,
             UserOverridesOnInitialized = userOverridesOnInitialized,
             UserOverridesOnInitializedAsync = userOverridesOnInitializedAsync,
-            ClassLocation = Location.None
+            ClassLocation = first.Location.ClassLocation
         };
 
         // Emit source with namespace-qualified hint name
@@ -435,130 +429,29 @@ internal sealed class SliceIncrementalGenerator : IIncrementalGenerator
     }
 
     /// <summary>
-    /// Value-equatable data class containing only primitives and strings — no Roslyn symbols.
-    /// This ensures the incremental pipeline's caching works correctly across phases.
+    /// Location metadata excluded from equality to avoid poisoning incremental cache.
     /// </summary>
-    private sealed class FieldData : IEquatable<FieldData>
+    private readonly struct FieldLocationData
     {
-        public string FieldName { get; }
-        public string ContainingClassName { get; }
-        public string ContainingClassNamespace { get; }
-        public string FieldTypeDisplayString { get; }
-        public string? FieldTypeOriginalDefinitionDisplayString { get; }
-        public string? TypeArgumentName { get; }
-        public string? TypeArgumentFullyQualified { get; }
-        public bool IsStatic { get; }
-        public bool IsGenericType { get; }
-        public string? TimeToLive { get; }
-        public bool HasInitializer { get; }
-        public string? FilePath { get; }
-        public int SpanStart { get; }
-        public int SpanLength { get; }
-        // Class-level data (same for all fields in same class)
-        public bool IsPartialClass { get; }
-        public bool InheritsFromComponentBase { get; }
-        public bool UserImplementsDisposable { get; }
-        public bool UserOverridesOnInitialized { get; }
-        public bool UserOverridesOnInitializedAsync { get; }
-        public string? ClassFilePath { get; }
-        public int ClassSpanStart { get; }
-        public int ClassSpanLength { get; }
-
-        public FieldData(
-            string fieldName,
-            string containingClassName,
-            string containingClassNamespace,
-            string fieldTypeDisplayString,
-            string? fieldTypeOriginalDefinitionDisplayString,
-            string? typeArgumentName,
-            string? typeArgumentFullyQualified,
-            bool isStatic,
-            bool isGenericType,
-            string? timeToLive,
-            bool hasInitializer,
-            string? filePath,
-            int spanStart,
-            int spanLength,
-            bool isPartialClass,
-            bool inheritsFromComponentBase,
-            bool userImplementsDisposable,
-            bool userOverridesOnInitialized,
-            bool userOverridesOnInitializedAsync,
-            string? classFilePath,
-            int classSpanStart,
-            int classSpanLength)
-        {
-            FieldName = fieldName;
-            ContainingClassName = containingClassName;
-            ContainingClassNamespace = containingClassNamespace;
-            FieldTypeDisplayString = fieldTypeDisplayString;
-            FieldTypeOriginalDefinitionDisplayString = fieldTypeOriginalDefinitionDisplayString;
-            TypeArgumentName = typeArgumentName;
-            TypeArgumentFullyQualified = typeArgumentFullyQualified;
-            IsStatic = isStatic;
-            IsGenericType = isGenericType;
-            TimeToLive = timeToLive;
-            HasInitializer = hasInitializer;
-            FilePath = filePath;
-            SpanStart = spanStart;
-            SpanLength = spanLength;
-            IsPartialClass = isPartialClass;
-            InheritsFromComponentBase = inheritsFromComponentBase;
-            UserImplementsDisposable = userImplementsDisposable;
-            UserOverridesOnInitialized = userOverridesOnInitialized;
-            UserOverridesOnInitializedAsync = userOverridesOnInitializedAsync;
-            ClassFilePath = classFilePath;
-            ClassSpanStart = classSpanStart;
-            ClassSpanLength = classSpanLength;
-        }
-
-        public bool Equals(FieldData? other)
-        {
-            if (other is null) return false;
-            if (ReferenceEquals(this, other)) return true;
-            return FieldName == other.FieldName
-                && ContainingClassName == other.ContainingClassName
-                && ContainingClassNamespace == other.ContainingClassNamespace
-                && FieldTypeDisplayString == other.FieldTypeDisplayString
-                && FieldTypeOriginalDefinitionDisplayString == other.FieldTypeOriginalDefinitionDisplayString
-                && TypeArgumentName == other.TypeArgumentName
-                && TypeArgumentFullyQualified == other.TypeArgumentFullyQualified
-                && IsStatic == other.IsStatic
-                && IsGenericType == other.IsGenericType
-                && TimeToLive == other.TimeToLive
-                && HasInitializer == other.HasInitializer
-                && FilePath == other.FilePath
-                && SpanStart == other.SpanStart
-                && SpanLength == other.SpanLength
-                && IsPartialClass == other.IsPartialClass
-                && InheritsFromComponentBase == other.InheritsFromComponentBase
-                && UserImplementsDisposable == other.UserImplementsDisposable
-                && UserOverridesOnInitialized == other.UserOverridesOnInitialized
-                && UserOverridesOnInitializedAsync == other.UserOverridesOnInitializedAsync
-                && ClassFilePath == other.ClassFilePath
-                && ClassSpanStart == other.ClassSpanStart
-                && ClassSpanLength == other.ClassSpanLength;
-        }
-
-        public override bool Equals(object? obj) => Equals(obj as FieldData);
-
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                int hash = 17;
-                hash = hash * 31 + (FieldName?.GetHashCode() ?? 0);
-                hash = hash * 31 + (ContainingClassName?.GetHashCode() ?? 0);
-                hash = hash * 31 + (ContainingClassNamespace?.GetHashCode() ?? 0);
-                hash = hash * 31 + (FieldTypeDisplayString?.GetHashCode() ?? 0);
-                hash = hash * 31 + (TypeArgumentName?.GetHashCode() ?? 0);
-                hash = hash * 31 + IsStatic.GetHashCode();
-                hash = hash * 31 + IsGenericType.GetHashCode();
-                hash = hash * 31 + HasInitializer.GetHashCode();
-                hash = hash * 31 + SpanStart;
-                hash = hash * 31 + SpanLength;
-                return hash;
-            }
-        }
+        public Location FieldLocation { get; init; }
+        public Location ClassLocation { get; init; }
     }
+
+    private sealed record FieldData(
+        string FieldName,
+        string ContainingClassName,
+        string ContainingClassNamespace,
+        string FieldTypeDisplayString,
+        string? FieldTypeOriginalDefinitionDisplayString,
+        string? TypeArgumentName,
+        string? TypeArgumentFullyQualified,
+        bool IsStatic,
+        bool IsGenericType,
+        string? TimeToLive,
+        bool HasInitializer,
+        bool IsPartialClass,
+        bool InheritsFromComponentBase,
+        bool UserImplementsDisposable,
+        bool UserOverridesOnInitialized,
+        bool UserOverridesOnInitializedAsync);
 }

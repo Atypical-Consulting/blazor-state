@@ -154,6 +154,29 @@ public class DiagnosticTests
     }
 
     [Fact]
+    public void BSP001_NonPartialClass_HasSourceLocation()
+    {
+        var source = """
+            using BlazorStatePlus.Abstractions;
+            using BlazorStatePlus.Attributes;
+            using Microsoft.AspNetCore.Components;
+
+            namespace TestApp;
+
+            public class MyComponent : ComponentBase
+            {
+                [Slice]
+                private IStateSlice<int> _counter;
+            }
+            """;
+
+        var diagnostics = TestHelper.GetDiagnostics(source);
+        var bsp001 = diagnostics.First(d => d.Id == "BSP001");
+        bsp001.Location.ShouldNotBe(Location.None);
+        bsp001.Location.SourceTree.ShouldNotBeNull();
+    }
+
+    [Fact]
     public void ValidComponent_NoDiagnosticErrors()
     {
         var source = """
