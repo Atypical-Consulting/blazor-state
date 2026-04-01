@@ -108,4 +108,25 @@ public class GeneratorOutputTests
         Assert.NotNull(generatedSource);
         Assert.Contains("await base.OnInitializedAsync()", generatedSource);
     }
+
+    [Fact]
+    public void GlobalNamespace_GeneratesValidCode()
+    {
+        var source = """
+            using BlazorStatePlus.Abstractions;
+            using BlazorStatePlus.Attributes;
+            using Microsoft.AspNetCore.Components;
+
+            public partial class MyComponent : ComponentBase
+            {
+                [Slice]
+                private IStateSlice<int> _counter;
+            }
+            """;
+
+        var (diagnostics, generatedSource) = TestHelper.RunGenerator(source);
+
+        Assert.NotNull(generatedSource);
+        Assert.DoesNotContain("namespace ;", generatedSource);
+    }
 }

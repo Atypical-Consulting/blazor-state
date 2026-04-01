@@ -20,8 +20,11 @@ internal static class Emitter
         sb.AppendLine("using System.Threading.Tasks;");
         sb.AppendLine("using Microsoft.AspNetCore.Components;");
         sb.AppendLine();
-        sb.AppendLine($"namespace {model.Namespace};");
-        sb.AppendLine();
+        if (!string.IsNullOrEmpty(model.Namespace))
+        {
+            sb.AppendLine($"namespace {model.Namespace};");
+            sb.AppendLine();
+        }
         if (model.UserImplementsDisposable)
             sb.AppendLine($"partial class {model.ClassName}");
         else
