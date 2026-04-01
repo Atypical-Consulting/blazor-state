@@ -1,0 +1,25 @@
+@* 
+    Example 1: Simple counter that persists across prerender.
+    Compare with the 30+ lines needed with raw PersistentComponentState.
+*@
+
+@page "/counter"
+@inherits Components.PersistentComponentBase
+
+<h1>Persistent Counter</h1>
+
+<p role="status">Current count: @_counter.Value</p>
+<p>
+    <em>
+        @if (_counter.WasRestored)
+        {
+            <span>Restored from prerender</span>
+        }
+        else
+        {
+            <span>Freshly initialized</span>
+        }
+    </em>
+</p>
+
+<button class="btn btn-primary" @onclick="Increment">Click me</button>

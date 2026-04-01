@@ -1,0 +1,26 @@
+@*
+    Example 3: Product detail page using a state group.
+    All related data (product, reviews, wishlist status) is persisted as one unit.
+*@
+
+@page "/product/{ProductId:int}"
+@inherits Components.PersistentComponentBase
+
+<h1>@(_page.Value.Product?.Name ?? "Loading...")</h1>
+
+@if (_page.Value.Product is not null)
+{
+    <p>@_page.Value.Product.Description</p>
+    <p><strong>@_page.Value.Product.Price.ToString("C")</strong></p>
+
+    <button class="btn @(_page.Value.IsInWishlist ? "btn-danger" : "btn-outline-primary")"
+            @onclick="ToggleWishlist">
+        @(_page.Value.IsInWishlist ? "Remove from wishlist" : "Add to wishlist")
+    </button>
+
+    @if (_page.Value.Reviews is not null)
+    {
+        <h2>Reviews (@_page.Value.Reviews.TotalCount)</h2>
+        <p>Average: @_page.Value.Reviews.AverageRating / 5</p>
+    }
+}

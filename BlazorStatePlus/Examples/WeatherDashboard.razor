@@ -1,0 +1,46 @@
+@*
+    Example 2: Weather dashboard with staleness detection.
+    Data is cached through prerender but auto-refreshes if older than 5 minutes.
+*@
+
+@page "/weather"
+@inherits Components.PersistentComponentBase
+
+<h1>Weather Dashboard</h1>
+
+@if (_forecasts.Value is null)
+{
+    <p><em>Loading forecasts...</em></p>
+}
+else
+{
+    @if (_forecasts.IsStale)
+    {
+        <div class="alert alert-warning">
+            Data is stale (last updated @_forecasts.LastUpdated.LocalDateTime).
+            <button class="btn btn-sm btn-outline-warning" @onclick="Refresh">
+                Refresh
+            </button>
+        </div>
+    }
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Temp (C)</th>
+                <th>Summary</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var f in _forecasts.Value)
+            {
+                <tr>
+                    <td>@f.Date.ToShortDateString()</td>
+                    <td>@f.TemperatureC</td>
+                    <td>@f.Summary</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
