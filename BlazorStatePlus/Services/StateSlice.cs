@@ -26,6 +26,8 @@ internal sealed class StateSlice<T> : IStateSlice<T>
         get => _value;
         set
         {
+            ObjectDisposedException.ThrowIf(_disposed, this);
+
             // Skip if reference/value equal to avoid unnecessary notifications
             if (EqualityComparer<T>.Default.Equals(_value, value))
                 return;

@@ -40,4 +40,21 @@ public class StateSliceTests
         Assert.True(result);
         Assert.Equal(99, slice.Value);
     }
+
+    [Fact]
+    public void Value_AfterDispose_ThrowsObjectDisposedException()
+    {
+        var slice = CreateSlice(42, wasRestored: false);
+        slice.Dispose();
+        Assert.Throws<ObjectDisposedException>(() => slice.Value = 99);
+    }
+
+    [Fact]
+    public void Value_AfterDispose_GetStillWorks()
+    {
+        var slice = CreateSlice(42, wasRestored: false);
+        slice.Value = 10;
+        slice.Dispose();
+        Assert.Equal(10, slice.Value);
+    }
 }
