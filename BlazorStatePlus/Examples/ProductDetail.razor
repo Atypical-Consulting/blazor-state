@@ -4,7 +4,6 @@
 *@
 
 @page "/product/{ProductId:int}"
-@inherits Components.PersistentComponentBase
 
 <h1>@(_page.Value.Product?.Name ?? "Loading...")</h1>
 

@@ -1,17 +1,16 @@
-﻿using BlazorStatePlus.Abstractions;
+using BlazorStatePlus.Abstractions;
+using BlazorStatePlus.Attributes;
 
 namespace BlazorStatePlus.Examples;
 
-public partial class PersistentCounter : Components.PersistentComponentBase
+public partial class PersistentCounter : ComponentBase
 {
-    private IStateSlice<int> _counter = null!;
+    [Slice]
+    private IStateSlice<int> _counter;
 
-    protected override void OnInitialized()
+    partial void OnInitializeSlices(SliceInitContext ctx)
     {
-        base.OnInitialized();
-
-        // Factory only runs during prerender; value is restored on interactive load.
-        _counter = UseSlice("counter", () => Random.Shared.Next(100));
+        ctx.Counter.DefaultValue(Random.Shared.Next(100));
     }
 
     private void Increment() => _counter.Value++;
