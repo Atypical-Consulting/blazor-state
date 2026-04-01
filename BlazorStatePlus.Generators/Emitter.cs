@@ -22,7 +22,11 @@ internal static class Emitter
         sb.AppendLine();
         sb.AppendLine($"namespace {model.Namespace};");
         sb.AppendLine();
-        sb.AppendLine($"partial class {model.ClassName}");
+        if (model.UserImplementsDisposable)
+            sb.AppendLine($"partial class {model.ClassName}");
+        else
+            sb.AppendLine($"partial class {model.ClassName} : global::System.IDisposable");
+
         sb.AppendLine("{");
 
         // --- Injected StateManager field (hidden from editor) ---
@@ -33,7 +37,7 @@ internal static class Emitter
 
         // --- SliceInitContext? __ctx field ---
         sb.AppendLine("    [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]");
-        sb.AppendLine($"    private {model.ClassName}.__SliceInitContext? __ctx;");
+        sb.AppendLine($"    private {model.ClassName}.SliceInitContext? __ctx;");
         sb.AppendLine();
 
         // --- OnInitialized override ---
@@ -41,7 +45,7 @@ internal static class Emitter
         sb.AppendLine("    {");
         sb.AppendLine("        base.OnInitialized();");
         sb.AppendLine();
-        sb.AppendLine($"        var __ctxLocal = new {model.ClassName}.__SliceInitContext();");
+        sb.AppendLine($"        var __ctxLocal = new {model.ClassName}.SliceInitContext();");
         sb.AppendLine("        OnInitializeSlices(__ctxLocal);");
         sb.AppendLine();
 
@@ -84,7 +88,7 @@ internal static class Emitter
         sb.AppendLine();
 
         // --- partial void OnInitializeSlices ---
-        sb.AppendLine($"    partial void OnInitializeSlices({model.ClassName}.__SliceInitContext ctx);");
+        sb.AppendLine($"    partial void OnInitializeSlices({model.ClassName}.SliceInitContext ctx);");
         sb.AppendLine();
 
         // --- partial void OnAfterSlicesCreated (only if user overrides OnInitialized) ---
@@ -104,7 +108,7 @@ internal static class Emitter
             {
                 sb.AppendLine($"        {field.FieldName}?.Dispose();");
             }
-            sb.AppendLine("        __sm?.Dispose();");
+            // StateManager is DI-scoped; don't dispose it here
             sb.AppendLine("    }");
         }
         else
@@ -116,7 +120,7 @@ internal static class Emitter
             {
                 sb.AppendLine($"        {field.FieldName}?.Dispose();");
             }
-            sb.AppendLine("        __sm?.Dispose();");
+            // StateManager is DI-scoped; don't dispose it here
             sb.AppendLine("    }");
         }
 
@@ -124,7 +128,7 @@ internal static class Emitter
 
         // --- Nested SliceInitContext class ---
         sb.AppendLine("    [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]");
-        sb.AppendLine("    public sealed class __SliceInitContext");
+        sb.AppendLine("    public sealed class SliceInitContext");
         sb.AppendLine("    {");
 
         foreach (var field in model.Fields)
