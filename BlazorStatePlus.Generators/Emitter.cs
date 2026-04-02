@@ -152,7 +152,7 @@ internal static class Emitter
 
         foreach (var field in model.Fields)
         {
-            sb.AppendLine($"        public global::BlazorStatePlus.Generators.SliceBuilder<{field.FullTypeArgument}> {field.PropertyName} {{ get; }} = new global::BlazorStatePlus.Generators.SliceBuilder<{field.FullTypeArgument}>();");
+            sb.AppendLine($"        public global::BlazorStatePlus.Builders.SliceBuilder<{field.FullTypeArgument}> {field.PropertyName} {{ get; }} = new global::BlazorStatePlus.Builders.SliceBuilder<{field.FullTypeArgument}>();");
         }
 
         sb.AppendLine();

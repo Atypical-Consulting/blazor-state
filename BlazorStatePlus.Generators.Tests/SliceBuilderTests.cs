@@ -2,6 +2,8 @@ using BlazorStatePlus.Abstractions;
 using Shouldly;
 using Xunit;
 
+using BlazorStatePlus.Builders;
+
 namespace BlazorStatePlus.Generators.Tests;
 
 public class SliceBuilderTests

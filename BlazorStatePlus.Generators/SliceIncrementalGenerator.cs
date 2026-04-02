@@ -399,7 +399,6 @@ internal sealed class SliceIncrementalGenerator : IIncrementalGenerator
             UserImplementsDisposable = userImplementsDisposable,
             UserOverridesOnInitialized = userOverridesOnInitialized,
             UserOverridesOnInitializedAsync = userOverridesOnInitializedAsync,
-            ClassLocation = first.Location.ClassLocation
         };
 
         // Emit source with namespace-qualified hint name

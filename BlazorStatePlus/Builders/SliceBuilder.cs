@@ -1,7 +1,7 @@
 using System.ComponentModel;
 using BlazorStatePlus.Abstractions;
 
-namespace BlazorStatePlus.Generators;
+namespace BlazorStatePlus.Builders;
 
 /// <summary>
 /// Fluent configuration builder for a single [Slice] field.

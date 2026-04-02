@@ -3,24 +3,23 @@ using Microsoft.CodeAnalysis;
 
 namespace BlazorStatePlus.Generators;
 
-internal sealed class ComponentModel
+internal sealed record ComponentModel
 {
-    public string Namespace { get; set; } = null!;
-    public string ClassName { get; set; } = null!;
-    public List<SliceFieldModel> Fields { get; set; } = null!;
-    public bool UserImplementsDisposable { get; set; }
-    public bool UserOverridesOnInitialized { get; set; }
-    public bool UserOverridesOnInitializedAsync { get; set; }
-    public Location ClassLocation { get; set; } = null!;
+    public string Namespace { get; init; } = null!;
+    public string ClassName { get; init; } = null!;
+    public List<SliceFieldModel> Fields { get; init; } = null!;
+    public bool UserImplementsDisposable { get; init; }
+    public bool UserOverridesOnInitialized { get; init; }
+    public bool UserOverridesOnInitializedAsync { get; init; }
 }
 
-internal sealed class SliceFieldModel
+internal sealed record SliceFieldModel
 {
-    public string FieldName { get; set; } = null!;
-    public string PropertyName { get; set; } = null!;
-    public string TypeArgument { get; set; } = null!;
-    public string FullTypeArgument { get; set; } = null!;
-    public string? TimeToLive { get; set; }
-    public string BaseKey { get; set; } = null!;
-    public Location FieldLocation { get; set; } = null!;
+    public string FieldName { get; init; } = null!;
+    public string PropertyName { get; init; } = null!;
+    public string TypeArgument { get; init; } = null!;
+    public string FullTypeArgument { get; init; } = null!;
+    public string? TimeToLive { get; init; }
+    public string BaseKey { get; init; } = null!;
+    public Location FieldLocation { get; init; } = null!;
 }
