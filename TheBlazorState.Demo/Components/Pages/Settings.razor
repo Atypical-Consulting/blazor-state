@@ -1,0 +1,88 @@
+@page "/settings"
+@rendermode InteractiveServer
+
+<PageTitle>Settings — TaskFlow</PageTitle>
+
+<div class="mb-6">
+    <h1 class="text-2xl font-bold text-slate-900">Settings</h1>
+    <p class="text-sm text-slate-500 mt-1">Preferences persisted to localStorage</p>
+</div>
+
+@if (SavedThemeMeta?.WasRestored == true)
+{
+    <div class="mb-6 flex items-center gap-2 text-xs text-emerald-600 bg-emerald-50 px-3 py-2 rounded-lg">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+        Preferences restored from localStorage — survives browser refresh
+    </div>
+}
+
+<!-- Appearance -->
+<div class="bg-white rounded-xl border border-gray-200 mb-6">
+    <div class="px-5 py-4 border-b border-gray-100">
+        <h2 class="text-sm font-semibold text-slate-700">Appearance</h2>
+    </div>
+    <div class="p-5 space-y-6">
+        <!-- Theme -->
+        <div>
+            <label class="block text-sm font-medium text-slate-700 mb-2">Theme</label>
+            <div class="flex gap-2">
+                <button @onclick='() => SetTheme("light")'
+                        class="@($"px-4 py-2 rounded-lg text-sm font-medium border transition-colors {(Theme.Theme == "light" ? "bg-indigo-50 border-indigo-300 text-indigo-700" : "bg-white border-gray-200 text-slate-600 hover:bg-gray-50")}")">
+                    Light
+                </button>
+                <button @onclick='() => SetTheme("dark")'
+                        class="@($"px-4 py-2 rounded-lg text-sm font-medium border transition-colors {(Theme.Theme == "dark" ? "bg-indigo-50 border-indigo-300 text-indigo-700" : "bg-white border-gray-200 text-slate-600 hover:bg-gray-50")}")">
+                    Dark
+                </button>
+            </div>
+        </div>
+
+        <!-- Density -->
+        <div>
+            <label class="block text-sm font-medium text-slate-700 mb-2">Density</label>
+            <div class="flex gap-2">
+                <button @onclick='() => SetDensity("comfortable")'
+                        class="@($"px-4 py-2 rounded-lg text-sm font-medium border transition-colors {(Theme.Density == "comfortable" ? "bg-indigo-50 border-indigo-300 text-indigo-700" : "bg-white border-gray-200 text-slate-600 hover:bg-gray-50")}")">
+                    Comfortable
+                </button>
+                <button @onclick='() => SetDensity("compact")'
+                        class="@($"px-4 py-2 rounded-lg text-sm font-medium border transition-colors {(Theme.Density == "compact" ? "bg-indigo-50 border-indigo-300 text-indigo-700" : "bg-white border-gray-200 text-slate-600 hover:bg-gray-50")}")">
+                    Compact
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Storage Strategy Info -->
+<div class="bg-white rounded-xl border border-gray-200 mb-6">
+    <div class="px-5 py-4 border-b border-gray-100">
+        <h2 class="text-sm font-semibold text-slate-700">About Storage Strategies</h2>
+    </div>
+    <div class="p-5">
+        <p class="text-sm text-slate-600 mb-4">
+            These preferences use <code class="text-xs bg-gray-100 px-1.5 py-0.5 rounded font-mono">StorageStrategy.LocalStorage()</code>,
+            so they survive browser refresh. Try changing a setting, then refresh the page.
+        </p>
+        <div class="grid grid-cols-2 gap-3 text-sm">
+            <div class="bg-gray-50 rounded-lg p-3">
+                <p class="font-medium text-slate-700">PrerenderHtml</p>
+                <p class="text-xs text-slate-500 mt-0.5">Survives prerender only (default)</p>
+            </div>
+            <div class="bg-gray-50 rounded-lg p-3">
+                <p class="font-medium text-slate-700">ServerMemoryCache</p>
+                <p class="text-xs text-slate-500 mt-0.5">Survives page reload (server only)</p>
+            </div>
+            <div class="bg-indigo-50 rounded-lg p-3 border border-indigo-200">
+                <p class="font-medium text-indigo-700">LocalStorage <span class="text-xs">(active)</span></p>
+                <p class="text-xs text-indigo-500 mt-0.5">Survives browser restart</p>
+            </div>
+            <div class="bg-gray-50 rounded-lg p-3">
+                <p class="font-medium text-slate-700">SessionStorage</p>
+                <p class="text-xs text-slate-500 mt-0.5">Survives refresh, clears on tab close</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<StateInspector Entries="InspectorEntries" />
