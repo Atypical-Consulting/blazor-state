@@ -106,6 +106,18 @@ public sealed class StateManager(
 
         logger.LogDebug("Property '{Key}': no persisted value, using default", key);
         RegisterPersistPropertyCallback(key, strategy, valueGetter);
+
+        // Eagerly update server cache on every value change (not just during OnPersisting).
+        // This ensures mutations are available when the component re-mounts in the same circuit.
+        meta.OnChanged += () =>
+        {
+            var envelope = new PersistedEnvelope<T>
+            {
+                Value = valueGetter(),
+                PersistedAt = DateTimeOffset.UtcNow
+            };
+            cache.Set(key, envelope, CacheEntryOptions);
+        };
     }
 
     /// <summary>
