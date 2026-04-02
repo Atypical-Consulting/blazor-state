@@ -1,5 +1,7 @@
 using TheBlazorState.Configuration;
 using TheBlazorState.Services;
+using TheBlazorState.Storage;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace TheBlazorState.Extensions;
@@ -18,7 +20,27 @@ public static class ServiceCollectionExtensions
 
         services.AddSingleton(options);
         services.AddMemoryCache();
+        services.AddScoped<BrowserStorageService>();
         services.AddScoped<StateManager>();
+        services.AddScoped<StorageStrategyInitializer>();
+
         return services;
+    }
+}
+
+/// <summary>
+/// Scoped service that initializes storage strategy singletons with their DI dependencies.
+/// Resolved automatically when StateManager is created.
+/// </summary>
+public sealed class StorageStrategyInitializer
+{
+    public StorageStrategyInitializer(
+        BrowserStorageService browserStorage,
+        IMemoryCache cache)
+    {
+        SessionStorageStrategy.Instance.Initialize(browserStorage);
+        LocalStorageStrategy.Instance.Initialize(browserStorage);
+        IndexedDbStrategy.Instance.Initialize(browserStorage);
+        ServerMemoryCacheStrategy.Instance.Initialize(cache);
     }
 }

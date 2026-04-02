@@ -1,12 +1,26 @@
 namespace TheBlazorState.Storage;
 
-internal sealed class SessionStorageStrategy : IStorageStrategy
+/// <summary>
+/// Persists state to browser sessionStorage. Survives page refresh within the same tab.
+/// </summary>
+public sealed class SessionStorageStrategy : IStorageStrategy
 {
     internal static readonly SessionStorageStrategy Instance = new();
-    public Task<StorageResult<T>> RestoreAsync<T>(string key)
-        => throw new NotImplementedException("SessionStorage requires browser JSInterop. Coming in a future release.");
-    public Task PersistAsync<T>(string key, T value, StorageMetadata metadata)
-        => throw new NotImplementedException("SessionStorage requires browser JSInterop. Coming in a future release.");
-    public Task RemoveAsync(string key)
-        => throw new NotImplementedException("SessionStorage requires browser JSInterop. Coming in a future release.");
+
+    private BrowserStorageService? _service;
+
+    internal void Initialize(BrowserStorageService service) => _service = service;
+
+    private BrowserStorageService Service =>
+        _service ?? throw new InvalidOperationException(
+            "SessionStorage strategy requires BrowserStorageService. Ensure AddTheBlazorState() is called.");
+
+    public Task<StorageResult<T>> RestoreAsync<T>(string key) =>
+        Service.GetAsync<T>("sessionStorage", key);
+
+    public Task PersistAsync<T>(string key, T value, StorageMetadata metadata) =>
+        Service.SetAsync("sessionStorage", key, value, metadata);
+
+    public Task RemoveAsync(string key) =>
+        Service.RemoveAsync("sessionStorage", key);
 }
