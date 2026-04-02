@@ -10,11 +10,11 @@
     <em>
         @if (_counter.WasRestored)
         {
-            <span>Restored from prerender</span>
+            <span>Restored from persistence (last updated @_counter.LastUpdated.LocalDateTime)</span>
         }
         else
         {
-            <span>Freshly initialized</span>
+            <span>Freshly initialized (random value)</span>
         }
     </em>
 </p>

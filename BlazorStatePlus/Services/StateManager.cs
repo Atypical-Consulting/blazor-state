@@ -1,16 +1,19 @@
 using BlazorStatePlus.Abstractions;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
 namespace BlazorStatePlus.Services;
 
 /// <summary>
 /// Central service for creating and managing <see cref="IStateSlice{T}"/> instances.
-/// Wraps <see cref="PersistentComponentState"/> with a friendlier API.
-/// 
+/// Wraps <see cref="PersistentComponentState"/> with a friendlier API,
+/// and uses <see cref="IMemoryCache"/> to persist state across page reloads.
+///
 /// Inject this into components instead of using <c>PersistentComponentState</c> directly.
 /// </summary>
 public sealed class StateManager(
     PersistentComponentState persistence,
+    IMemoryCache cache,
     ILogger<StateManager> logger) : IDisposable
 {
     private readonly List<PersistingComponentStateSubscription> _subscriptions = [];
@@ -18,10 +21,15 @@ public sealed class StateManager(
     private bool _registered;
     private bool _disposed;
 
+    private static readonly MemoryCacheEntryOptions CacheEntryOptions = new()
+    {
+        SlidingExpiration = TimeSpan.FromMinutes(30)
+    };
+
     /// <summary>
     /// Creates a state slice for a single value.
-    /// Automatically tries to restore from prerendered state,
-    /// and registers a callback to persist the current value.
+    /// Automatically tries to restore from prerendered state or server-side cache,
+    /// and registers callbacks to persist the current value.
     /// </summary>
     /// <typeparam name="T">Type of the value to persist (must be JSON-serializable).</typeparam>
     /// <param name="key">Unique key for this slice within the component.</param>
@@ -71,7 +79,26 @@ public sealed class StateManager(
             {
                 restoredValue = defaultValue;
                 effectivelyRestored = false;
-                logger.LogDebug("Slice '{Key}': no persisted value, using default", options.Key);
+                logger.LogDebug("Slice '{Key}': no persisted value from prerender", options.Key);
+            }
+
+            // Fallback: try server-side memory cache (survives page reloads)
+            if (!effectivelyRestored
+                && cache.TryGetValue<PersistedEnvelope<T>>(options.Key!, out var cached)
+                && cached is not null)
+            {
+                if (options.TimeToLive.HasValue
+                    && DateTimeOffset.UtcNow - cached.PersistedAt > options.TimeToLive.Value)
+                {
+                    logger.LogDebug("Slice '{Key}': cached value discarded (TTL expired)", options.Key);
+                }
+                else
+                {
+                    restoredValue = cached.Value;
+                    effectivelyRestored = true;
+                    persistedAt = cached.PersistedAt;
+                    logger.LogDebug("Slice '{Key}': restored from server cache", options.Key);
+                }
             }
         }
         catch (Exception ex)
@@ -83,17 +110,31 @@ public sealed class StateManager(
 
         var slice = new StateSlice<T>(restoredValue, effectivelyRestored, options, persistedAt);
 
+        // Update server cache whenever the value changes
+        slice.OnChanged += () => UpdateCache<T>(options.Key!, slice.Value);
+
         RegisterPersistCallback(() =>
         {
-            persistence.PersistAsJson(options.Key!, new PersistedEnvelope<T>
+            var envelope = new PersistedEnvelope<T>
             {
                 Value = slice.Value,
                 PersistedAt = DateTimeOffset.UtcNow
-            });
+            };
+            persistence.PersistAsJson(options.Key!, envelope);
+            cache.Set(options.Key!, envelope, CacheEntryOptions);
             return Task.CompletedTask;
         });
 
         return slice;
+    }
+
+    private void UpdateCache<T>(string key, T value)
+    {
+        cache.Set(key, new PersistedEnvelope<T>
+        {
+            Value = value,
+            PersistedAt = DateTimeOffset.UtcNow
+        }, CacheEntryOptions);
     }
 
     private void RegisterPersistCallback(Func<Task> callback)

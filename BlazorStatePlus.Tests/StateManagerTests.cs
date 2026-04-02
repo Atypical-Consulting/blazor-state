@@ -3,6 +3,7 @@ using BlazorStatePlus.Services;
 using Bunit;
 using Bunit.TestDoubles;
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using Shouldly;
@@ -13,6 +14,7 @@ namespace BlazorStatePlus.Tests;
 public class StateManagerTests : BunitContext
 {
     private BunitPersistentComponentState FakeState { get; set; } = null!;
+    private IMemoryCache Cache { get; set; } = new MemoryCache(new MemoryCacheOptions());
 
     public StateManagerTests()
     {
@@ -22,7 +24,7 @@ public class StateManagerTests : BunitContext
     private StateManager CreateManager()
     {
         var pcs = Services.GetRequiredService<PersistentComponentState>();
-        return new StateManager(pcs, NullLogger<StateManager>.Instance);
+        return new StateManager(pcs, Cache, NullLogger<StateManager>.Instance);
     }
 
     // -- CreateSlice ----------------------------------------------------------
@@ -189,6 +191,57 @@ public class StateManagerTests : BunitContext
         // The key assertion: LastUpdated should be close to PersistedAt, not UtcNow
         var age = DateTimeOffset.UtcNow - slice.LastUpdated;
         age.TotalMinutes.ShouldBeGreaterThan(3.5); // Should be ~4 minutes old
+    }
+
+    // -- Server cache (reload persistence) --------------------------------------
+
+    [Fact]
+    public void CreateSlice_ValueChange_UpdatesServerCache()
+    {
+        using var manager = CreateManager();
+        var slice = manager.CreateSlice<int>("cached", defaultValue: 0);
+        slice.Value = 77;
+
+        // A second manager (simulating page reload) should restore from cache
+        using var manager2 = CreateManager();
+        var slice2 = manager2.CreateSlice<int>("cached", defaultValue: 0);
+
+        slice2.Value.ShouldBe(77);
+        slice2.WasRestored.ShouldBeTrue();
+    }
+
+    [Fact]
+    public void CreateSlice_NoPrerenderButCached_RestoresFromCache()
+    {
+        // Pre-populate the cache directly
+        Cache.Set("mykey", new StateManager.PersistedEnvelope<string>
+        {
+            Value = "from-cache",
+            PersistedAt = DateTimeOffset.UtcNow
+        });
+
+        using var manager = CreateManager();
+        var slice = manager.CreateSlice<string>("mykey", defaultValue: "default");
+
+        slice.Value.ShouldBe("from-cache");
+        slice.WasRestored.ShouldBeTrue();
+    }
+
+    [Fact]
+    public void CreateSlice_CachedValueExpired_FallsBackToDefault()
+    {
+        Cache.Set("stale", new StateManager.PersistedEnvelope<int>
+        {
+            Value = 99,
+            PersistedAt = DateTimeOffset.UtcNow.AddHours(-2)
+        });
+
+        using var manager = CreateManager();
+        var slice = manager.CreateSlice<int>("stale", defaultValue: 0,
+            configure: o => o.TimeToLive = TimeSpan.FromMinutes(30));
+
+        slice.Value.ShouldBe(0);
+        slice.WasRestored.ShouldBeFalse();
     }
 
     // -- Dispose --------------------------------------------------------------
