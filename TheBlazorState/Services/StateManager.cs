@@ -57,8 +57,11 @@ public sealed class StateManager(
         ArgumentException.ThrowIfNullOrWhiteSpace(key);
 
         // Allow re-registration when a component re-mounts in the same circuit.
-        // The persist callback will be replaced with the new getter.
         _registeredKeys.Add(key);
+
+        // Always register persist callback + eager change handler (before any early returns).
+        RegisterPersistPropertyCallback(key, strategy, valueGetter);
+        RegisterEagerChangeHandler(key, strategy, meta, valueGetter);
 
         var ttl = meta.TimeToLive;
 
@@ -77,7 +80,6 @@ public sealed class StateManager(
                     valueSetter(envelope.Value);
                     meta.MarkRestored(envelope.PersistedAt);
                     logger.LogDebug("Property '{Key}': restored from prerender", key);
-                    RegisterPersistPropertyCallback(key, strategy, valueGetter);
                     return;
                 }
             }
@@ -94,7 +96,6 @@ public sealed class StateManager(
                     valueSetter(cached.Value);
                     meta.MarkRestored(cached.PersistedAt);
                     logger.LogDebug("Property '{Key}': restored from server cache", key);
-                    RegisterPersistPropertyCallback(key, strategy, valueGetter);
                     return;
                 }
             }
@@ -105,22 +106,19 @@ public sealed class StateManager(
         }
 
         logger.LogDebug("Property '{Key}': no persisted value, using default", key);
-        RegisterPersistPropertyCallback(key, strategy, valueGetter);
+    }
 
-        // Eagerly update cache + browser strategy on every value change.
-        // Cache: ensures mutations survive component re-mount in the same circuit.
-        // Browser strategy: ensures mutations survive page refresh (localStorage, etc.)
+    private void RegisterEagerChangeHandler<T>(
+        string key, IStorageStrategy? strategy, StateMeta meta, Func<T> valueGetter)
+    {
         var effectiveStrategy = strategy ?? options.DefaultStorage;
         meta.OnChanged += () =>
         {
             var value = valueGetter();
             var now = DateTimeOffset.UtcNow;
-            var envelope = new PersistedEnvelope<T>
-            {
-                Value = value,
-                PersistedAt = now
-            };
-            cache.Set(key, envelope, CacheEntryOptions);
+
+            // Always update server cache eagerly
+            cache.Set(key, new PersistedEnvelope<T> { Value = value, PersistedAt = now }, CacheEntryOptions);
 
             // Write to browser strategy eagerly (fire-and-forget on circuit thread)
             if (effectiveStrategy is not PrerenderHtmlStrategy and not ServerMemoryCacheStrategy)
