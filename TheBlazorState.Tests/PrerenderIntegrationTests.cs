@@ -16,9 +16,9 @@ public class PrerenderIntegrationTests : IClassFixture<WebApplicationFactory<The
     public void Dispose() => _client.Dispose();
 
     [Fact]
-    public async Task CounterPage_PrerenderContainsPersistentState()
+    public async Task DashboardPage_PrerenderContainsPersistentState()
     {
-        var response = await _client.GetAsync("/counter");
+        var response = await _client.GetAsync("/");
         response.EnsureSuccessStatusCode();
 
         var html = await response.Content.ReadAsStringAsync();
@@ -29,9 +29,9 @@ public class PrerenderIntegrationTests : IClassFixture<WebApplicationFactory<The
     }
 
     [Fact]
-    public async Task WeatherPage_PrerenderContainsPersistentState()
+    public async Task BoardPage_PrerenderContainsPersistentState()
     {
-        var response = await _client.GetAsync("/weather");
+        var response = await _client.GetAsync("/board");
         response.EnsureSuccessStatusCode();
 
         var html = await response.Content.ReadAsStringAsync();
