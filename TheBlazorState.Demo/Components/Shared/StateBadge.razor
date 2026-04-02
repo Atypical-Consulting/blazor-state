@@ -1,0 +1,16 @@
+@if (Value)
+{
+    <span class="@($"inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium {TrueClass}")">@TrueLabel</span>
+}
+else
+{
+    <span class="@($"inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium {FalseClass}")">@FalseLabel</span>
+}
+
+@code {
+    [Parameter, EditorRequired] public bool Value { get; set; }
+    [Parameter] public string TrueLabel { get; set; } = "Yes";
+    [Parameter] public string FalseLabel { get; set; } = "No";
+    [Parameter] public string TrueClass { get; set; } = "bg-emerald-100 text-emerald-700";
+    [Parameter] public string FalseClass { get; set; } = "bg-gray-100 text-gray-500";
+}
