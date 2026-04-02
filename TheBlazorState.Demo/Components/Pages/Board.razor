@@ -1,0 +1,77 @@
+@page "/board"
+@rendermode InteractiveServer
+
+<PageTitle>Board — TaskFlow</PageTitle>
+
+<div class="mb-6">
+    <h1 class="text-2xl font-bold text-slate-900">Board</h1>
+    <p class="text-sm text-slate-500 mt-1">@Project.SelectedProject.Name — Kanban view</p>
+</div>
+
+@if (BoardState is null)
+{
+    <div class="flex items-center gap-3 text-slate-400 py-12">
+        <svg class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+        Loading board...
+    </div>
+}
+else
+{
+    @if (BoardStateMeta.WasRestored)
+    {
+        <div class="mb-4 flex items-center gap-2 text-xs text-emerald-600 bg-emerald-50 px-3 py-2 rounded-lg">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            Board restored from cache — instant render
+        </div>
+    }
+
+    <div class="grid grid-cols-3 gap-5">
+        @{ RenderColumn("To Do", BoardState.ToDo, "todo", null, "inprogress"); }
+        @{ RenderColumn("In Progress", BoardState.InProgress, "inprogress", "todo", "done"); }
+        @{ RenderColumn("Done", BoardState.Done, "done", "inprogress", null); }
+    </div>
+
+    <StateInspector Entries="InspectorEntries" />
+}
+
+@{ void RenderColumn(string title, List<TaskItem> tasks, string columnId, string? prevColumn, string? nextColumn)
+{
+    <div class="bg-gray-100 rounded-xl p-4">
+        <div class="flex items-center justify-between mb-3">
+            <h3 class="text-sm font-semibold text-slate-700">@title</h3>
+            <span class="text-xs text-slate-400 bg-white px-2 py-0.5 rounded-full">@tasks.Count</span>
+        </div>
+        <div class="space-y-2.5">
+            @foreach (var task in tasks)
+            {
+                <div class="bg-white rounded-lg border border-gray-200 p-3 shadow-sm">
+                    <p class="text-sm font-medium text-slate-800 mb-2">@task.Title</p>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="@($"text-xs px-1.5 py-0.5 rounded font-medium {PriorityClasses(task.Priority)}")">@task.Priority</span>
+                            <span class="@($"w-5 h-5 rounded-full text-white text-[10px] flex items-center justify-center font-medium {AvatarColor(task.AssigneeInitials)}")" title="@task.AssigneeName">@task.AssigneeInitials</span>
+                        </div>
+                        <div class="flex gap-1">
+                            @if (prevColumn is not null)
+                            {
+                                var prev = prevColumn;
+                                <button @onclick="() => MoveTask(task, columnId, prev)"
+                                        class="text-slate-400 hover:text-slate-600 p-0.5" title="Move left">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                                </button>
+                            }
+                            @if (nextColumn is not null)
+                            {
+                                var next = nextColumn;
+                                <button @onclick="() => MoveTask(task, columnId, next)"
+                                        class="text-slate-400 hover:text-slate-600 p-0.5" title="Move right">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                                </button>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+} }
