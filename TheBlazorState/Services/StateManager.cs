@@ -107,16 +107,26 @@ public sealed class StateManager(
         logger.LogDebug("Property '{Key}': no persisted value, using default", key);
         RegisterPersistPropertyCallback(key, strategy, valueGetter);
 
-        // Eagerly update server cache on every value change (not just during OnPersisting).
-        // This ensures mutations are available when the component re-mounts in the same circuit.
+        // Eagerly update cache + browser strategy on every value change.
+        // Cache: ensures mutations survive component re-mount in the same circuit.
+        // Browser strategy: ensures mutations survive page refresh (localStorage, etc.)
+        var effectiveStrategy = strategy ?? options.DefaultStorage;
         meta.OnChanged += () =>
         {
+            var value = valueGetter();
+            var now = DateTimeOffset.UtcNow;
             var envelope = new PersistedEnvelope<T>
             {
-                Value = valueGetter(),
-                PersistedAt = DateTimeOffset.UtcNow
+                Value = value,
+                PersistedAt = now
             };
             cache.Set(key, envelope, CacheEntryOptions);
+
+            // Write to browser strategy eagerly (fire-and-forget on circuit thread)
+            if (effectiveStrategy is not PrerenderHtmlStrategy and not ServerMemoryCacheStrategy)
+            {
+                _ = PersistToBrowserStrategyAsync(key, value, now, effectiveStrategy, meta.TimeToLive);
+            }
         };
     }
 
@@ -197,6 +207,22 @@ public sealed class StateManager(
                 }
             }
         });
+    }
+
+    private async Task PersistToBrowserStrategyAsync<T>(
+        string key, T value, DateTimeOffset timestamp,
+        IStorageStrategy strategy, TimeSpan? ttl)
+    {
+        try
+        {
+            var metadata = new StorageMetadata(key, ttl, timestamp);
+            await strategy.PersistAsync(key, value, metadata);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Property '{Key}': eager persist to {Strategy} failed",
+                key, strategy.GetType().Name);
+        }
     }
 
     private void RegisterPersistCallback(Func<Task> callback)

@@ -1,0 +1,68 @@
+- generic [ref=e2]:
+  - complementary [ref=e3]:
+    - generic [ref=e4]:
+      - heading "TaskFlow" [level=1] [ref=e5]
+      - paragraph [ref=e6]: TheBlazorState Demo
+    - generic [ref=e7]:
+      - paragraph [ref=e8]: Projects
+      - button "Marketing" [ref=e9]: Marketing
+      - button "Engineering" [ref=e11]: Engineering
+      - button "Design" [ref=e13]: Design
+    - generic [ref=e15]:
+      - paragraph [ref=e16]: Views
+      - link "Dashboard" [ref=e17] [cursor=pointer]:
+        - /url: ""
+        - img [ref=e18]
+        - text: Dashboard
+      - link "Board" [ref=e20] [cursor=pointer]:
+        - /url: board
+        - img [ref=e21]
+        - text: Board
+      - link "Settings" [ref=e23] [cursor=pointer]:
+        - /url: settings
+        - img [ref=e24]
+        - text: Settings
+    - paragraph [ref=e28]: Powered by TheBlazorState
+  - main [ref=e29]:
+    - generic [ref=e30]:
+      - generic [ref=e31]:
+        - heading "Settings" [level=1] [ref=e32]
+        - paragraph [ref=e33]: Preferences persisted to localStorage
+      - generic [ref=e34]:
+        - heading "Appearance" [level=2] [ref=e36]
+        - generic [ref=e37]:
+          - generic [ref=e38]:
+            - generic [ref=e39]: Theme
+            - generic [ref=e40]:
+              - button "Light" [ref=e41]
+              - button "Dark" [ref=e42]
+          - generic [ref=e43]:
+            - generic [ref=e44]: Density
+            - generic [ref=e45]:
+              - button "Comfortable" [ref=e46]
+              - button "Compact" [ref=e47]
+      - generic [ref=e48]:
+        - heading "About Storage Strategies" [level=2] [ref=e50]
+        - generic [ref=e51]:
+          - paragraph [ref=e52]:
+            - text: These preferences use
+            - code [ref=e53]: StorageStrategy.LocalStorage()
+            - text: ", so they survive browser refresh. Try changing a setting, then refresh the page."
+          - generic [ref=e54]:
+            - generic [ref=e55]:
+              - paragraph [ref=e56]: PrerenderHtml
+              - paragraph [ref=e57]: Survives prerender only (default)
+            - generic [ref=e58]:
+              - paragraph [ref=e59]: ServerMemoryCache
+              - paragraph [ref=e60]: Survives page reload (server only)
+            - generic [ref=e61]:
+              - paragraph [ref=e62]: LocalStorage (active)
+              - paragraph [ref=e63]: Survives browser restart
+            - generic [ref=e64]:
+              - paragraph [ref=e65]: SessionStorage
+              - paragraph [ref=e66]: Survives refresh, clears on tab close
+      - button "State Inspector" [ref=e68]:
+        - generic [ref=e69]:
+          - img [ref=e70]
+          - text: State Inspector
+        - img [ref=e72]
