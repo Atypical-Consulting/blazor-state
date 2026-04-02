@@ -150,6 +150,15 @@ internal static class PersistEmitter
             sb.AppendLine();
         }
 
+        // Subscribe to injected shared state changes
+        foreach (var shared in model.InjectedSharedStates)
+        {
+            sb.AppendLine($"        {shared.PropertyName}.StateChanged += __OnSharedStateChanged;");
+        }
+
+        if (model.InjectedSharedStates.Count > 0)
+            sb.AppendLine();
+
         sb.AppendLine("        __stateCtx = __ctx.HasAsyncInit ? __ctx : null;");
         sb.AppendLine("    }");
         sb.AppendLine();
@@ -186,12 +195,23 @@ internal static class PersistEmitter
         sb.AppendLine($"    partial void ConfigureState({model.ClassName}.__StateContext ctx);");
         sb.AppendLine();
 
+        // --- Shared state handler ---
+        if (model.InjectedSharedStates.Count > 0)
+        {
+            sb.AppendLine("    private void __OnSharedStateChanged() => InvokeAsync(StateHasChanged);");
+            sb.AppendLine();
+        }
+
         // --- Dispose ---
         sb.AppendLine("    public void Dispose()");
         sb.AppendLine("    {");
         foreach (var prop in model.Properties)
         {
             sb.AppendLine($"        __{prop.PropertyName}_meta?.ClearHandlers();");
+        }
+        foreach (var shared in model.InjectedSharedStates)
+        {
+            sb.AppendLine($"        {shared.PropertyName}.StateChanged -= __OnSharedStateChanged;");
         }
         sb.AppendLine("    }");
 

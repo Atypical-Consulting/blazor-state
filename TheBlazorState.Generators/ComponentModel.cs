@@ -8,6 +8,7 @@ internal sealed record PersistComponentModel
     public string Namespace { get; init; } = null!;
     public string ClassName { get; init; } = null!;
     public List<PersistPropertyModel> Properties { get; init; } = null!;
+    public List<InjectedSharedState> InjectedSharedStates { get; init; } = new();
     public bool UserImplementsDisposable { get; init; }
     public bool UserOverridesOnInitialized { get; init; }
     public bool UserOverridesOnInitializedAsync { get; init; }
@@ -20,4 +21,9 @@ internal sealed record PersistPropertyModel
     public string? TimeToLive { get; init; }
     public string BaseKey { get; init; } = null!;
     public Location PropertyLocation { get; init; } = null!;
+}
+
+internal sealed record InjectedSharedState
+{
+    public string PropertyName { get; init; } = null!;
 }
