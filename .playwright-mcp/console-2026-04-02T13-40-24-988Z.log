@@ -1,0 +1,7 @@
+[     315ms] [INFO] [2026-04-02T13:40:25.302Z] Information: Normalizing '_blazor' to 'http://localhost:5273/_blazor'. @ http://localhost:5273/_framework/blazor.web.js:0
+[     333ms] [INFO] [2026-04-02T13:40:25.321Z] Information: WebSocket connected to ws://localhost:5273/_blazor?id=eVaITl76JxFIdKboARwbvA. @ http://localhost:5273/_framework/blazor.web.js:0
+[  186602ms] [ERROR] [2026-04-02T13:43:31.589Z] Error: System.InvalidOperationException: A property with key 'Settings.SavedTheme' has already been registered. Each key must be unique.
+   at TheBlazorState.Services.StateManager.RestoreProperty[T](String key, IStorageStrategy strategy, StateMeta meta, Action`1 valueSetter, Func`1 valueGetter) in C:\repo\POC\BlazorStatePlus\TheBlazorState\Services\StateManager.cs:line 60
+   at TheBlazorState.Demo.Components.Pages.Settings.OnInitialized() in C:\repo\POC\BlazorStatePlus\TheBlazorState.Demo\obj\Debug\net10.0\TheBlazorState.Generators\TheBlazorState.Generators.PersistIncrementalGenerator\TheBlazorState.Demo.Components.Pages.Settings.Persist.g.cs:line 95
+   at Microsoft.AspNetCore.Components.ComponentBase.RunInitAndSetParametersAsync() @ http://localhost:5273/_framework/blazor.web.js:0
+[  186603ms] [INFO] [2026-04-02T13:43:31.590Z] Information: Connection disconnected. @ http://localhost:5273/_framework/blazor.web.js:0

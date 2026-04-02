@@ -12,14 +12,26 @@ public partial class Board : ComponentBase
     [Inject] public ProjectState Project { get; set; } = default!;
     [Inject] private TaskService TaskService { get; set; } = default!;
 
+    private int _lastProjectId;
+
     [Persist(TimeToLive = "00:05:00")]
     public partial BoardData? BoardState { get; set; }
 
     partial void ConfigureState(__StateContext ctx)
     {
+        _lastProjectId = Project.SelectedProject.Id;
         ctx.BoardState
             .KeySuffix(Project.SelectedProject.Id)
             .LoadFrom(async () => (BoardData?)await TaskService.GetBoardAsync(Project.SelectedProject.Id));
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (Project.SelectedProject.Id != _lastProjectId)
+        {
+            _lastProjectId = Project.SelectedProject.Id;
+            BoardState = await TaskService.GetBoardAsync(Project.SelectedProject.Id);
+        }
     }
 
     private void MoveTask(TaskItem task, string from, string to)

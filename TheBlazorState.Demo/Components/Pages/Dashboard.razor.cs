@@ -12,14 +12,26 @@ public partial class Dashboard : ComponentBase
     [Inject] public ProjectState Project { get; set; } = default!;
     [Inject] private StatsService StatsService { get; set; } = default!;
 
+    private int _lastProjectId;
+
     [Persist(TimeToLive = "00:02:00")]
     public partial DashboardData? Stats { get; set; }
 
     partial void ConfigureState(__StateContext ctx)
     {
+        _lastProjectId = Project.SelectedProject.Id;
         ctx.Stats
             .KeySuffix(Project.SelectedProject.Id)
             .LoadFrom(async () => (DashboardData?)await StatsService.GetDashboardAsync(Project.SelectedProject.Id));
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (Project.SelectedProject.Id != _lastProjectId)
+        {
+            _lastProjectId = Project.SelectedProject.Id;
+            await Refresh();
+        }
     }
 
     private async Task Refresh()

@@ -273,10 +273,10 @@ public class StateManagerRestoreTests : IDisposable
         cached!.Value.ShouldBe(42);
     }
 
-    // --- Duplicate key throws ---
+    // --- Duplicate key allowed (component re-mount) ---
 
     [Fact]
-    public void RestoreProperty_DuplicateKey_Throws()
+    public void RestoreProperty_DuplicateKey_Allowed_For_Remount()
     {
         var manager = CreateManager();
         var meta1 = new StateMeta(ttl: null);
@@ -285,8 +285,8 @@ public class StateManagerRestoreTests : IDisposable
 
         manager.RestoreProperty<int>("TestComponent.Count", null, meta1, v => val = v, () => val);
 
-        // Act & Assert
-        Should.Throw<InvalidOperationException>(() =>
+        // Should not throw — component may re-mount in the same circuit
+        Should.NotThrow(() =>
             manager.RestoreProperty<int>("TestComponent.Count", null, meta2, v => val = v, () => val));
     }
 

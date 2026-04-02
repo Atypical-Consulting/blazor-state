@@ -56,9 +56,9 @@ public sealed class StateManager(
         ObjectDisposedException.ThrowIf(_disposed, this);
         ArgumentException.ThrowIfNullOrWhiteSpace(key);
 
-        if (!_registeredKeys.Add(key))
-            throw new InvalidOperationException(
-                $"A property with key '{key}' has already been registered. Each key must be unique.");
+        // Allow re-registration when a component re-mounts in the same circuit.
+        // The persist callback will be replaced with the new getter.
+        _registeredKeys.Add(key);
 
         var ttl = meta.TimeToLive;
 
