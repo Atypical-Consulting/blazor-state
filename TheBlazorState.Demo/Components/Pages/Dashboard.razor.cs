@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Components;
 using TheBlazorState.Attributes;
-using TheBlazorState.Abstractions;
 using TheBlazorState.Demo.Models;
 using TheBlazorState.Demo.Services;
 using TheBlazorState.Demo.State;
@@ -25,18 +24,6 @@ public partial class Dashboard : ComponentBase
             .KeySuffix(Project.SelectedProject.Id)
             .LoadFrom(async () => (DashboardData?)await StatsService.GetDashboardAsync(Project.SelectedProject.Id));
 
-        // Subscribe to project changes (auto-subscription can't see generated INotifyStateChanged)
-        ((INotifyStateChanged)Project).StateChanged += OnProjectChanged;
-    }
-
-    private async void OnProjectChanged()
-    {
-        if (Project.SelectedProject.Id != _lastProjectId)
-        {
-            _lastProjectId = Project.SelectedProject.Id;
-            Stats = await StatsService.GetDashboardAsync(Project.SelectedProject.Id);
-            await InvokeAsync(StateHasChanged);
-        }
     }
 
     private async Task Refresh()

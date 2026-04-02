@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Components;
 using TheBlazorState.Attributes;
-using TheBlazorState.Abstractions;
 using TheBlazorState.Demo.Models;
 using TheBlazorState.Demo.Services;
 using TheBlazorState.Demo.State;
@@ -26,18 +25,6 @@ public partial class Board : ComponentBase
             .KeySuffix(Project.SelectedProject.Id)
             .LoadFrom(async () => (BoardData?)await TaskService.GetBoardAsync(Project.SelectedProject.Id));
         ctx.BoardState.Storage = StorageStrategy.LocalStorage();
-
-        ((INotifyStateChanged)Project).StateChanged += OnProjectChanged;
-    }
-
-    private async void OnProjectChanged()
-    {
-        if (Project.SelectedProject.Id != _lastProjectId)
-        {
-            _lastProjectId = Project.SelectedProject.Id;
-            BoardState = await TaskService.GetBoardAsync(Project.SelectedProject.Id);
-            await InvokeAsync(StateHasChanged);
-        }
     }
 
     private void MoveTask(TaskItem task, string from, string to)
