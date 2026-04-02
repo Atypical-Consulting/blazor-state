@@ -244,6 +244,15 @@ public class StateManagerTests : BunitContext
         slice.WasRestored.ShouldBeFalse();
     }
 
+    [Fact]
+    public void CreateSlice_DuplicateKey_ThrowsInvalidOperationException()
+    {
+        using var manager = CreateManager();
+        manager.CreateSlice<int>("counter");
+
+        Should.Throw<InvalidOperationException>(() => manager.CreateSlice<int>("counter"));
+    }
+
     // -- Dispose --------------------------------------------------------------
 
     [Fact]

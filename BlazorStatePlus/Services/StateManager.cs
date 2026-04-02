@@ -18,6 +18,7 @@ public sealed class StateManager(
 {
     private readonly List<PersistingComponentStateSubscription> _subscriptions = [];
     private readonly List<Func<Task>> _persistCallbacks = [];
+    private readonly HashSet<string> _registeredKeys = [];
     private bool _registered;
     private bool _disposed;
 
@@ -48,6 +49,10 @@ public sealed class StateManager(
         ObjectDisposedException.ThrowIf(_disposed, this);
         ArgumentException.ThrowIfNullOrWhiteSpace(key);
         var options = BuildOptions(key, configure);
+
+        if (!_registeredKeys.Add(options.Key!))
+            throw new InvalidOperationException(
+                $"A slice with key '{options.Key}' has already been registered. Each slice key must be unique.");
 
         T restoredValue;
         bool effectivelyRestored;
@@ -172,6 +177,7 @@ public sealed class StateManager(
 
         _subscriptions.Clear();
         _persistCallbacks.Clear();
+        _registeredKeys.Clear();
     }
 
     /// <summary>
