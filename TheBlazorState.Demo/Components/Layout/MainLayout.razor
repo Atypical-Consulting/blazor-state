@@ -1,7 +1,8 @@
 @inherits LayoutComponentBase
 @inject ThemeState Theme
+@implements IDisposable
 
-<div class="@($"flex min-h-screen {(Theme.Theme == "dark" ? "dark" : "")} {(Theme.Density == "compact" ? "density-compact" : "")}")">
+<div class="@LayoutClasses">
     <Sidebar />
     <main class="flex-1 overflow-auto bg-gray-50 dark:bg-gray-900">
         <div class="max-w-6xl mx-auto px-8 py-8">
@@ -9,3 +10,20 @@
         </div>
     </main>
 </div>
+
+@code {
+    private string LayoutClasses =>
+        $"flex min-h-screen {(Theme.Theme == "dark" ? "dark" : "")} {(Theme.Density == "compact" ? "density-compact" : "")}";
+
+    protected override void OnInitialized()
+    {
+        ((TheBlazorState.Abstractions.INotifyStateChanged)Theme).StateChanged += OnThemeChanged;
+    }
+
+    private void OnThemeChanged() => InvokeAsync(StateHasChanged);
+
+    public void Dispose()
+    {
+        ((TheBlazorState.Abstractions.INotifyStateChanged)Theme).StateChanged -= OnThemeChanged;
+    }
+}

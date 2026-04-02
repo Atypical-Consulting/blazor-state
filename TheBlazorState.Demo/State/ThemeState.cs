@@ -12,7 +12,7 @@ public partial class ThemeState
 
     public ThemeState()
     {
-        Theme = "light";
+        Theme = "dark";
         Density = "comfortable";
     }
 }

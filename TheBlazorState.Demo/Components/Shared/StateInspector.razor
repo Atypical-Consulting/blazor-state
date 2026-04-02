@@ -1,18 +1,18 @@
-<div class="mt-8 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
+<div class="mt-8 border border-canvas-200 dark:border-canvas-800 rounded-xl overflow-hidden animate-fade-up stagger-5">
     <button @onclick="Toggle"
-            class="w-full flex items-center justify-between px-4 py-3 bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-sm">
-        <span class="font-semibold text-slate-700 dark:text-gray-200 flex items-center gap-2">
-            <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+            class="w-full flex items-center justify-between px-4 py-3 bg-canvas-50 dark:bg-canvas-900 hover:bg-canvas-100 dark:hover:bg-canvas-800 transition-colors text-sm">
+        <span class="font-mono text-xs font-semibold text-canvas-500 dark:text-canvas-400 flex items-center gap-2 uppercase tracking-wider">
+            <svg class="w-4 h-4 text-signal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
             State Inspector
         </span>
-        <svg class="@($"w-4 h-4 text-slate-400 dark:text-gray-500 transition-transform {(_open ? "rotate-180" : "")}")" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        <svg class="@($"w-4 h-4 text-canvas-400 dark:text-canvas-600 transition-transform duration-200 {(_open ? "rotate-180" : "")}")" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
     </button>
     @if (_open)
     {
-        <div class="p-4 bg-white dark:bg-gray-800">
+        <div class="p-4 bg-white dark:bg-canvas-900 border-t border-canvas-100 dark:border-canvas-800">
             <table class="w-full text-sm">
                 <thead>
-                    <tr class="text-left text-xs text-slate-400 dark:text-gray-500 uppercase tracking-wider">
+                    <tr class="text-left text-[10px] font-mono text-canvas-400 dark:text-canvas-600 uppercase tracking-widest">
                         <th class="pb-2 pr-4">Property</th>
                         <th class="pb-2 pr-4">Storage</th>
                         <th class="pb-2 pr-4">Restored</th>
@@ -21,16 +21,16 @@
                         <th class="pb-2">Last Updated</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
+                <tbody class="divide-y divide-canvas-100 dark:divide-canvas-800">
                     @foreach (var entry in Entries)
                     {
-                        <tr>
-                            <td class="py-2 pr-4 font-mono text-xs text-slate-700 dark:text-gray-200">@entry.Name</td>
-                            <td class="py-2 pr-4 text-xs text-slate-500 dark:text-gray-400">@entry.Strategy</td>
+                        <tr class="hover:bg-canvas-50 dark:hover:bg-canvas-800/50 transition-colors">
+                            <td class="py-2 pr-4 font-mono text-xs font-medium text-canvas-700 dark:text-canvas-300">@entry.Name</td>
+                            <td class="py-2 pr-4 font-mono text-xs text-canvas-400 dark:text-canvas-500">@entry.Strategy</td>
                             <td class="py-2 pr-4"><StateBadge Value="entry.Meta.WasRestored" TrueLabel="Restored" FalseLabel="Fresh" /></td>
-                            <td class="py-2 pr-4"><StateBadge Value="entry.Meta.IsDirty" TrueLabel="Dirty" FalseLabel="Clean" TrueClass="bg-amber-100 text-amber-700" /></td>
-                            <td class="py-2 pr-4"><StateBadge Value="entry.Meta.IsStale" TrueLabel="Stale" FalseLabel="Fresh" TrueClass="bg-rose-100 text-rose-700" /></td>
-                            <td class="py-2 text-xs text-slate-500 dark:text-gray-400">@FormatTime(entry.Meta.LastUpdated)</td>
+                            <td class="py-2 pr-4"><StateBadge Value="entry.Meta.IsDirty" TrueLabel="Dirty" FalseLabel="Clean" TrueClass="bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400" /></td>
+                            <td class="py-2 pr-4"><StateBadge Value="entry.Meta.IsStale" TrueLabel="Stale" FalseLabel="Fresh" TrueClass="bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400" /></td>
+                            <td class="py-2 font-mono text-xs text-canvas-400 dark:text-canvas-600">@FormatTime(entry.Meta.LastUpdated)</td>
                         </tr>
                     }
                 </tbody>

@@ -2,29 +2,29 @@
 
 <PageTitle>Board — TaskFlow</PageTitle>
 
-<div class="mb-6">
-    <h1 class="text-2xl font-bold text-slate-900 dark:text-gray-100">Board</h1>
-    <p class="text-sm text-slate-500 dark:text-gray-400 mt-1">@Project.SelectedProject.Name — Kanban view</p>
+<div class="mb-6 animate-fade-up">
+    <h1 class="font-display text-2xl font-bold text-canvas-900 dark:text-canvas-50">Board</h1>
+    <p class="text-sm text-canvas-500 dark:text-canvas-500 mt-1">@Project.SelectedProject.Name — Kanban view</p>
 </div>
 
 @if (BoardState is null)
 {
-    <div class="flex items-center gap-3 text-slate-400 dark:text-gray-500 py-12">
+    <div class="flex items-center gap-3 text-canvas-400 dark:text-canvas-600 py-12">
         <svg class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
-        Loading board...
+        <span class="font-mono text-sm">Loading board...</span>
     </div>
 }
 else
 {
     @if (BoardStateMeta.WasRestored)
     {
-        <div class="mb-4 flex items-center gap-2 text-xs text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-3 py-2 rounded-lg">
+        <div class="mb-4 flex items-center gap-2 text-xs text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 px-3 py-2 rounded-lg animate-fade-up">
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-            Board restored from localStorage — instant render
+            <span class="font-mono">Board restored from localStorage — instant render</span>
         </div>
     }
 
-    <div class="grid grid-cols-3 gap-5">
+    <div class="grid grid-cols-3 gap-5 animate-fade-up stagger-1">
         @{ RenderColumn("To Do", BoardState.ToDo, "todo", null, "inprogress"); }
         @{ RenderColumn("In Progress", BoardState.InProgress, "inprogress", "todo", "done"); }
         @{ RenderColumn("Done", BoardState.Done, "done", "inprogress", null); }
@@ -35,27 +35,35 @@ else
 
 @{ void RenderColumn(string title, List<TaskItem> tasks, string columnId, string? prevColumn, string? nextColumn)
 {
-    <div class="bg-gray-100 dark:bg-gray-700 rounded-xl p-4">
-        <div class="flex items-center justify-between mb-3">
-            <h3 class="text-sm font-semibold text-slate-700 dark:text-gray-200">@title</h3>
-            <span class="text-xs text-slate-400 dark:text-gray-500 bg-white dark:bg-gray-800 px-2 py-0.5 rounded-full">@tasks.Count</span>
+    var accentClass = columnId switch
+    {
+        "todo" => "bg-canvas-300 dark:bg-canvas-600",
+        "inprogress" => "bg-signal-400",
+        "done" => "bg-emerald-400",
+        _ => "bg-canvas-400"
+    };
+    <div class="bg-canvas-100 dark:bg-canvas-900 rounded-xl border border-canvas-200 dark:border-canvas-800 p-4 relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-full h-0.5 @accentClass"></div>
+        <div class="flex items-center justify-between mb-3 mt-1">
+            <h3 class="text-xs font-mono font-semibold text-canvas-500 dark:text-canvas-400 uppercase tracking-wider">@title</h3>
+            <span class="text-xs font-mono text-canvas-400 dark:text-canvas-600 bg-white dark:bg-canvas-800 px-2 py-0.5 rounded-md border border-canvas-200 dark:border-canvas-700">@tasks.Count</span>
         </div>
-        <div class="space-y-2.5">
+        <div class="space-y-2">
             @foreach (var task in tasks)
             {
-                <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-3 shadow-sm">
-                    <p class="text-sm font-medium text-slate-800 dark:text-gray-200 mb-2">@task.Title</p>
+                <div class="bg-white dark:bg-canvas-800 rounded-lg border border-canvas-200 dark:border-canvas-700 p-3 hover:border-canvas-300 dark:hover:border-canvas-600 transition-colors group">
+                    <p class="text-sm font-medium text-canvas-800 dark:text-canvas-200 mb-2.5">@task.Title</p>
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-2">
-                            <span class="@($"text-xs px-1.5 py-0.5 rounded font-medium {PriorityClasses(task.Priority)}")">@task.Priority</span>
+                            <span class="@($"text-[10px] font-mono px-1.5 py-0.5 rounded font-medium tracking-wide {PriorityClasses(task.Priority)}")">@task.Priority</span>
                             <span class="@($"w-5 h-5 rounded-full text-white text-[10px] flex items-center justify-center font-medium {AvatarColor(task.AssigneeInitials)}")" title="@task.AssigneeName">@task.AssigneeInitials</span>
                         </div>
-                        <div class="flex gap-1">
+                        <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                             @if (prevColumn is not null)
                             {
                                 var prev = prevColumn;
                                 <button @onclick="() => MoveTask(task, columnId, prev)"
-                                        class="text-slate-400 dark:text-gray-500 hover:text-slate-600 dark:hover:text-gray-300 p-0.5" title="Move left">
+                                        class="text-canvas-400 dark:text-canvas-500 hover:text-signal-500 dark:hover:text-signal-400 p-0.5 transition-colors" title="Move left">
                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                                 </button>
                             }
@@ -63,7 +71,7 @@ else
                             {
                                 var next = nextColumn;
                                 <button @onclick="() => MoveTask(task, columnId, next)"
-                                        class="text-slate-400 dark:text-gray-500 hover:text-slate-600 dark:hover:text-gray-300 p-0.5" title="Move right">
+                                        class="text-canvas-400 dark:text-canvas-500 hover:text-signal-500 dark:hover:text-signal-400 p-0.5 transition-colors" title="Move right">
                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                                 </button>
                             }

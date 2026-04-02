@@ -2,35 +2,35 @@
 
 <PageTitle>Settings — TaskFlow</PageTitle>
 
-<div class="mb-6">
-    <h1 class="text-2xl font-bold text-slate-900 dark:text-gray-100">Settings</h1>
-    <p class="text-sm text-slate-500 dark:text-gray-400 mt-1">Preferences persisted to localStorage</p>
+<div class="mb-6 animate-fade-up">
+    <h1 class="font-display text-2xl font-bold text-canvas-900 dark:text-canvas-50">Settings</h1>
+    <p class="text-sm text-canvas-500 dark:text-canvas-500 mt-1">Preferences persisted to localStorage</p>
 </div>
 
 @if (SavedThemeMeta?.WasRestored == true)
 {
-    <div class="mb-6 flex items-center gap-2 text-xs text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-3 py-2 rounded-lg">
+    <div class="mb-6 flex items-center gap-2 text-xs text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 px-3 py-2 rounded-lg animate-fade-up">
         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-        Preferences restored from localStorage — survives browser refresh
+        <span class="font-mono">Preferences restored from localStorage — survives browser refresh</span>
     </div>
 }
 
 <!-- Appearance -->
-<div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 mb-6">
-    <div class="px-5 py-4 border-b border-gray-100 dark:border-gray-700">
-        <h2 class="text-sm font-semibold text-slate-700 dark:text-gray-200">Appearance</h2>
+<div class="animate-fade-up stagger-1 bg-white dark:bg-canvas-900 rounded-xl border border-canvas-200 dark:border-canvas-800 mb-6 overflow-hidden">
+    <div class="px-5 py-4 border-b border-canvas-100 dark:border-canvas-800">
+        <h2 class="text-xs font-mono font-semibold text-canvas-500 dark:text-canvas-400 uppercase tracking-wider">Appearance</h2>
     </div>
     <div class="p-5 space-y-6">
         <!-- Theme -->
         <div>
-            <label class="block text-sm font-medium text-slate-700 dark:text-gray-200 mb-2">Theme</label>
+            <label class="block text-sm font-medium text-canvas-700 dark:text-canvas-200 mb-2">Theme</label>
             <div class="flex gap-2">
                 <button @onclick='() => SetTheme("light")'
-                        class="@($"px-4 py-2 rounded-lg text-sm font-medium border transition-colors {(Theme.Theme == "light" ? "bg-indigo-50 dark:bg-indigo-900/30 border-indigo-300 dark:border-indigo-600 text-indigo-700 dark:text-indigo-400" : "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-slate-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700")}")">
+                        class="@($"px-4 py-2 rounded-lg text-sm font-medium border transition-all duration-150 {(Theme.Theme == "light" ? "bg-signal-50 dark:bg-signal-500/10 border-signal-300 dark:border-signal-700 text-signal-700 dark:text-signal-400" : "bg-white dark:bg-canvas-800 border-canvas-200 dark:border-canvas-700 text-canvas-500 dark:text-canvas-400 hover:border-canvas-300 dark:hover:border-canvas-600")}")">
                     Light
                 </button>
                 <button @onclick='() => SetTheme("dark")'
-                        class="@($"px-4 py-2 rounded-lg text-sm font-medium border transition-colors {(Theme.Theme == "dark" ? "bg-indigo-50 dark:bg-indigo-900/30 border-indigo-300 dark:border-indigo-600 text-indigo-700 dark:text-indigo-400" : "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-slate-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700")}")">
+                        class="@($"px-4 py-2 rounded-lg text-sm font-medium border transition-all duration-150 {(Theme.Theme == "dark" ? "bg-signal-50 dark:bg-signal-500/10 border-signal-300 dark:border-signal-700 text-signal-700 dark:text-signal-400" : "bg-white dark:bg-canvas-800 border-canvas-200 dark:border-canvas-700 text-canvas-500 dark:text-canvas-400 hover:border-canvas-300 dark:hover:border-canvas-600")}")">
                     Dark
                 </button>
             </div>
@@ -38,14 +38,14 @@
 
         <!-- Density -->
         <div>
-            <label class="block text-sm font-medium text-slate-700 dark:text-gray-200 mb-2">Density</label>
+            <label class="block text-sm font-medium text-canvas-700 dark:text-canvas-200 mb-2">Density</label>
             <div class="flex gap-2">
                 <button @onclick='() => SetDensity("comfortable")'
-                        class="@($"px-4 py-2 rounded-lg text-sm font-medium border transition-colors {(Theme.Density == "comfortable" ? "bg-indigo-50 dark:bg-indigo-900/30 border-indigo-300 dark:border-indigo-600 text-indigo-700 dark:text-indigo-400" : "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-slate-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700")}")">
+                        class="@($"px-4 py-2 rounded-lg text-sm font-medium border transition-all duration-150 {(Theme.Density == "comfortable" ? "bg-signal-50 dark:bg-signal-500/10 border-signal-300 dark:border-signal-700 text-signal-700 dark:text-signal-400" : "bg-white dark:bg-canvas-800 border-canvas-200 dark:border-canvas-700 text-canvas-500 dark:text-canvas-400 hover:border-canvas-300 dark:hover:border-canvas-600")}")">
                     Comfortable
                 </button>
                 <button @onclick='() => SetDensity("compact")'
-                        class="@($"px-4 py-2 rounded-lg text-sm font-medium border transition-colors {(Theme.Density == "compact" ? "bg-indigo-50 dark:bg-indigo-900/30 border-indigo-300 dark:border-indigo-600 text-indigo-700 dark:text-indigo-400" : "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-slate-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700")}")">
+                        class="@($"px-4 py-2 rounded-lg text-sm font-medium border transition-all duration-150 {(Theme.Density == "compact" ? "bg-signal-50 dark:bg-signal-500/10 border-signal-300 dark:border-signal-700 text-signal-700 dark:text-signal-400" : "bg-white dark:bg-canvas-800 border-canvas-200 dark:border-canvas-700 text-canvas-500 dark:text-canvas-400 hover:border-canvas-300 dark:hover:border-canvas-600")}")">
                     Compact
                 </button>
             </div>
@@ -54,31 +54,32 @@
 </div>
 
 <!-- Storage Strategy Info -->
-<div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 mb-6">
-    <div class="px-5 py-4 border-b border-gray-100 dark:border-gray-700">
-        <h2 class="text-sm font-semibold text-slate-700 dark:text-gray-200">About Storage Strategies</h2>
+<div class="animate-fade-up stagger-2 bg-white dark:bg-canvas-900 rounded-xl border border-canvas-200 dark:border-canvas-800 mb-6 overflow-hidden">
+    <div class="px-5 py-4 border-b border-canvas-100 dark:border-canvas-800">
+        <h2 class="text-xs font-mono font-semibold text-canvas-500 dark:text-canvas-400 uppercase tracking-wider">About Storage Strategies</h2>
     </div>
     <div class="p-5">
-        <p class="text-sm text-slate-600 dark:text-gray-300 mb-4">
-            These preferences use <code class="text-xs bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded font-mono">StorageStrategy.LocalStorage()</code>,
+        <p class="text-sm text-canvas-600 dark:text-canvas-400 mb-4">
+            These preferences use <code class="text-xs font-mono bg-canvas-100 dark:bg-canvas-800 text-signal-600 dark:text-signal-400 px-1.5 py-0.5 rounded border border-canvas-200 dark:border-canvas-700">StorageStrategy.LocalStorage()</code>,
             so they survive browser refresh. Try changing a setting, then refresh the page.
         </p>
         <div class="grid grid-cols-2 gap-3 text-sm">
-            <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
-                <p class="font-medium text-slate-700 dark:text-gray-200">PrerenderHtml</p>
-                <p class="text-xs text-slate-500 dark:text-gray-400 mt-0.5">Survives prerender only (default)</p>
+            <div class="bg-canvas-50 dark:bg-canvas-950 rounded-lg p-3 border border-canvas-200 dark:border-canvas-800">
+                <p class="font-mono font-medium text-canvas-700 dark:text-canvas-300 text-xs">PrerenderHtml</p>
+                <p class="text-xs text-canvas-400 dark:text-canvas-500 mt-0.5">Survives prerender only (default)</p>
             </div>
-            <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
-                <p class="font-medium text-slate-700 dark:text-gray-200">ServerMemoryCache</p>
-                <p class="text-xs text-slate-500 dark:text-gray-400 mt-0.5">Survives page reload (server only)</p>
+            <div class="bg-canvas-50 dark:bg-canvas-950 rounded-lg p-3 border border-canvas-200 dark:border-canvas-800">
+                <p class="font-mono font-medium text-canvas-700 dark:text-canvas-300 text-xs">ServerMemoryCache</p>
+                <p class="text-xs text-canvas-400 dark:text-canvas-500 mt-0.5">Survives page reload (server only)</p>
             </div>
-            <div class="bg-indigo-50 dark:bg-indigo-900/30 rounded-lg p-3 border border-indigo-200 dark:border-indigo-700">
-                <p class="font-medium text-indigo-700 dark:text-indigo-400">LocalStorage <span class="text-xs">(active)</span></p>
-                <p class="text-xs text-indigo-500 dark:text-indigo-400 mt-0.5">Survives browser restart</p>
+            <div class="bg-signal-50 dark:bg-signal-500/10 rounded-lg p-3 border border-signal-200 dark:border-signal-800 relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-0.5 bg-signal-400"></div>
+                <p class="font-mono font-medium text-signal-700 dark:text-signal-400 text-xs">LocalStorage <span class="text-[10px] uppercase tracking-wider">(active)</span></p>
+                <p class="text-xs text-signal-500 dark:text-signal-500 mt-0.5">Survives browser restart</p>
             </div>
-            <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
-                <p class="font-medium text-slate-700 dark:text-gray-200">SessionStorage</p>
-                <p class="text-xs text-slate-500 dark:text-gray-400 mt-0.5">Survives refresh, clears on tab close</p>
+            <div class="bg-canvas-50 dark:bg-canvas-950 rounded-lg p-3 border border-canvas-200 dark:border-canvas-800">
+                <p class="font-mono font-medium text-canvas-700 dark:text-canvas-300 text-xs">SessionStorage</p>
+                <p class="text-xs text-canvas-400 dark:text-canvas-500 mt-0.5">Survives refresh, clears on tab close</p>
             </div>
         </div>
     </div>

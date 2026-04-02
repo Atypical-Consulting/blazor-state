@@ -1,49 +1,65 @@
-<aside class="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col h-screen sticky top-0">
-    <!-- Logo -->
-    <div class="px-5 py-4 border-b border-gray-100 dark:border-gray-700">
-        <h1 class="text-lg font-bold text-slate-900 dark:text-gray-100 tracking-tight">TaskFlow</h1>
-        <p class="text-xs text-slate-400 dark:text-gray-500 mt-0.5">TheBlazorState Demo</p>
+<aside class="w-64 bg-white dark:bg-canvas-900 border-r border-canvas-200 dark:border-canvas-800 flex flex-col h-screen sticky top-0">
+    <!-- Brand -->
+    <div class="px-5 py-5 border-b border-canvas-100 dark:border-canvas-800">
+        <div class="flex items-center gap-3">
+            <!-- Signal logo mark -->
+            <div class="relative flex items-center justify-center w-8 h-8 rounded-lg bg-signal-500/10 dark:bg-signal-500/15">
+                <svg class="w-4.5 h-4.5 text-signal-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                    <path d="M2 12h4l3-9 6 18 3-9h4" />
+                </svg>
+                <span class="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-signal-400 animate-signal"></span>
+            </div>
+            <div>
+                <h1 class="font-display text-base font-bold text-canvas-900 dark:text-canvas-50 tracking-tight">TaskFlow</h1>
+                <p class="text-[10px] font-mono text-canvas-400 dark:text-canvas-600 tracking-wider uppercase">TheBlazorState</p>
+            </div>
+        </div>
     </div>
 
     <!-- Projects -->
     <div class="px-3 py-4">
-        <p class="px-2 mb-2 text-xs font-semibold text-slate-400 dark:text-gray-500 uppercase tracking-wider">Projects</p>
+        <p class="px-2 mb-2 text-[10px] font-mono font-medium text-canvas-400 dark:text-canvas-600 uppercase tracking-widest">Projects</p>
         @foreach (var project in ProjectSvc.GetAll())
         {
             var isActive = ProjectState.SelectedProject.Id == project.Id;
             <button @onclick="() => SelectProject(project)"
-                    class="@($"w-full text-left px-3 py-2 rounded-lg text-sm mb-0.5 flex items-center gap-2.5 transition-colors {(isActive ? "bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 font-medium" : "text-slate-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700")}")">
-                <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color: @project.Color"></span>
+                    class="@($"w-full text-left px-3 py-2 rounded-lg text-sm mb-0.5 flex items-center gap-2.5 transition-all duration-150 {(isActive ? "bg-signal-50 dark:bg-signal-500/10 text-signal-700 dark:text-signal-400 font-medium" : "text-canvas-600 dark:text-canvas-400 hover:bg-canvas-50 dark:hover:bg-canvas-800 hover:text-canvas-900 dark:hover:text-canvas-200")}")">
+                <span class="w-2 h-2 rounded-full flex-shrink-0 ring-2 ring-offset-1 dark:ring-offset-canvas-900 transition-all duration-150 @(isActive ? "ring-signal-400/50" : "ring-transparent")" style="background-color: @project.Color"></span>
                 @project.Name
             </button>
         }
     </div>
 
     <!-- Navigation -->
-    <div class="px-3 py-2 border-t border-gray-100 dark:border-gray-700">
-        <p class="px-2 mb-2 text-xs font-semibold text-slate-400 dark:text-gray-500 uppercase tracking-wider">Views</p>
+    <div class="px-3 py-2 border-t border-canvas-100 dark:border-canvas-800">
+        <p class="px-2 mb-2 text-[10px] font-mono font-medium text-canvas-400 dark:text-canvas-600 uppercase tracking-widest">Views</p>
         <NavLink href="" Match="NavLinkMatch.All"
-                 class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-slate-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                 ActiveClass="bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 font-medium">
+                 class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-canvas-500 dark:text-canvas-400 hover:bg-canvas-50 dark:hover:bg-canvas-800 hover:text-canvas-900 dark:hover:text-canvas-200 transition-all duration-150"
+                 ActiveClass="nav-active bg-canvas-50 dark:bg-canvas-800 text-canvas-900 dark:text-canvas-100 font-medium">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
             Dashboard
         </NavLink>
         <NavLink href="board"
-                 class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-slate-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                 ActiveClass="bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 font-medium">
+                 class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-canvas-500 dark:text-canvas-400 hover:bg-canvas-50 dark:hover:bg-canvas-800 hover:text-canvas-900 dark:hover:text-canvas-200 transition-all duration-150"
+                 ActiveClass="nav-active bg-canvas-50 dark:bg-canvas-800 text-canvas-900 dark:text-canvas-100 font-medium">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"/></svg>
             Board
         </NavLink>
         <NavLink href="settings"
-                 class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-slate-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                 ActiveClass="bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 font-medium">
+                 class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-canvas-500 dark:text-canvas-400 hover:bg-canvas-50 dark:hover:bg-canvas-800 hover:text-canvas-900 dark:hover:text-canvas-200 transition-all duration-150"
+                 ActiveClass="nav-active bg-canvas-50 dark:bg-canvas-800 text-canvas-900 dark:text-canvas-100 font-medium">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
             Settings
         </NavLink>
     </div>
 
     <!-- Footer -->
-    <div class="mt-auto px-5 py-4 border-t border-gray-100 dark:border-gray-700">
-        <p class="text-xs text-slate-400 dark:text-gray-500">Powered by <span class="font-medium text-indigo-500">TheBlazorState</span></p>
+    <div class="mt-auto px-5 py-4 border-t border-canvas-100 dark:border-canvas-800">
+        <div class="flex items-center gap-2">
+            <span class="w-1.5 h-1.5 rounded-full bg-signal-500 animate-signal"></span>
+            <p class="text-xs text-canvas-400 dark:text-canvas-500">
+                Powered by <span class="font-mono font-medium text-signal-600 dark:text-signal-400">TheBlazorState</span>
+            </p>
+        </div>
     </div>
 </aside>

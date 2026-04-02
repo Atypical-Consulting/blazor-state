@@ -65,10 +65,10 @@ public partial class Board : ComponentBase
 
     private static string PriorityClasses(Priority p) => p switch
     {
-        Priority.High => "bg-rose-100 text-rose-700",
-        Priority.Medium => "bg-amber-100 text-amber-700",
-        Priority.Low => "bg-emerald-100 text-emerald-700",
-        _ => "bg-gray-100 text-gray-600"
+        Priority.High => "bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400",
+        Priority.Medium => "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400",
+        Priority.Low => "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400",
+        _ => "bg-canvas-100 dark:bg-canvas-800 text-canvas-600 dark:text-canvas-400"
     };
 
     private static string AvatarColor(string initials) =>

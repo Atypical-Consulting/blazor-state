@@ -1,0 +1,67 @@
+[     125ms] [INFO] [2026-04-02T14:23:06.452Z] Information: Normalizing '_blazor' to 'http://localhost:5273/_blazor'. @ http://localhost:5273/_framework/blazor.web.js:0
+[     142ms] [INFO] [2026-04-02T14:23:06.470Z] Information: WebSocket connected to ws://localhost:5273/_blazor?id=6f842zIXwUfvw3vDW_u-6Q. @ http://localhost:5273/_framework/blazor.web.js:0
+[  114804ms] [ERROR] [2026-04-02T14:25:01.132Z] Error: Connection disconnected with error 'Error: WebSocket closed with status code: 1006 (no reason given).'. @ http://localhost:5273/_framework/blazor.web.js:0
+[  114806ms] [INFO] [2026-04-02T14:25:01.133Z] Information: Normalizing '_blazor' to 'http://localhost:5273/_blazor'. @ http://localhost:5273/_framework/blazor.web.js:0
+[  117167ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:5273/_blazor/negotiate?negotiateVersion=1:0
+[  117167ms] [WARNING] [2026-04-02T14:25:03.495Z] Warning: Error from HTTP request. TypeError: Failed to fetch. @ http://localhost:5273/_framework/blazor.web.js:0
+[  117167ms] [ERROR] [2026-04-02T14:25:03.495Z] Error: Failed to complete negotiation with the server: TypeError: Failed to fetch @ http://localhost:5273/_framework/blazor.web.js:0
+[  117167ms] [ERROR] [2026-04-02T14:25:03.495Z] Error: Failed to start the connection: Error: Failed to complete negotiation with the server: TypeError: Failed to fetch @ http://localhost:5273/_framework/blazor.web.js:0
+[  117168ms] [ERROR] [2026-04-02T14:25:03.495Z] Error: Error: Failed to complete negotiation with the server: TypeError: Failed to fetch @ http://localhost:5273/_framework/blazor.web.js:0
+[  117168ms] [ERROR] [2026-04-02T14:25:03.495Z] Error: Error: Failed to complete negotiation with the server: TypeError: Failed to fetch @ http://localhost:5273/_framework/blazor.web.js:0
+[  117168ms] [INFO] [2026-04-02T14:25:03.496Z] Information: Normalizing '_blazor' to 'http://localhost:5273/_blazor'. @ http://localhost:5273/_framework/blazor.web.js:0
+[  117416ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:5273/_blazor/negotiate?negotiateVersion=1:0
+[  117416ms] [WARNING] [2026-04-02T14:25:03.744Z] Warning: Error from HTTP request. TypeError: Failed to fetch. @ http://localhost:5273/_framework/blazor.web.js:0
+[  117416ms] [ERROR] [2026-04-02T14:25:03.744Z] Error: Failed to complete negotiation with the server: TypeError: Failed to fetch @ http://localhost:5273/_framework/blazor.web.js:0
+[  117416ms] [ERROR] [2026-04-02T14:25:03.744Z] Error: Failed to start the connection: Error: Failed to complete negotiation with the server: TypeError: Failed to fetch @ http://localhost:5273/_framework/blazor.web.js:0
+[  117416ms] [ERROR] [2026-04-02T14:25:03.744Z] Error: Error: Failed to complete negotiation with the server: TypeError: Failed to fetch @ http://localhost:5273/_framework/blazor.web.js:0
+[  117416ms] [ERROR] [2026-04-02T14:25:03.744Z] Error: Error: Failed to complete negotiation with the server: TypeError: Failed to fetch @ http://localhost:5273/_framework/blazor.web.js:0
+[  117417ms] [INFO] [2026-04-02T14:25:03.744Z] Information: Normalizing '_blazor' to 'http://localhost:5273/_blazor'. @ http://localhost:5273/_framework/blazor.web.js:0
+[  119520ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:5273/_blazor/negotiate?negotiateVersion=1:0
+[  119520ms] [WARNING] [2026-04-02T14:25:05.848Z] Warning: Error from HTTP request. TypeError: Failed to fetch. @ http://localhost:5273/_framework/blazor.web.js:0
+[  119521ms] [ERROR] [2026-04-02T14:25:05.848Z] Error: Failed to complete negotiation with the server: TypeError: Failed to fetch @ http://localhost:5273/_framework/blazor.web.js:0
+[  119521ms] [ERROR] [2026-04-02T14:25:05.848Z] Error: Failed to start the connection: Error: Failed to complete negotiation with the server: TypeError: Failed to fetch @ http://localhost:5273/_framework/blazor.web.js:0
+[  119521ms] [ERROR] [2026-04-02T14:25:05.848Z] Error: Error: Failed to complete negotiation with the server: TypeError: Failed to fetch @ http://localhost:5273/_framework/blazor.web.js:0
+[  119521ms] [ERROR] [2026-04-02T14:25:05.848Z] Error: Error: Failed to complete negotiation with the server: TypeError: Failed to fetch @ http://localhost:5273/_framework/blazor.web.js:0
+[  119521ms] [INFO] [2026-04-02T14:25:05.848Z] Information: Normalizing '_blazor' to 'http://localhost:5273/_blazor'. @ http://localhost:5273/_framework/blazor.web.js:0
+[  119786ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:5273/_blazor/negotiate?negotiateVersion=1:0
+[  119786ms] [WARNING] [2026-04-02T14:25:06.113Z] Warning: Error from HTTP request. TypeError: Failed to fetch. @ http://localhost:5273/_framework/blazor.web.js:0
+[  119786ms] [ERROR] [2026-04-02T14:25:06.114Z] Error: Failed to complete negotiation with the server: TypeError: Failed to fetch @ http://localhost:5273/_framework/blazor.web.js:0
+[  119786ms] [ERROR] [2026-04-02T14:25:06.114Z] Error: Failed to start the connection: Error: Failed to complete negotiation with the server: TypeError: Failed to fetch @ http://localhost:5273/_framework/blazor.web.js:0
+[  119786ms] [ERROR] [2026-04-02T14:25:06.114Z] Error: Error: Failed to complete negotiation with the server: TypeError: Failed to fetch @ http://localhost:5273/_framework/blazor.web.js:0
+[  119786ms] [ERROR] [2026-04-02T14:25:06.114Z] Error: Error: Failed to complete negotiation with the server: TypeError: Failed to fetch @ http://localhost:5273/_framework/blazor.web.js:0
+[  119786ms] [INFO] [2026-04-02T14:25:06.114Z] Information: Normalizing '_blazor' to 'http://localhost:5273/_blazor'. @ http://localhost:5273/_framework/blazor.web.js:0
+[  121863ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:5273/_blazor/negotiate?negotiateVersion=1:0
+[  121863ms] [WARNING] [2026-04-02T14:25:08.190Z] Warning: Error from HTTP request. TypeError: Failed to fetch. @ http://localhost:5273/_framework/blazor.web.js:0
+[  121863ms] [ERROR] [2026-04-02T14:25:08.190Z] Error: Failed to complete negotiation with the server: TypeError: Failed to fetch @ http://localhost:5273/_framework/blazor.web.js:0
+[  121863ms] [ERROR] [2026-04-02T14:25:08.190Z] Error: Failed to start the connection: Error: Failed to complete negotiation with the server: TypeError: Failed to fetch @ http://localhost:5273/_framework/blazor.web.js:0
+[  121863ms] [ERROR] [2026-04-02T14:25:08.190Z] Error: Error: Failed to complete negotiation with the server: TypeError: Failed to fetch @ http://localhost:5273/_framework/blazor.web.js:0
+[  121863ms] [ERROR] [2026-04-02T14:25:08.190Z] Error: Error: Failed to complete negotiation with the server: TypeError: Failed to fetch @ http://localhost:5273/_framework/blazor.web.js:0
+[  121863ms] [INFO] [2026-04-02T14:25:08.191Z] Information: Normalizing '_blazor' to 'http://localhost:5273/_blazor'. @ http://localhost:5273/_framework/blazor.web.js:0
+[  122129ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:5273/_blazor/negotiate?negotiateVersion=1:0
+[  122129ms] [WARNING] [2026-04-02T14:25:08.457Z] Warning: Error from HTTP request. TypeError: Failed to fetch. @ http://localhost:5273/_framework/blazor.web.js:0
+[  122129ms] [ERROR] [2026-04-02T14:25:08.457Z] Error: Failed to complete negotiation with the server: TypeError: Failed to fetch @ http://localhost:5273/_framework/blazor.web.js:0
+[  122129ms] [ERROR] [2026-04-02T14:25:08.457Z] Error: Failed to start the connection: Error: Failed to complete negotiation with the server: TypeError: Failed to fetch @ http://localhost:5273/_framework/blazor.web.js:0
+[  122129ms] [ERROR] [2026-04-02T14:25:08.457Z] Error: Error: Failed to complete negotiation with the server: TypeError: Failed to fetch @ http://localhost:5273/_framework/blazor.web.js:0
+[  122130ms] [ERROR] [2026-04-02T14:25:08.457Z] Error: Error: Failed to complete negotiation with the server: TypeError: Failed to fetch @ http://localhost:5273/_framework/blazor.web.js:0
+[  122130ms] [INFO] [2026-04-02T14:25:08.457Z] Information: Normalizing '_blazor' to 'http://localhost:5273/_blazor'. @ http://localhost:5273/_framework/blazor.web.js:0
+[  124224ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:5273/_blazor/negotiate?negotiateVersion=1:0
+[  124224ms] [WARNING] [2026-04-02T14:25:10.551Z] Warning: Error from HTTP request. TypeError: Failed to fetch. @ http://localhost:5273/_framework/blazor.web.js:0
+[  124224ms] [ERROR] [2026-04-02T14:25:10.551Z] Error: Failed to complete negotiation with the server: TypeError: Failed to fetch @ http://localhost:5273/_framework/blazor.web.js:0
+[  124224ms] [ERROR] [2026-04-02T14:25:10.551Z] Error: Failed to start the connection: Error: Failed to complete negotiation with the server: TypeError: Failed to fetch @ http://localhost:5273/_framework/blazor.web.js:0
+[  124224ms] [ERROR] [2026-04-02T14:25:10.551Z] Error: Error: Failed to complete negotiation with the server: TypeError: Failed to fetch @ http://localhost:5273/_framework/blazor.web.js:0
+[  124224ms] [ERROR] [2026-04-02T14:25:10.552Z] Error: Error: Failed to complete negotiation with the server: TypeError: Failed to fetch @ http://localhost:5273/_framework/blazor.web.js:0
+[  124224ms] [INFO] [2026-04-02T14:25:10.552Z] Information: Normalizing '_blazor' to 'http://localhost:5273/_blazor'. @ http://localhost:5273/_framework/blazor.web.js:0
+[  124487ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:5273/_blazor/negotiate?negotiateVersion=1:0
+[  124487ms] [WARNING] [2026-04-02T14:25:10.815Z] Warning: Error from HTTP request. TypeError: Failed to fetch. @ http://localhost:5273/_framework/blazor.web.js:0
+[  124488ms] [ERROR] [2026-04-02T14:25:10.815Z] Error: Failed to complete negotiation with the server: TypeError: Failed to fetch @ http://localhost:5273/_framework/blazor.web.js:0
+[  124488ms] [ERROR] [2026-04-02T14:25:10.815Z] Error: Failed to start the connection: Error: Failed to complete negotiation with the server: TypeError: Failed to fetch @ http://localhost:5273/_framework/blazor.web.js:0
+[  124488ms] [ERROR] [2026-04-02T14:25:10.815Z] Error: Error: Failed to complete negotiation with the server: TypeError: Failed to fetch @ http://localhost:5273/_framework/blazor.web.js:0
+[  124488ms] [ERROR] [2026-04-02T14:25:10.815Z] Error: Error: Failed to complete negotiation with the server: TypeError: Failed to fetch @ http://localhost:5273/_framework/blazor.web.js:0
+[  124488ms] [INFO] [2026-04-02T14:25:10.815Z] Information: Normalizing '_blazor' to 'http://localhost:5273/_blazor'. @ http://localhost:5273/_framework/blazor.web.js:0
+[  126562ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:5273/_blazor/negotiate?negotiateVersion=1:0
+[  126562ms] [WARNING] [2026-04-02T14:25:12.889Z] Warning: Error from HTTP request. TypeError: Failed to fetch. @ http://localhost:5273/_framework/blazor.web.js:0
+[  126562ms] [ERROR] [2026-04-02T14:25:12.889Z] Error: Failed to complete negotiation with the server: TypeError: Failed to fetch @ http://localhost:5273/_framework/blazor.web.js:0
+[  126562ms] [ERROR] [2026-04-02T14:25:12.889Z] Error: Failed to start the connection: Error: Failed to complete negotiation with the server: TypeError: Failed to fetch @ http://localhost:5273/_framework/blazor.web.js:0
+[  126562ms] [ERROR] [2026-04-02T14:25:12.889Z] Error: Error: Failed to complete negotiation with the server: TypeError: Failed to fetch @ http://localhost:5273/_framework/blazor.web.js:0
+[  126562ms] [ERROR] [2026-04-02T14:25:12.890Z] Error: Error: Failed to complete negotiation with the server: TypeError: Failed to fetch @ http://localhost:5273/_framework/blazor.web.js:0
+[  126562ms] [INFO] [2026-04-02T14:25:12.890Z] Information: Normalizing '_blazor' to 'http://localhost:5273/_blazor'. @ http://localhost:5273/_framework/blazor.web.js:0
