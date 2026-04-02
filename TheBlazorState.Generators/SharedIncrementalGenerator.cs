@@ -71,8 +71,10 @@ internal sealed class SharedIncrementalGenerator : IIncrementalGenerator
             if (isPartialClass) break;
         }
 
-        // Property type (fully qualified)
-        string fullTypeName = propertySymbol.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+        // Property type (fully qualified, with nullable annotation)
+        var fullyQualifiedWithNullable = SymbolDisplayFormat.FullyQualifiedFormat.AddMiscellaneousOptions(
+            SymbolDisplayMiscellaneousOptions.IncludeNullableReferenceTypeModifier);
+        string fullTypeName = propertySymbol.Type.ToDisplayString(fullyQualifiedWithNullable);
 
         string className = containingType.Name;
         string ns = containingType.ContainingNamespace.IsGlobalNamespace
