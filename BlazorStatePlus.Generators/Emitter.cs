@@ -121,7 +121,7 @@ internal static class Emitter
         if (model.UserImplementsDisposable)
         {
             // User handles IDisposable; emit a private helper they must call
-            sb.AppendLine("    private void __DisposeSlices()");
+            sb.AppendLine("    private void DisposeSlices()");
             sb.AppendLine("    {");
             foreach (var field in model.Fields)
             {

@@ -137,6 +137,33 @@ public class GeneratorOutputTests
     }
 
     [Fact]
+    public void UserImplementsDisposable_EmitsDisposeSlicesHelper()
+    {
+        var source = """
+            using BlazorStatePlus.Abstractions;
+            using BlazorStatePlus.Attributes;
+            using Microsoft.AspNetCore.Components;
+            using System;
+
+            namespace TestApp;
+
+            public partial class MyComponent : ComponentBase, IDisposable
+            {
+                [Slice]
+                private IStateSlice<int> _counter;
+
+                public void Dispose() { }
+            }
+            """;
+
+        var (diagnostics, generatedSource) = TestHelper.RunGenerator(source);
+
+        generatedSource.ShouldNotBeNull();
+        generatedSource.ShouldContain("private void DisposeSlices()");
+        generatedSource.ShouldNotContain("__DisposeSlices");
+    }
+
+    [Fact]
     public void GlobalNamespace_GeneratesValidCode()
     {
         var source = """

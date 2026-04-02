@@ -33,7 +33,7 @@ internal static class DiagnosticDescriptors
     public static readonly DiagnosticDescriptor ExistingDisposable = new(
         "BSP006",
         "Component already implements IDisposable",
-        "Class '{0}' implements IDisposable; call __DisposeSlices() from your Dispose method",
+        "Class '{0}' implements IDisposable; call DisposeSlices() from your Dispose method",
         Category, DiagnosticSeverity.Warning, isEnabledByDefault: true);
 
     public static readonly DiagnosticDescriptor DuplicateKey = new(

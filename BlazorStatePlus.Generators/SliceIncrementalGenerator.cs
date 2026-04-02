@@ -354,7 +354,7 @@ internal sealed class SliceIncrementalGenerator : IIncrementalGenerator
         {
             for (int j = i + 1; j < validFields.Count; j++)
             {
-                if (validFields[i].BaseKey == validFields[j].BaseKey)
+                if (string.Equals(validFields[i].BaseKey, validFields[j].BaseKey, StringComparison.OrdinalIgnoreCase))
                 {
                     spc.ReportDiagnostic(Diagnostic.Create(
                         DiagnosticDescriptors.DuplicateKey,
