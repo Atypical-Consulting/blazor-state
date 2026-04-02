@@ -1,0 +1,18 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/src/">
+    <Project Path="TheBlazorState/TheBlazorState.csproj" />
+    <Project Path="TheBlazorState.Generators/TheBlazorState.Generators.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="TheBlazorState.Generators.Tests/TheBlazorState.Generators.Tests.csproj" />
+    <Project Path="TheBlazorState.Tests/TheBlazorState.Tests.csproj" />
+  </Folder>
+  <Folder Name="/samples/">
+    <Project Path="TheBlazorState.Demo/TheBlazorState.Demo.csproj" />
+  </Folder>
+</Solution>
