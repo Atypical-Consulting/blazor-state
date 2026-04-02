@@ -1,8 +1,9 @@
 @inherits LayoutComponentBase
+@inject ThemeState Theme
 
-<div class="flex min-h-screen">
+<div class="@($"flex min-h-screen {(Theme.Theme == "dark" ? "dark" : "")} {(Theme.Density == "compact" ? "density-compact" : "")}")">
     <Sidebar />
-    <main class="flex-1 overflow-auto">
+    <main class="flex-1 overflow-auto bg-gray-50 dark:bg-gray-900">
         <div class="max-w-6xl mx-auto px-8 py-8">
             @Body
         </div>

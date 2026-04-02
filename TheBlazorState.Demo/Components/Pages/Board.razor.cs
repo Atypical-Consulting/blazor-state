@@ -5,6 +5,7 @@ using TheBlazorState.Demo.Models;
 using TheBlazorState.Demo.Services;
 using TheBlazorState.Demo.State;
 using TheBlazorState.Demo.Components.Shared;
+using TheBlazorState.Storage;
 
 namespace TheBlazorState.Demo.Components.Pages;
 
@@ -24,6 +25,7 @@ public partial class Board : ComponentBase
         ctx.BoardState
             .KeySuffix(Project.SelectedProject.Id)
             .LoadFrom(async () => (BoardData?)await TaskService.GetBoardAsync(Project.SelectedProject.Id));
+        ctx.BoardState.Storage = StorageStrategy.LocalStorage();
 
         ((INotifyStateChanged)Project).StateChanged += OnProjectChanged;
     }
@@ -81,6 +83,6 @@ public partial class Board : ComponentBase
 
     private List<StateInspectorEntry> InspectorEntries =>
     [
-        new("BoardState", "PrerenderHtml (default)", BoardStateMeta)
+        new("BoardState", "LocalStorage", BoardStateMeta)
     ];
 }
