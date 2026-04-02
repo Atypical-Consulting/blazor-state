@@ -2,5 +2,72 @@
 @rendermode InteractiveServer
 
 <PageTitle>Dashboard — TaskFlow</PageTitle>
-<h1 class="text-2xl font-bold">Dashboard</h1>
-<p class="text-slate-500">Coming next...</p>
+
+<div class="mb-6">
+    <h1 class="text-2xl font-bold text-slate-900">Dashboard</h1>
+    <p class="text-sm text-slate-500 mt-1">@Project.SelectedProject.Name project overview</p>
+</div>
+
+@if (Stats is null)
+{
+    <div class="flex items-center gap-3 text-slate-400 py-12">
+        <svg class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+        Loading dashboard...
+    </div>
+}
+else
+{
+    @if (StatsMeta.IsStale)
+    {
+        <div class="mb-6 flex items-center gap-3 bg-amber-50 border border-amber-200 text-amber-800 px-4 py-3 rounded-lg text-sm">
+            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
+            <span>Data is stale — last updated @StatsMeta.LastUpdated.LocalDateTime.ToString("HH:mm:ss")</span>
+            <button @onclick="Refresh" class="ml-auto text-amber-700 font-medium hover:underline">Refresh</button>
+        </div>
+    }
+
+    @if (StatsMeta.WasRestored)
+    {
+        <div class="mb-6 flex items-center gap-2 text-xs text-emerald-600 bg-emerald-50 px-3 py-2 rounded-lg">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            Restored from prerender cache — no redundant API call
+        </div>
+    }
+
+    <!-- Stat Cards -->
+    <div class="grid grid-cols-3 gap-5 mb-8">
+        <div class="bg-white rounded-xl border border-gray-200 p-5">
+            <p class="text-sm font-medium text-slate-500">Total Tasks</p>
+            <p class="text-3xl font-bold text-slate-900 mt-1">@Stats.TotalTasks</p>
+        </div>
+        <div class="bg-white rounded-xl border border-gray-200 p-5">
+            <p class="text-sm font-medium text-slate-500">In Progress</p>
+            <p class="text-3xl font-bold text-indigo-600 mt-1">@Stats.InProgress</p>
+        </div>
+        <div class="bg-white rounded-xl border border-gray-200 p-5">
+            <p class="text-sm font-medium text-slate-500">Completed</p>
+            <p class="text-3xl font-bold text-emerald-600 mt-1">@Stats.Completed</p>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="bg-white rounded-xl border border-gray-200">
+        <div class="px-5 py-4 border-b border-gray-100">
+            <h2 class="text-sm font-semibold text-slate-700">Recent Activity</h2>
+        </div>
+        <ul class="divide-y divide-gray-100">
+            @foreach (var activity in Stats.RecentActivity)
+            {
+                <li class="px-5 py-3 flex items-center justify-between">
+                    <div>
+                        <span class="text-sm text-slate-700 font-medium">@activity.TaskTitle</span>
+                        <span class="text-sm text-slate-400 ml-1">@activity.Action by @activity.Actor</span>
+                    </div>
+                    <span class="text-xs text-slate-400">@FormatRelativeTime(activity.Timestamp)</span>
+                </li>
+            }
+        </ul>
+    </div>
+
+    <StateInspector Entries="InspectorEntries" />
+}
