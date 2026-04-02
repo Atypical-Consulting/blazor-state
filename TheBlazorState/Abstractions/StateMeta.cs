@@ -24,6 +24,9 @@ public sealed class StateMeta
     public bool IsStale =>
         _ttl.HasValue && DateTimeOffset.UtcNow - LastUpdated > _ttl.Value;
 
+    /// <summary>The configured time-to-live, or null if none.</summary>
+    public TimeSpan? TimeToLive => _ttl;
+
     /// <summary>UTC timestamp of last value change or restore.</summary>
     public DateTimeOffset LastUpdated { get; private set; }
 

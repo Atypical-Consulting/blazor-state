@@ -14,9 +14,17 @@ public static class TestHelper
     {
         var result = RunGeneratorInternal(source);
 
-        var generatedSource = result.GeneratedTrees.Length > 0
-            ? result.GeneratedTrees[0].GetText().ToString()
-            : null;
+        // Concatenate all generated sources so both old and new tests can find their output
+        string? generatedSource = null;
+        if (result.GeneratedTrees.Length > 0)
+        {
+            var sb = new System.Text.StringBuilder();
+            foreach (var tree in result.GeneratedTrees)
+            {
+                sb.Append(tree.GetText().ToString());
+            }
+            generatedSource = sb.ToString();
+        }
 
         return (result.Diagnostics, generatedSource);
     }
@@ -37,9 +45,10 @@ public static class TestHelper
             CachedReferences.Value,
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
-        var generator = new SliceIncrementalGenerator();
+        var sliceGenerator = new SliceIncrementalGenerator();
+        var persistGenerator = new PersistIncrementalGenerator();
 
-        GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
+        GeneratorDriver driver = CSharpGeneratorDriver.Create(sliceGenerator, persistGenerator);
         driver = driver.RunGeneratorsAndUpdateCompilation(compilation, out _, out _);
 
         return driver.GetRunResult();

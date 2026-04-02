@@ -133,6 +133,91 @@ public sealed class StateManager(
         return slice;
     }
 
+    /// <summary>
+    /// Restores a property value from prerender state or server cache.
+    /// Called by generated code during OnInitialized for [Persist] properties.
+    /// </summary>
+    /// <typeparam name="T">Type of the property value.</typeparam>
+    /// <param name="key">Unique persistence key for this property.</param>
+    /// <param name="meta">The StateMeta companion for this property.</param>
+    /// <param name="valueSetter">Action to set the backing field value.</param>
+    /// <param name="valueGetter">Func to get the current backing field value.</param>
+    public void RestoreProperty<T>(
+        string key,
+        StateMeta meta,
+        Action<T> valueSetter,
+        Func<T> valueGetter)
+    {
+        ObjectDisposedException.ThrowIf(_disposed, this);
+        ArgumentException.ThrowIfNullOrWhiteSpace(key);
+
+        if (!_registeredKeys.Add(key))
+            throw new InvalidOperationException(
+                $"A property with key '{key}' has already been registered. Each key must be unique.");
+
+        var ttl = meta.TimeToLive;
+
+        // Try prerender state
+        try
+        {
+            var wasRestored = persistence.TryTakeFromJson<PersistedEnvelope<T>>(key, out var envelope);
+            if (wasRestored && envelope is not null)
+            {
+                if (ttl.HasValue && DateTimeOffset.UtcNow - envelope.PersistedAt > ttl.Value)
+                {
+                    logger.LogDebug("Property '{Key}': restored value discarded (TTL expired)", key);
+                }
+                else
+                {
+                    valueSetter(envelope.Value);
+                    meta.MarkRestored(envelope.PersistedAt);
+                    logger.LogDebug("Property '{Key}': restored from prerender", key);
+                    RegisterPersistPropertyCallback(key, valueGetter);
+                    return;
+                }
+            }
+
+            // Try server cache
+            if (cache.TryGetValue<PersistedEnvelope<T>>(key, out var cached) && cached is not null)
+            {
+                if (ttl.HasValue && DateTimeOffset.UtcNow - cached.PersistedAt > ttl.Value)
+                {
+                    logger.LogDebug("Property '{Key}': cached value discarded (TTL expired)", key);
+                }
+                else
+                {
+                    valueSetter(cached.Value);
+                    meta.MarkRestored(cached.PersistedAt);
+                    logger.LogDebug("Property '{Key}': restored from server cache", key);
+                    RegisterPersistPropertyCallback(key, valueGetter);
+                    return;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Property '{Key}': deserialization failed, using default", key);
+        }
+
+        logger.LogDebug("Property '{Key}': no persisted value, using default", key);
+        RegisterPersistPropertyCallback(key, valueGetter);
+    }
+
+    private void RegisterPersistPropertyCallback<T>(string key, Func<T> valueGetter)
+    {
+        RegisterPersistCallback(() =>
+        {
+            var envelope = new PersistedEnvelope<T>
+            {
+                Value = valueGetter(),
+                PersistedAt = DateTimeOffset.UtcNow
+            };
+            persistence.PersistAsJson(key, envelope);
+            cache.Set(key, envelope, CacheEntryOptions);
+            return Task.CompletedTask;
+        });
+    }
+
     private void UpdateCache<T>(string key, T value)
     {
         cache.Set(key, new PersistedEnvelope<T>
