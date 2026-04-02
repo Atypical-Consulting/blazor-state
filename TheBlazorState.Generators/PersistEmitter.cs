@@ -143,6 +143,7 @@ internal static class PersistEmitter
             sb.AppendLine($"            {backingField} = __ctx.{prop.PropertyName}.GetDefaultValue();");
             sb.AppendLine($"        __stateManager.RestoreProperty<{prop.FullTypeName}>(");
             sb.AppendLine($"            __ctx.{prop.PropertyName}.ResolveKey(\"{EscapeString(prop.BaseKey)}\"),");
+            sb.AppendLine($"            __ctx.{prop.PropertyName}.Storage ?? __ctx.Storage,");
             sb.AppendLine($"            {metaField},");
             sb.AppendLine($"            __v => {backingField} = __v,");
             sb.AppendLine($"            () => {backingField});");
@@ -159,7 +160,7 @@ internal static class PersistEmitter
         if (model.InjectedSharedStates.Count > 0)
             sb.AppendLine();
 
-        sb.AppendLine("        __stateCtx = __ctx.HasAsyncInit ? __ctx : null;");
+        sb.AppendLine("        __stateCtx = __ctx;");
         sb.AppendLine("    }");
         sb.AppendLine();
 
@@ -168,12 +169,27 @@ internal static class PersistEmitter
         sb.AppendLine("    {");
         sb.AppendLine("        await base.OnInitializedAsync();");
         sb.AppendLine();
-        sb.AppendLine("        if (__stateCtx is not null)");
-        sb.AppendLine("        {");
-        sb.AppendLine("            var __ctx = __stateCtx;");
-        sb.AppendLine("            __stateCtx = null;");
+        sb.AppendLine("        var __ctx = __stateCtx;");
+        sb.AppendLine("        __stateCtx = null;");
         sb.AppendLine();
+        sb.AppendLine("        if (__ctx is not null)");
+        sb.AppendLine("        {");
 
+        // Async restore from configured strategy
+        foreach (var prop in model.Properties)
+        {
+            string backingField = $"__{prop.PropertyName}_backing";
+            string metaField = $"__{prop.PropertyName}_meta";
+
+            sb.AppendLine($"            await __stateManager.RestorePropertyAsync<{prop.FullTypeName}>(");
+            sb.AppendLine($"                __ctx.{prop.PropertyName}.ResolveKey(\"{EscapeString(prop.BaseKey)}\"),");
+            sb.AppendLine($"                __ctx.{prop.PropertyName}.Storage ?? __ctx.Storage,");
+            sb.AppendLine($"                {metaField},");
+            sb.AppendLine($"                __v => {backingField} = __v);");
+            sb.AppendLine();
+        }
+
+        // Async factories
         foreach (var prop in model.Properties)
         {
             string backingField = $"__{prop.PropertyName}_backing";
