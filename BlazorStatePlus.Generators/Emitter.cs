@@ -58,6 +58,7 @@ internal static class Emitter
             sb.AppendLine($"            __ctxLocal.{field.PropertyName}.ResolveKey(\"{EscapeString(field.BaseKey)}\"),");
             sb.AppendLine($"            __ctxLocal.{field.PropertyName}.GetDefaultValue(),");
             sb.AppendLine($"            {optionsArg});");
+            sb.AppendLine($"        {field.FieldName}.OnChanged += () => InvokeAsync(StateHasChanged);");
         }
 
         sb.AppendLine();

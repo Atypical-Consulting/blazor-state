@@ -111,6 +111,32 @@ public class GeneratorOutputTests
     }
 
     [Fact]
+    public void GeneratedCode_WiresOnChangedToStateHasChanged()
+    {
+        var source = """
+            using BlazorStatePlus.Abstractions;
+            using BlazorStatePlus.Attributes;
+            using Microsoft.AspNetCore.Components;
+
+            namespace TestApp;
+
+            public partial class MyComponent : ComponentBase
+            {
+                [Slice]
+                private IStateSlice<int> _counter;
+            }
+            """;
+
+        var (diagnostics, generatedSource) = TestHelper.RunGenerator(source);
+
+        diagnostics.ShouldNotContain(d => d.Severity == DiagnosticSeverity.Error);
+        generatedSource.ShouldNotBeNull();
+        generatedSource.ShouldContain("OnChanged");
+        generatedSource.ShouldContain("InvokeAsync");
+        generatedSource.ShouldContain("StateHasChanged");
+    }
+
+    [Fact]
     public void GlobalNamespace_GeneratesValidCode()
     {
         var source = """
