@@ -1,3 +1,4 @@
+using TheBlazorState.Configuration;
 using TheBlazorState.Services;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -5,23 +6,19 @@ namespace TheBlazorState.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    extension(IServiceCollection services)
+    /// <summary>
+    /// Registers TheBlazorState services: StateManager, storage strategies, and options.
+    /// </summary>
+    public static IServiceCollection AddTheBlazorState(
+        this IServiceCollection services,
+        Action<TheBlazorStateOptions>? configure = null)
     {
-        /// <summary>
-        /// Registers <see cref="StateManager"/> and its dependencies.
-        /// Call this in your <c>Program.cs</c> to enable the library.
-        ///
-        /// <example>
-        /// <code>
-        /// builder.Services.AddTheBlazorState();
-        /// </code>
-        /// </example>
-        /// </summary>
-        public IServiceCollection AddTheBlazorState()
-        {
-            services.AddMemoryCache();
-            services.AddScoped<StateManager>();
-            return services;
-        }
+        var options = new TheBlazorStateOptions();
+        configure?.Invoke(options);
+
+        services.AddSingleton(options);
+        services.AddMemoryCache();
+        services.AddScoped<StateManager>();
+        return services;
     }
 }
