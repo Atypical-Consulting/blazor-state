@@ -41,12 +41,14 @@ public class StateManagerRestoreTests : IDisposable
         var options = new TheBlazorStateOptions();
         var browserStorage = new BrowserStorageService(null!);
         var initializer = new StorageStrategyInitializer(browserStorage, _cache);
+        var crossTabSync = new CrossTabSyncService(_ctx.Services.GetRequiredService<Microsoft.JSInterop.IJSRuntime>());
         return new StateManager(
             _ctx.Services.GetRequiredService<Microsoft.AspNetCore.Components.PersistentComponentState>(),
             _cache,
             NullLogger<StateManager>.Instance,
             options,
-            initializer);
+            initializer,
+            crossTabSync);
     }
 
     // --- Restore from PersistentComponentState ---

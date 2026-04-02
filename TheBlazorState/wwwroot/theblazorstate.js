@@ -83,3 +83,25 @@ export async function removeItemIndexedDb(key) {
         request.onerror = () => reject(request.error);
     });
 }
+
+// --- Cross-tab sync ---
+let _dotNetRef = null;
+
+export function registerCrossTabSync(dotNetReference) {
+    _dotNetRef = dotNetReference;
+    window.addEventListener('storage', _onStorageEvent);
+}
+
+export function unregisterCrossTabSync() {
+    window.removeEventListener('storage', _onStorageEvent);
+    if (_dotNetRef) {
+        _dotNetRef.dispose();
+        _dotNetRef = null;
+    }
+}
+
+function _onStorageEvent(e) {
+    if (_dotNetRef && e.key && e.newValue !== null) {
+        _dotNetRef.invokeMethodAsync('OnStorageChanged', e.key, e.newValue);
+    }
+}

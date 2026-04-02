@@ -21,6 +21,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton(options);
         services.AddMemoryCache();
         services.AddScoped<BrowserStorageService>();
+        services.AddScoped<CrossTabSyncService>();
         services.AddScoped<StateManager>();
         services.AddScoped<StorageStrategyInitializer>();
 

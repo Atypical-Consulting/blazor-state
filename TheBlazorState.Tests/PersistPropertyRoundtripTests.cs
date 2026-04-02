@@ -33,6 +33,7 @@ public class PersistPropertyRoundtripTests : IDisposable
         _ctx.Services.AddScoped<TheBlazorState.Extensions.StorageStrategyInitializer>();
         _ctx.Services.AddScoped<TheBlazorState.Storage.BrowserStorageService>(_ =>
             new TheBlazorState.Storage.BrowserStorageService(null!));
+        _ctx.Services.AddScoped<TheBlazorState.Storage.CrossTabSyncService>();
         _ctx.Services.AddScoped<StateManager>();
     }
 

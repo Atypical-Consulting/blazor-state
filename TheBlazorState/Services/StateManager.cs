@@ -20,7 +20,8 @@ public sealed class StateManager(
     IMemoryCache cache,
     ILogger<StateManager> logger,
     TheBlazorStateOptions options,
-    StorageStrategyInitializer initializer) : IDisposable
+    StorageStrategyInitializer initializer,
+    CrossTabSyncService crossTabSync) : IDisposable
 {
     private readonly List<PersistingComponentStateSubscription> _subscriptions = [];
     private readonly List<Func<Task>> _persistCallbacks = [];
@@ -62,7 +63,7 @@ public sealed class StateManager(
 
         // Always register persist callback + eager change handler (before any early returns).
         RegisterPersistPropertyCallback(key, strategy, valueGetter);
-        RegisterEagerChangeHandler(key, strategy, meta, valueGetter);
+        RegisterEagerChangeHandler(key, strategy, meta, valueGetter, valueSetter);
 
         var ttl = meta.TimeToLive;
 
@@ -110,7 +111,7 @@ public sealed class StateManager(
     }
 
     private void RegisterEagerChangeHandler<T>(
-        string key, IStorageStrategy? strategy, StateMeta meta, Func<T> valueGetter)
+        string key, IStorageStrategy? strategy, StateMeta meta, Func<T> valueGetter, Action<T> valueSetter)
     {
         var effectiveStrategy = strategy ?? options.DefaultStorage;
         meta.OnChanged += () =>
@@ -127,6 +128,28 @@ public sealed class StateManager(
                 _ = PersistToBrowserStrategyAsync(key, value, now, effectiveStrategy, meta.TimeToLive);
             }
         };
+
+        // Register for cross-tab sync if using LocalStorage
+        if (effectiveStrategy is LocalStorageStrategy)
+        {
+            crossTabSync.RegisterKey(key, rawJson =>
+            {
+                try
+                {
+                    var envelope = JsonSerializer.Deserialize<PersistedEnvelope<T>>(rawJson);
+                    if (envelope is not null)
+                    {
+                        valueSetter(envelope.Value);
+                        meta.MarkDirty();
+                        meta.RaiseChanged();
+                    }
+                }
+                catch (JsonException)
+                {
+                    // Ignore malformed data from other tabs
+                }
+            });
+        }
     }
 
     /// <summary>
@@ -174,6 +197,9 @@ public sealed class StateManager(
         {
             logger.LogWarning(ex, "Property '{Key}': async restore failed, using default", key);
         }
+
+        // Start cross-tab sync listener (idempotent — safe to call multiple times)
+        await crossTabSync.StartListeningAsync();
     }
 
     private void RegisterPersistPropertyCallback<T>(string key, IStorageStrategy? strategy, Func<T> valueGetter)
