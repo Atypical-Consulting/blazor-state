@@ -1,6 +1,9 @@
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using TheBlazorState.Abstractions;
+using TheBlazorState.Configuration;
+using TheBlazorState.Extensions;
+using TheBlazorState.Storage;
 
 namespace TheBlazorState.Services;
 
@@ -14,7 +17,9 @@ namespace TheBlazorState.Services;
 public sealed class StateManager(
     PersistentComponentState persistence,
     IMemoryCache cache,
-    ILogger<StateManager> logger) : IDisposable
+    ILogger<StateManager> logger,
+    TheBlazorStateOptions options,
+    StorageStrategyInitializer initializer) : IDisposable
 {
     private readonly List<PersistingComponentStateSubscription> _subscriptions = [];
     private readonly List<Func<Task>> _persistCallbacks = [];
@@ -22,22 +27,28 @@ public sealed class StateManager(
     private bool _registered;
     private bool _disposed;
 
+    // Keep compiler happy — initializer is used to force DI ordering
+    private readonly StorageStrategyInitializer _initializer = initializer;
+
     private static readonly MemoryCacheEntryOptions CacheEntryOptions = new()
     {
         SlidingExpiration = TimeSpan.FromMinutes(30)
     };
 
     /// <summary>
-    /// Restores a property value from prerender state or server cache.
+    /// Restores a property value from prerender state or server cache (synchronous path).
     /// Called by generated code during OnInitialized for [Persist] properties.
+    /// The sync path (PersistentComponentState + IMemoryCache) ALWAYS runs regardless of strategy.
     /// </summary>
     /// <typeparam name="T">Type of the property value.</typeparam>
     /// <param name="key">Unique persistence key for this property.</param>
+    /// <param name="strategy">The configured storage strategy (may be null for default).</param>
     /// <param name="meta">The StateMeta companion for this property.</param>
     /// <param name="valueSetter">Action to set the backing field value.</param>
     /// <param name="valueGetter">Func to get the current backing field value.</param>
     public void RestoreProperty<T>(
         string key,
+        IStorageStrategy? strategy,
         StateMeta meta,
         Action<T> valueSetter,
         Func<T> valueGetter)
@@ -66,7 +77,7 @@ public sealed class StateManager(
                     valueSetter(envelope.Value);
                     meta.MarkRestored(envelope.PersistedAt);
                     logger.LogDebug("Property '{Key}': restored from prerender", key);
-                    RegisterPersistPropertyCallback(key, valueGetter);
+                    RegisterPersistPropertyCallback(key, strategy, valueGetter);
                     return;
                 }
             }
@@ -83,7 +94,7 @@ public sealed class StateManager(
                     valueSetter(cached.Value);
                     meta.MarkRestored(cached.PersistedAt);
                     logger.LogDebug("Property '{Key}': restored from server cache", key);
-                    RegisterPersistPropertyCallback(key, valueGetter);
+                    RegisterPersistPropertyCallback(key, strategy, valueGetter);
                     return;
                 }
             }
@@ -94,21 +105,85 @@ public sealed class StateManager(
         }
 
         logger.LogDebug("Property '{Key}': no persisted value, using default", key);
-        RegisterPersistPropertyCallback(key, valueGetter);
+        RegisterPersistPropertyCallback(key, strategy, valueGetter);
     }
 
-    private void RegisterPersistPropertyCallback<T>(string key, Func<T> valueGetter)
+    /// <summary>
+    /// Asynchronously restores a property value from a browser storage strategy (e.g., LocalStorage, SessionStorage, IndexedDB).
+    /// Called by generated code during OnInitializedAsync for [Persist] properties.
+    /// Skips if already restored or if strategy is PrerenderHtml/ServerMemoryCache (already handled sync).
+    /// </summary>
+    public async Task RestorePropertyAsync<T>(
+        string key,
+        IStorageStrategy? strategy,
+        StateMeta meta,
+        Action<T> valueSetter)
     {
-        RegisterPersistCallback(() =>
+        // Skip if already restored by the sync path
+        if (meta.WasRestored)
+            return;
+
+        // Resolve effective strategy
+        var effective = strategy ?? options.DefaultStorage;
+
+        // Skip for strategies already handled by the sync RestoreProperty path
+        if (effective is PrerenderHtmlStrategy or ServerMemoryCacheStrategy)
+            return;
+
+        try
+        {
+            var result = await effective.RestoreAsync<T>(key);
+            if (result.Found && result.Value is not null)
+            {
+                var ttl = meta.TimeToLive;
+                if (ttl.HasValue && result.PersistedAt.HasValue
+                    && DateTimeOffset.UtcNow - result.PersistedAt.Value > ttl.Value)
+                {
+                    logger.LogDebug("Property '{Key}': async restored value discarded (TTL expired)", key);
+                    return;
+                }
+
+                valueSetter(result.Value);
+                meta.MarkRestored(result.PersistedAt ?? DateTimeOffset.UtcNow);
+                logger.LogDebug("Property '{Key}': restored from {Strategy}", key, effective.GetType().Name);
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Property '{Key}': async restore failed, using default", key);
+        }
+    }
+
+    private void RegisterPersistPropertyCallback<T>(string key, IStorageStrategy? strategy, Func<T> valueGetter)
+    {
+        // Resolve effective strategy
+        var effective = strategy ?? options.DefaultStorage;
+
+        RegisterPersistCallback(async () =>
         {
             var envelope = new PersistedEnvelope<T>
             {
                 Value = valueGetter(),
                 PersistedAt = DateTimeOffset.UtcNow
             };
+
+            // Always write to prerender HTML + server cache
             persistence.PersistAsJson(key, envelope);
             cache.Set(key, envelope, CacheEntryOptions);
-            return Task.CompletedTask;
+
+            // Additionally write to the configured strategy if it's a browser strategy
+            if (effective is not (PrerenderHtmlStrategy or ServerMemoryCacheStrategy))
+            {
+                try
+                {
+                    var metadata = new StorageMetadata(key, null, envelope.PersistedAt);
+                    await effective.PersistAsync(key, envelope.Value, metadata);
+                }
+                catch (Exception ex)
+                {
+                    logger.LogWarning(ex, "Property '{Key}': failed to persist to {Strategy}", key, effective.GetType().Name);
+                }
+            }
         });
     }
 

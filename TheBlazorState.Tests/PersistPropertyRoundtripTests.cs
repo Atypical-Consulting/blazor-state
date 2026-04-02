@@ -29,6 +29,10 @@ public class PersistPropertyRoundtripTests : IDisposable
         _persistentState = _ctx.AddBunitPersistentComponentState();
         _ctx.Services.AddMemoryCache();
         _ctx.Services.AddSingleton<ILogger<StateManager>>(NullLogger<StateManager>.Instance);
+        _ctx.Services.AddSingleton(new TheBlazorState.Configuration.TheBlazorStateOptions());
+        _ctx.Services.AddScoped<TheBlazorState.Extensions.StorageStrategyInitializer>();
+        _ctx.Services.AddScoped<TheBlazorState.Storage.BrowserStorageService>(_ =>
+            new TheBlazorState.Storage.BrowserStorageService(null!));
         _ctx.Services.AddScoped<StateManager>();
     }
 
@@ -163,6 +167,7 @@ public class PersistPropertyRoundtripTests : IDisposable
             CountMeta.OnChanged += StateHasChanged;
             StateManager.RestoreProperty<int>(
                 "TestCounterComponent.Count",
+                null,
                 CountMeta,
                 v => _count = v,
                 () => _count);

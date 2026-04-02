@@ -6,7 +6,10 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Shouldly;
 using TheBlazorState.Abstractions;
+using TheBlazorState.Configuration;
+using TheBlazorState.Extensions;
 using TheBlazorState.Services;
+using TheBlazorState.Storage;
 using Xunit;
 using static TheBlazorState.Services.StateManager;
 
@@ -35,10 +38,15 @@ public class StateManagerRestoreTests : IDisposable
 
     private StateManager CreateManager()
     {
+        var options = new TheBlazorStateOptions();
+        var browserStorage = new BrowserStorageService(null!);
+        var initializer = new StorageStrategyInitializer(browserStorage, _cache);
         return new StateManager(
             _ctx.Services.GetRequiredService<Microsoft.AspNetCore.Components.PersistentComponentState>(),
             _cache,
-            NullLogger<StateManager>.Instance);
+            NullLogger<StateManager>.Instance,
+            options,
+            initializer);
     }
 
     // --- Restore from PersistentComponentState ---
@@ -61,6 +69,7 @@ public class StateManagerRestoreTests : IDisposable
         // Act
         manager.RestoreProperty<int>(
             "TestComponent.Count",
+            null,
             meta,
             v => restoredValue = v,
             () => restoredValue);
@@ -90,6 +99,7 @@ public class StateManagerRestoreTests : IDisposable
         // Act
         manager.RestoreProperty<string>(
             "TestComponent.Name",
+            null,
             meta,
             v => restoredValue = v,
             () => restoredValue);
@@ -119,6 +129,7 @@ public class StateManagerRestoreTests : IDisposable
         // Act
         manager.RestoreProperty<int>(
             "TestComponent.Count",
+            null,
             meta,
             v => restoredValue = v,
             () => restoredValue);
@@ -146,6 +157,7 @@ public class StateManagerRestoreTests : IDisposable
         // Act
         manager.RestoreProperty<int>(
             "TestComponent.Count",
+            null,
             meta,
             v => restoredValue = v,
             () => restoredValue);
@@ -175,6 +187,7 @@ public class StateManagerRestoreTests : IDisposable
         // Act
         manager.RestoreProperty<int>(
             "TestComponent.Count",
+            null,
             meta,
             v => restoredValue = v,
             () => restoredValue);
@@ -196,6 +209,7 @@ public class StateManagerRestoreTests : IDisposable
         // Act
         manager.RestoreProperty<int>(
             "TestComponent.Count",
+            null,
             meta,
             v => restoredValue = v,
             () => restoredValue);
@@ -225,6 +239,7 @@ public class StateManagerRestoreTests : IDisposable
         // Act
         manager.RestoreProperty<int>(
             "TestComponent.Count",
+            null,
             meta,
             v => val = v,
             () => val);
@@ -245,6 +260,7 @@ public class StateManagerRestoreTests : IDisposable
 
         manager.RestoreProperty<int>(
             "TestComponent.Count",
+            null,
             meta,
             v => currentValue = v,
             () => currentValue);
@@ -267,11 +283,11 @@ public class StateManagerRestoreTests : IDisposable
         var meta2 = new StateMeta(ttl: null);
         int val = 0;
 
-        manager.RestoreProperty<int>("TestComponent.Count", meta1, v => val = v, () => val);
+        manager.RestoreProperty<int>("TestComponent.Count", null, meta1, v => val = v, () => val);
 
         // Act & Assert
         Should.Throw<InvalidOperationException>(() =>
-            manager.RestoreProperty<int>("TestComponent.Count", meta2, v => val = v, () => val));
+            manager.RestoreProperty<int>("TestComponent.Count", null, meta2, v => val = v, () => val));
     }
 
     // --- Null/empty key throws ---
@@ -287,7 +303,7 @@ public class StateManagerRestoreTests : IDisposable
         int val = 0;
 
         Should.Throw<ArgumentException>(() =>
-            manager.RestoreProperty<int>(key!, meta, v => val = v, () => val));
+            manager.RestoreProperty<int>(key!, null, meta, v => val = v, () => val));
     }
 
     // --- After dispose throws ---
@@ -302,6 +318,6 @@ public class StateManagerRestoreTests : IDisposable
         int val = 0;
 
         Should.Throw<ObjectDisposedException>(() =>
-            manager.RestoreProperty<int>("TestComponent.Count", meta, v => val = v, () => val));
+            manager.RestoreProperty<int>("TestComponent.Count", null, meta, v => val = v, () => val));
     }
 }
