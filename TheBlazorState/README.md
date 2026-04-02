@@ -1,4 +1,4 @@
-# BlazorStatePlus
+# TheBlazorState
 
 Zero-boilerplate prerender-to-interactive state handoff for Blazor components (.NET 10+).
 
@@ -10,7 +10,7 @@ Zero-boilerplate prerender-to-interactive state handoff for Blazor components (.
 
 ```csharp
 // Program.cs
-builder.Services.AddBlazorStatePlus();
+builder.Services.AddTheBlazorState();
 ```
 
 ## Quick Comparison
@@ -49,7 +49,7 @@ builder.Services.AddBlazorStatePlus();
 }
 ```
 
-### After (with BlazorStatePlus)
+### After (with TheBlazorState)
 
 ```csharp
 public partial class Weather : ComponentBase

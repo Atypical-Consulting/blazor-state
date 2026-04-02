@@ -1,4 +1,4 @@
-# BlazorStatePlus.Generators
+# TheBlazorState.Generators
 
 Roslyn incremental source generator that eliminates boilerplate for Blazor persistent state management.
 
@@ -36,7 +36,7 @@ No base class, no string keys, no manual wiring.
 ## Architecture
 
 - **Target:** `netstandard2.0` (Roslyn requirement)
-- **Ships inside** the main `BlazorStatePlus` NuGet package via `OutputItemType="Analyzer"`
+- **Ships inside** the main `TheBlazorState` NuGet package via `OutputItemType="Analyzer"`
 - **Pipeline:** `ForAttributeWithMetadataName` → validate → build `ComponentModel` → `Emitter.Emit()`
 
 ## Diagnostics
