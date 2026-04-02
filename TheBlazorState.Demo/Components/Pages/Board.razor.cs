@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using TheBlazorState.Attributes;
+using TheBlazorState.Abstractions;
 using TheBlazorState.Demo.Models;
 using TheBlazorState.Demo.Services;
 using TheBlazorState.Demo.State;
@@ -23,14 +24,17 @@ public partial class Board : ComponentBase
         ctx.BoardState
             .KeySuffix(Project.SelectedProject.Id)
             .LoadFrom(async () => (BoardData?)await TaskService.GetBoardAsync(Project.SelectedProject.Id));
+
+        ((INotifyStateChanged)Project).StateChanged += OnProjectChanged;
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    private async void OnProjectChanged()
     {
         if (Project.SelectedProject.Id != _lastProjectId)
         {
             _lastProjectId = Project.SelectedProject.Id;
             BoardState = await TaskService.GetBoardAsync(Project.SelectedProject.Id);
+            await InvokeAsync(StateHasChanged);
         }
     }
 
