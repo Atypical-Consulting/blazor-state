@@ -15,6 +15,14 @@
         @(Page.IsInWishlist ? "Remove from wishlist" : "Add to wishlist")
     </button>
 
+    <button class="btn btn-primary ms-2" @onclick="AddToCart">
+        Add to Cart
+    </button>
+
+    <div class="mt-3 p-3 border rounded bg-light">
+        <strong>Cart:</strong> @Cart.Items.Count item(s) &mdash; Total: @Cart.Total.ToString("C")
+    </div>
+
     @if (Page.Reviews is not null)
     {
         <h2>Reviews (@Page.Reviews.TotalCount)</h2>

@@ -1,5 +1,6 @@
 using TheBlazorState.Demo.Components;
 using TheBlazorState.Demo.Services;
+using TheBlazorState.Demo.State;
 using TheBlazorState.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +12,7 @@ builder.Services.AddTheBlazorState();
 builder.Services.AddScoped<WeatherService>();
 builder.Services.AddScoped<ProductService>();
 builder.Services.AddScoped<ReviewService>();
+builder.Services.AddScoped<CartState>();
 
 var app = builder.Build();
 

@@ -1,5 +1,6 @@
 using TheBlazorState.Attributes;
 using TheBlazorState.Demo.Services;
+using TheBlazorState.Demo.State;
 using Microsoft.AspNetCore.Components;
 
 namespace TheBlazorState.Demo.Components.Pages;
@@ -8,6 +9,7 @@ public partial class ProductDetail : ComponentBase
 {
     [Inject] private ProductService Products { get; set; } = null!;
     [Inject] private ReviewService Reviews { get; set; } = null!;
+    [Inject] public CartState Cart { get; set; } = default!;
 
     [Parameter]
     public int ProductId { get; set; }
@@ -31,6 +33,16 @@ public partial class ProductDetail : ComponentBase
     {
         if (Page is null) return;
         Page = Page with { IsInWishlist = !Page.IsInWishlist };
+    }
+
+    private void AddToCart()
+    {
+        if (Page?.Product is null) return;
+        Cart.AddItem(new CartItem(
+            Page.Product.Id,
+            Page.Product.Name,
+            Page.Product.Price,
+            1));
     }
 
     public record ProductPageState
