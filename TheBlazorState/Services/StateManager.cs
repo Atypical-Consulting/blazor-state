@@ -193,13 +193,19 @@ public sealed class StateManager(
             persistence.PersistAsJson(key, envelope);
             cache.Set(key, envelope, CacheEntryOptions);
 
-            // Additionally write to the configured strategy if it's a browser strategy
+            // Additionally write to the configured strategy if it's a browser strategy.
+            // Skip during prerender — JSInterop isn't available. The eager OnChanged
+            // handler writes to browser storage during interactive mode instead.
             if (effective is not (PrerenderHtmlStrategy or ServerMemoryCacheStrategy))
             {
                 try
                 {
                     var metadata = new StorageMetadata(key, null, envelope.PersistedAt);
                     await effective.PersistAsync(key, envelope.Value, metadata);
+                }
+                catch (InvalidOperationException)
+                {
+                    // Expected during prerender — JSInterop not yet available
                 }
                 catch (Exception ex)
                 {
