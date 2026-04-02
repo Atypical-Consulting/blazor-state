@@ -10,6 +10,7 @@ namespace TheBlazorState.Storage;
 public sealed class BrowserStorageService
 {
     private readonly IJSRuntime _jsRuntime;
+    private readonly SemaphoreSlim _moduleLock = new(1, 1);
     private IJSObjectReference? _module;
 
     public BrowserStorageService(IJSRuntime jsRuntime)
@@ -19,9 +20,19 @@ public sealed class BrowserStorageService
 
     private async ValueTask<IJSObjectReference> GetModuleAsync()
     {
-        _module ??= await _jsRuntime.InvokeAsync<IJSObjectReference>(
-            "import", "./_content/TheBlazorState/theblazorstate.js");
-        return _module;
+        if (_module is not null) return _module;
+
+        await _moduleLock.WaitAsync();
+        try
+        {
+            _module ??= await _jsRuntime.InvokeAsync<IJSObjectReference>(
+                "import", "./_content/TheBlazorState/theblazorstate.js");
+            return _module;
+        }
+        finally
+        {
+            _moduleLock.Release();
+        }
     }
 
     public async Task<StorageResult<T>> GetAsync<T>(string storeName, string key)
@@ -45,8 +56,17 @@ public sealed class BrowserStorageService
 
             return new StorageResult<T>(true, envelope.Value, envelope.PersistedAt);
         }
-        catch
+        catch (JsonException)
         {
+            return new StorageResult<T>(false, default, null);
+        }
+        catch (JSException)
+        {
+            return new StorageResult<T>(false, default, null);
+        }
+        catch (InvalidOperationException)
+        {
+            // JSInterop not available during prerender
             return new StorageResult<T>(false, default, null);
         }
     }

@@ -20,12 +20,18 @@ public sealed class PropertyConfigurator<T>
 
     public PropertyConfigurator<T> KeySuffix(params object[] parts)
     {
+        ArgumentNullException.ThrowIfNull(parts);
+        foreach (var part in parts)
+        {
+            ArgumentNullException.ThrowIfNull(part, nameof(parts));
+        }
         _suffixParts = parts;
         return this;
     }
 
     public PropertyConfigurator<T> KeyOverride(string key)
     {
+        ArgumentException.ThrowIfNullOrEmpty(key);
         _keyOverride = key;
         return this;
     }

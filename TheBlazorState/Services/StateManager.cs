@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using TheBlazorState.Abstractions;
@@ -100,7 +101,7 @@ public sealed class StateManager(
                 }
             }
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is JsonException or InvalidOperationException or InvalidCastException)
         {
             logger.LogWarning(ex, "Property '{Key}': deserialization failed, using default", key);
         }
