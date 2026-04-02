@@ -131,43 +131,6 @@ internal sealed class PersistIncrementalGenerator : IIncrementalGenerator
             }
         }
 
-        // Detect [Inject] properties whose type implements INotifyStateChanged
-        var injectedSharedStateNames = new List<string>();
-        foreach (var member in containingType.GetMembers())
-        {
-            if (member is IPropertySymbol injectedProp)
-            {
-                bool hasInjectAttr = false;
-                foreach (var attr in injectedProp.GetAttributes())
-                {
-                    var attrClass = attr.AttributeClass;
-                    if (attrClass != null && attrClass.ToDisplayString() == "Microsoft.AspNetCore.Components.InjectAttribute")
-                    {
-                        hasInjectAttr = true;
-                        break;
-                    }
-                }
-
-                if (hasInjectAttr)
-                {
-                    bool implementsNotify = false;
-                    foreach (var iface in injectedProp.Type.AllInterfaces)
-                    {
-                        if (iface.ToDisplayString() == "TheBlazorState.Abstractions.INotifyStateChanged")
-                        {
-                            implementsNotify = true;
-                            break;
-                        }
-                    }
-
-                    if (implementsNotify)
-                    {
-                        injectedSharedStateNames.Add(injectedProp.Name);
-                    }
-                }
-            }
-        }
-
         // Property type (fully qualified, with nullable annotation)
         var fullyQualifiedWithNullable = SymbolDisplayFormat.FullyQualifiedFormat.AddMiscellaneousOptions(
             SymbolDisplayMiscellaneousOptions.IncludeNullableReferenceTypeModifier);
@@ -195,8 +158,7 @@ internal sealed class PersistIncrementalGenerator : IIncrementalGenerator
             InheritsFromComponentBase: inheritsFromComponentBase,
             UserImplementsDisposable: userImplementsDisposable,
             UserOverridesOnInitialized: userOverridesOnInitialized,
-            UserOverridesOnInitializedAsync: userOverridesOnInitializedAsync,
-            InjectedSharedStatePropertyNames: injectedSharedStateNames);
+            UserOverridesOnInitializedAsync: userOverridesOnInitializedAsync);
 
         var locationData = new PersistLocationData
         {
@@ -302,18 +264,11 @@ internal sealed class PersistIncrementalGenerator : IIncrementalGenerator
         if (hasErrors || validProps.Count == 0)
             return;
 
-        var injectedSharedStates = new List<InjectedSharedState>();
-        foreach (var name in first.Data.InjectedSharedStatePropertyNames)
-        {
-            injectedSharedStates.Add(new InjectedSharedState { PropertyName = name });
-        }
-
         var model = new PersistComponentModel
         {
             Namespace = ns,
             ClassName = className,
             Properties = validProps,
-            InjectedSharedStates = injectedSharedStates,
             UserImplementsDisposable = first.Data.UserImplementsDisposable,
             UserOverridesOnInitialized = first.Data.UserOverridesOnInitialized,
             UserOverridesOnInitializedAsync = first.Data.UserOverridesOnInitializedAsync,
@@ -344,6 +299,5 @@ internal sealed class PersistIncrementalGenerator : IIncrementalGenerator
         bool InheritsFromComponentBase,
         bool UserImplementsDisposable,
         bool UserOverridesOnInitialized,
-        bool UserOverridesOnInitializedAsync,
-        List<string> InjectedSharedStatePropertyNames);
+        bool UserOverridesOnInitializedAsync);
 }

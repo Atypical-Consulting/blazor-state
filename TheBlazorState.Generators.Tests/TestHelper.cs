@@ -47,8 +47,9 @@ public static class TestHelper
 
         var persistGenerator = new PersistIncrementalGenerator();
         var sharedGenerator = new SharedIncrementalGenerator();
+        var injectSubGenerator = new InjectSubscriptionGenerator();
 
-        GeneratorDriver driver = CSharpGeneratorDriver.Create(persistGenerator, sharedGenerator);
+        GeneratorDriver driver = CSharpGeneratorDriver.Create(persistGenerator, sharedGenerator, injectSubGenerator);
         driver = driver.RunGeneratorsAndUpdateCompilation(compilation, out _, out _);
 
         return driver.GetRunResult();

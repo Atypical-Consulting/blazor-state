@@ -10,15 +10,14 @@ public class SharedSubscriptionTests
     {
         var source = @"
 using TheBlazorState.Attributes;
-using TheBlazorState.Abstractions;
 using Microsoft.AspNetCore.Components;
 
 namespace Test;
 
-public partial class CartState : INotifyStateChanged
+public partial class CartState
 {
-    public event System.Action? StateChanged;
-    public decimal Total { get; set; }
+    [Shared]
+    public partial decimal Total { get; set; }
 }
 
 public partial class MyComponent : ComponentBase
@@ -30,8 +29,12 @@ public partial class MyComponent : ComponentBase
     public partial int Counter { get; set; }
 }";
         var (diagnostics, generatedSource) = TestHelper.RunGenerator(source);
-        generatedSource.ShouldContain("Cart.StateChanged");
+        generatedSource.ShouldNotBeNull();
+        // PersistEmitter emits partial method hooks
+        generatedSource.ShouldContain("__SubscribeToSharedState");
         generatedSource.ShouldContain("__OnSharedStateChanged");
+        // InjectSubscriptionGenerator emits actual subscription in partial method body
+        generatedSource.ShouldContain("Cart.StateChanged");
     }
 
     [Fact]
@@ -39,15 +42,14 @@ public partial class MyComponent : ComponentBase
     {
         var source = @"
 using TheBlazorState.Attributes;
-using TheBlazorState.Abstractions;
 using Microsoft.AspNetCore.Components;
 
 namespace Test;
 
-public partial class CartState : INotifyStateChanged
+public partial class CartState
 {
-    public event System.Action? StateChanged;
-    public decimal Total { get; set; }
+    [Shared]
+    public partial decimal Total { get; set; }
 }
 
 public partial class MyComponent : ComponentBase
@@ -59,6 +61,10 @@ public partial class MyComponent : ComponentBase
     public partial int Counter { get; set; }
 }";
         var (diagnostics, generatedSource) = TestHelper.RunGenerator(source);
+        generatedSource.ShouldNotBeNull();
+        // PersistEmitter calls __UnsubscribeFromSharedState in Dispose
+        generatedSource.ShouldContain("__UnsubscribeFromSharedState");
+        // InjectSubscriptionGenerator emits the actual unsubscribe
         generatedSource.ShouldContain("Cart.StateChanged -=");
     }
 
@@ -77,7 +83,12 @@ public partial class MyComponent : ComponentBase
     public partial int Counter { get; set; }
 }";
         var (diagnostics, generatedSource) = TestHelper.RunGenerator(source);
-        generatedSource.ShouldNotContain("StateChanged");
-        generatedSource.ShouldNotContain("__OnSharedStateChanged");
+        generatedSource.ShouldNotBeNull();
+        // PersistEmitter still emits the partial method declarations (no-ops without InjectSubscriptionGenerator)
+        generatedSource.ShouldContain("partial void __SubscribeToSharedState");
+        generatedSource.ShouldContain("partial void __UnsubscribeFromSharedState");
+        // But no actual StateChanged subscriptions
+        generatedSource.ShouldNotContain("StateChanged +=");
+        generatedSource.ShouldNotContain("StateChanged -=");
     }
 }
