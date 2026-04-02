@@ -1,4 +1,3 @@
-using TheBlazorState.Abstractions;
 using TheBlazorState.Attributes;
 using TheBlazorState.Demo.Services;
 using Microsoft.AspNetCore.Components;
@@ -13,14 +12,14 @@ public partial class ProductDetail : ComponentBase
     [Parameter]
     public int ProductId { get; set; }
 
-    [Slice(TimeToLive = "00:05:00")]
-    private IStateSlice<ProductPageState> _page = null!;
+    [Persist(TimeToLive = "00:05:00")]
+    public partial ProductPageState? Page { get; set; }
 
-    partial void OnInitializeSlices(SliceInitContext ctx)
+    partial void ConfigureState(__StateContext ctx)
     {
         ctx.Page
            .KeySuffix(ProductId)
-           .InitializeFrom(async () => new ProductPageState
+           .LoadFrom(async () => new ProductPageState
            {
                Product = await Products.GetAsync(ProductId),
                Reviews = await Reviews.GetSummaryAsync(ProductId),
@@ -30,8 +29,8 @@ public partial class ProductDetail : ComponentBase
 
     private void ToggleWishlist()
     {
-        var state = _page.Value;
-        _page.Value = state with { IsInWishlist = !state.IsInWishlist };
+        if (Page is null) return;
+        Page = Page with { IsInWishlist = !Page.IsInWishlist };
     }
 
     public record ProductPageState

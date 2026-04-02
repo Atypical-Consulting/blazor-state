@@ -139,6 +139,8 @@ internal static class PersistEmitter
                 : "null";
 
             sb.AppendLine($"        {metaField} = new global::TheBlazorState.Abstractions.StateMeta({ttlArg});");
+            sb.AppendLine($"        if (__ctx.{prop.PropertyName}.HasDefaultValue)");
+            sb.AppendLine($"            {backingField} = __ctx.{prop.PropertyName}.GetDefaultValue();");
             sb.AppendLine($"        __stateManager.RestoreProperty<{prop.FullTypeName}>(");
             sb.AppendLine($"            __ctx.{prop.PropertyName}.ResolveKey(\"{EscapeString(prop.BaseKey)}\"),");
             sb.AppendLine($"            {metaField},");

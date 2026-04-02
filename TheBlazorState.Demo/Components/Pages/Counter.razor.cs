@@ -1,4 +1,3 @@
-using TheBlazorState.Abstractions;
 using TheBlazorState.Attributes;
 using Microsoft.AspNetCore.Components;
 
@@ -6,13 +5,13 @@ namespace TheBlazorState.Demo.Components.Pages;
 
 public partial class Counter : ComponentBase
 {
-    [Slice]
-    private IStateSlice<int> _counter = null!;
+    [Persist]
+    public partial int Count { get; set; }
 
-    partial void OnInitializeSlices(SliceInitContext ctx)
+    partial void ConfigureState(__StateContext ctx)
     {
-        ctx.Counter.DefaultValue(Random.Shared.Next(100));
+        ctx.Count.DefaultValue(Random.Shared.Next(100));
     }
 
-    private void Increment() => _counter.Value++;
+    private void Increment() => Count++;
 }

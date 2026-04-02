@@ -45,10 +45,9 @@ public static class TestHelper
             CachedReferences.Value,
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
-        var sliceGenerator = new SliceIncrementalGenerator();
         var persistGenerator = new PersistIncrementalGenerator();
 
-        GeneratorDriver driver = CSharpGeneratorDriver.Create(sliceGenerator, persistGenerator);
+        GeneratorDriver driver = CSharpGeneratorDriver.Create(persistGenerator);
         driver = driver.RunGeneratorsAndUpdateCompilation(compilation, out _, out _);
 
         return driver.GetRunResult();
@@ -83,7 +82,7 @@ public static class TestHelper
         }
 
         // 2. Add the TheBlazorState library assembly
-        TryAdd(typeof(TheBlazorState.Abstractions.IStateSlice<>).Assembly.Location);
+        TryAdd(typeof(TheBlazorState.Abstractions.StateMeta).Assembly.Location);
 
         // 3. Add ASP.NET Core shared framework assemblies (ComponentBase, etc.)
         //    These are not loaded at runtime in a test, so we resolve them from disk.

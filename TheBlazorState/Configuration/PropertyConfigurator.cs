@@ -12,6 +12,8 @@ public sealed class PropertyConfigurator<T>
     private object[]? _suffixParts;
     private string? _keyOverride;
     private Func<Task<T>>? _asyncFactory;
+    private T _defaultValue = default!;
+    private bool _hasDefaultValue;
 
     /// <summary>Override the storage strategy for this specific property.</summary>
     public IStorageStrategy? Storage { get; set; }
@@ -25,6 +27,17 @@ public sealed class PropertyConfigurator<T>
     public PropertyConfigurator<T> KeyOverride(string key)
     {
         _keyOverride = key;
+        return this;
+    }
+
+    /// <summary>
+    /// Set a default value for this property when no persisted value exists.
+    /// The value is applied during OnInitialized before RestoreProperty is called.
+    /// </summary>
+    public PropertyConfigurator<T> DefaultValue(T value)
+    {
+        _defaultValue = value;
+        _hasDefaultValue = true;
         return this;
     }
 
@@ -49,6 +62,12 @@ public sealed class PropertyConfigurator<T>
 
         return baseKey + ":" + string.Join(":", _suffixParts);
     }
+
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public bool HasDefaultValue => _hasDefaultValue;
+
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public T GetDefaultValue() => _defaultValue;
 
     [EditorBrowsable(EditorBrowsableState.Never)]
     public bool HasAsyncFactory => _asyncFactory is not null;

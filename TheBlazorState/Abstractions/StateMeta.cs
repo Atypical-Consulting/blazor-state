@@ -33,19 +33,27 @@ public sealed class StateMeta
     /// <summary>Fires whenever the property value changes.</summary>
     public event Action? OnChanged;
 
-    internal void MarkRestored(DateTimeOffset persistedAt)
+    /// <summary>Called by generated code to record that a value was restored from persistence.</summary>
+    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+    public void MarkRestored(DateTimeOffset persistedAt)
     {
         WasRestored = true;
         LastUpdated = persistedAt;
     }
 
-    internal void MarkDirty()
+    /// <summary>Called by generated code when the property value changes.</summary>
+    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+    public void MarkDirty()
     {
         IsDirty = true;
         LastUpdated = DateTimeOffset.UtcNow;
     }
 
-    internal void RaiseChanged() => OnChanged?.Invoke();
+    /// <summary>Called by generated code to raise the OnChanged event.</summary>
+    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+    public void RaiseChanged() => OnChanged?.Invoke();
 
-    internal void ClearHandlers() => OnChanged = null;
+    /// <summary>Called by generated code during Dispose to detach all handlers.</summary>
+    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+    public void ClearHandlers() => OnChanged = null;
 }

@@ -5,12 +5,12 @@
 
 <h1>Persistent Counter</h1>
 
-<p role="status">Current count: @_counter.Value</p>
+<p role="status">Current count: @Count</p>
 <p>
     <em>
-        @if (_counter.WasRestored)
+        @if (CountMeta.WasRestored)
         {
-            <span>Restored from persistence (last updated @_counter.LastUpdated.LocalDateTime)</span>
+            <span>Restored from persistence (last updated @CountMeta.LastUpdated.LocalDateTime)</span>
         }
         else
         {

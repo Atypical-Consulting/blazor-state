@@ -5,16 +5,16 @@
 
 <h1>Weather Dashboard</h1>
 
-@if (_forecasts.Value is null)
+@if (Forecasts is null)
 {
     <p><em>Loading forecasts...</em></p>
 }
 else
 {
-    @if (_forecasts.IsStale)
+    @if (ForecastsMeta.IsStale)
     {
         <div class="alert alert-warning">
-            Data is stale (last updated @_forecasts.LastUpdated.LocalDateTime).
+            Data is stale (last updated @ForecastsMeta.LastUpdated.LocalDateTime).
             <button class="btn btn-sm btn-outline-warning" @onclick="Refresh">
                 Refresh
             </button>
@@ -30,7 +30,7 @@ else
             </tr>
         </thead>
         <tbody>
-            @foreach (var f in _forecasts.Value)
+            @foreach (var f in Forecasts)
             {
                 <tr>
                     <td>@f.Date.ToShortDateString()</td>

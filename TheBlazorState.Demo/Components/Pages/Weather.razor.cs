@@ -1,4 +1,3 @@
-using TheBlazorState.Abstractions;
 using TheBlazorState.Attributes;
 using TheBlazorState.Demo.Services;
 using Microsoft.AspNetCore.Components;
@@ -10,18 +9,17 @@ public partial class Weather : ComponentBase
     [Inject] private WeatherService WeatherSvc { get; set; } = null!;
     [Inject] private ILogger<Weather> Logger { get; set; } = null!;
 
-    [Slice(TimeToLive = "00:05:00")]
-    private IStateSlice<WeatherForecast[]> _forecasts = null!;
+    [Persist(TimeToLive = "00:05:00")]
+    public partial WeatherForecast[]? Forecasts { get; set; }
 
-    partial void OnInitializeSlices(SliceInitContext ctx)
+    partial void ConfigureState(__StateContext ctx)
     {
-        ctx.Forecasts
-           .InitializeFrom(() => WeatherSvc.GetForecastAsync());
+        ctx.Forecasts.LoadFrom(() => WeatherSvc.GetForecastAsync());
     }
 
     private async Task Refresh()
     {
-        _forecasts.Value = await WeatherSvc.GetForecastAsync();
+        Forecasts = await WeatherSvc.GetForecastAsync();
         Logger.LogInformation("Forecasts refreshed at {Time}", DateTimeOffset.UtcNow);
     }
 }
