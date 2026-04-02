@@ -19,7 +19,7 @@ public partial class Board : ComponentBase
     {
         ctx.BoardState
             .KeySuffix(Project.SelectedProject.Id)
-            .LoadFrom(() => TaskService.GetBoardAsync(Project.SelectedProject.Id));
+            .LoadFrom(async () => (BoardData?)await TaskService.GetBoardAsync(Project.SelectedProject.Id));
     }
 
     private void MoveTask(TaskItem task, string from, string to)

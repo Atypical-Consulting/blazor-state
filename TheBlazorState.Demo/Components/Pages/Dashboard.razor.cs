@@ -19,7 +19,7 @@ public partial class Dashboard : ComponentBase
     {
         ctx.Stats
             .KeySuffix(Project.SelectedProject.Id)
-            .LoadFrom(() => StatsService.GetDashboardAsync(Project.SelectedProject.Id));
+            .LoadFrom(async () => (DashboardData?)await StatsService.GetDashboardAsync(Project.SelectedProject.Id));
     }
 
     private async Task Refresh()
