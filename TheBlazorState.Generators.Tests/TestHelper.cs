@@ -46,8 +46,9 @@ public static class TestHelper
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
         var persistGenerator = new PersistIncrementalGenerator();
+        var sharedGenerator = new SharedIncrementalGenerator();
 
-        GeneratorDriver driver = CSharpGeneratorDriver.Create(persistGenerator);
+        GeneratorDriver driver = CSharpGeneratorDriver.Create(persistGenerator, sharedGenerator);
         driver = driver.RunGeneratorsAndUpdateCompilation(compilation, out _, out _);
 
         return driver.GetRunResult();
