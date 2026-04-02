@@ -1,0 +1,135 @@
+- generic [ref=e2]:
+  - complementary [ref=e3]:
+    - generic [ref=e4]:
+      - heading "TaskFlow" [active] [level=1] [ref=e5]
+      - paragraph [ref=e6]: TheBlazorState Demo
+    - generic [ref=e7]:
+      - paragraph [ref=e8]: Projects
+      - button "Marketing" [ref=e9]: Marketing
+      - button "Engineering" [ref=e11]: Engineering
+      - button "Design" [ref=e13]: Design
+    - generic [ref=e15]:
+      - paragraph [ref=e16]: Views
+      - link "Dashboard" [ref=e17] [cursor=pointer]:
+        - /url: ""
+        - img [ref=e18]
+        - text: Dashboard
+      - link "Board" [ref=e20] [cursor=pointer]:
+        - /url: board
+        - img [ref=e21]
+        - text: Board
+      - link "Settings" [ref=e23] [cursor=pointer]:
+        - /url: settings
+        - img [ref=e24]
+        - text: Settings
+    - paragraph [ref=e28]: Powered by TheBlazorState
+  - main [ref=e29]:
+    - generic [ref=e30]:
+      - generic [ref=e120]:
+        - heading "Board" [level=1] [ref=e121]
+        - paragraph [ref=e122]: Marketing — Kanban view
+      - generic [ref=e123]:
+        - img [ref=e124]
+        - text: Board restored from cache — instant render
+      - generic [ref=e126]:
+        - generic [ref=e127]:
+          - generic [ref=e128]:
+            - heading "To Do" [level=3] [ref=e129]
+            - text: "4"
+          - generic [ref=e130]:
+            - generic [ref=e131]:
+              - paragraph [ref=e132]: Write blog post
+              - generic [ref=e133]:
+                - generic [ref=e134]: High AL
+                - button "Move right" [ref=e136]:
+                  - img
+            - generic [ref=e138]:
+              - paragraph [ref=e139]: Design social media graphics
+              - generic [ref=e140]:
+                - generic [ref=e141]: Medium BO
+                - button "Move right" [ref=e143]:
+                  - img
+            - generic [ref=e145]:
+              - paragraph [ref=e146]: Plan Q3 campaign
+              - generic [ref=e147]:
+                - generic [ref=e148]: Low CA
+                - button "Move right" [ref=e150]:
+                  - img
+            - generic [ref=e152]:
+              - paragraph [ref=e153]: Update landing page copy
+              - generic [ref=e154]:
+                - generic [ref=e155]: Medium AL
+                - button "Move right" [ref=e157]:
+                  - img
+        - generic [ref=e159]:
+          - generic [ref=e160]:
+            - heading "In Progress" [level=3] [ref=e161]
+            - text: "3"
+          - generic [ref=e162]:
+            - generic [ref=e163]:
+              - paragraph [ref=e164]: A/B test email subject lines
+              - generic [ref=e165]:
+                - generic [ref=e166]: High BO
+                - generic [ref=e167]:
+                  - button "Move left" [ref=e168]:
+                    - img
+                  - button "Move right" [ref=e170]:
+                    - img
+            - generic [ref=e172]:
+              - paragraph [ref=e173]: Prepare press kit
+              - generic [ref=e174]:
+                - generic [ref=e175]: Medium CA
+                - generic [ref=e176]:
+                  - button "Move left" [ref=e177]:
+                    - img
+                  - button "Move right" [ref=e179]:
+                    - img
+            - generic [ref=e181]:
+              - paragraph [ref=e182]: Review analytics report
+              - generic [ref=e183]:
+                - generic [ref=e184]: Low AL
+                - generic [ref=e185]:
+                  - button "Move left" [ref=e186]:
+                    - img
+                  - button "Move right" [ref=e188]:
+                    - img
+        - generic [ref=e190]:
+          - generic [ref=e191]:
+            - heading "Done" [level=3] [ref=e192]
+            - text: "5"
+          - generic [ref=e193]:
+            - generic [ref=e194]:
+              - paragraph [ref=e195]: Launch newsletter
+              - generic [ref=e196]:
+                - generic [ref=e197]: High BO
+                - button "Move left" [ref=e199]:
+                  - img
+            - generic [ref=e201]:
+              - paragraph [ref=e202]: Set up tracking pixels
+              - generic [ref=e203]:
+                - generic [ref=e204]: Medium CA
+                - button "Move left" [ref=e206]:
+                  - img
+            - generic [ref=e208]:
+              - paragraph [ref=e209]: Redesign email template
+              - generic [ref=e210]:
+                - generic [ref=e211]: Low AL
+                - button "Move left" [ref=e213]:
+                  - img
+            - generic [ref=e215]:
+              - paragraph [ref=e216]: Create brand guidelines
+              - generic [ref=e217]:
+                - generic [ref=e218]: High BO
+                - button "Move left" [ref=e220]:
+                  - img
+            - generic [ref=e222]:
+              - paragraph [ref=e223]: Audit competitor content
+              - generic [ref=e224]:
+                - generic [ref=e225]: Medium CA
+                - button "Move left" [ref=e227]:
+                  - img
+      - button "State Inspector" [ref=e230]:
+        - generic [ref=e231]:
+          - img [ref=e232]
+          - text: State Inspector
+        - img [ref=e234]
