@@ -57,6 +57,9 @@ internal sealed class StateSlice<T> : IStateSlice<T>
         if (WasRestored && !IsStale)
             return false;
 
+        if (EqualityComparer<T>.Default.Equals(_value, value))
+            return false;
+
         Value = value;
         return true;
     }
@@ -66,7 +69,12 @@ internal sealed class StateSlice<T> : IStateSlice<T>
         if (WasRestored && !IsStale)
             return false;
 
-        Value = await factory();
+        var value = await factory();
+
+        if (EqualityComparer<T>.Default.Equals(_value, value))
+            return false;
+
+        Value = value;
         return true;
     }
 

@@ -178,4 +178,20 @@ public class StateSliceTests
         await slice.InitializeIfNeededAsync(async () => 99);
         slice.Value.ShouldBe(99);
     }
+
+    [Fact]
+    public void InitializeIfNeeded_WhenNotRestored_SameValue_ReturnsFalse()
+    {
+        var slice = CreateSlice(42, wasRestored: false);
+        var result = slice.InitializeIfNeeded(42);
+        result.ShouldBeFalse();
+    }
+
+    [Fact]
+    public async Task InitializeIfNeededAsync_WhenNotRestored_SameValue_ReturnsFalse()
+    {
+        var slice = CreateSlice(42, wasRestored: false);
+        var result = await slice.InitializeIfNeededAsync(() => Task.FromResult(42));
+        result.ShouldBeFalse();
+    }
 }
