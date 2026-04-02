@@ -65,4 +65,11 @@ public class StorageStrategyTests
         var strategy = StorageStrategy.ServerMemoryCache();
         strategy.ShouldNotBeNull();
     }
+
+    [Fact]
+    public void StorageStrategy_Custom_Throws_When_Invoked_Directly()
+    {
+        var strategy = StorageStrategy.Custom("redis");
+        Should.Throw<InvalidOperationException>(() => strategy.RestoreAsync<string>("key").GetAwaiter().GetResult());
+    }
 }
