@@ -1,19 +1,28 @@
 # TheBlazorState
 
-Zero-boilerplate prerender-to-interactive state handoff for Blazor components (.NET 10+).
+Ergonomic state management for Blazor. Two attributes -- `[Persist]` for prerender-to-interactive persistence and `[Shared]` for cross-component reactive state -- cover the most common state challenges in Blazor apps. A Roslyn source generator handles all the wiring: no boilerplate, no base classes, no ceremony.
 
-> **What this is:** A source-generator-powered library that wraps `PersistentComponentState` to eliminate the manual `TryTakeFromJson` / `RegisterOnPersisting` / `IDisposable` ceremony.
->
-> **What this is NOT:** This library does **not** persist state across page refreshes, navigation, browser sessions, or server restarts. It handles the prerender-to-interactive handoff only — the moment between when the server renders HTML and when the interactive runtime takes over.
-
-## Setup
+## Quick Start
 
 ```csharp
 // Program.cs
 builder.Services.AddTheBlazorState();
 ```
 
-## Quick Comparison
+```csharp
+// Counter.razor.cs
+public partial class Counter : ComponentBase
+{
+    [Persist]
+    public partial int Count { get; set; }
+
+    private void Increment() => Count++;
+}
+```
+
+That is the entire setup. The source generator emits the backing field, persistence hooks, lifecycle overrides, and disposal logic.
+
+## Before / After
 
 ### Before (raw Blazor API)
 
@@ -54,132 +63,216 @@ builder.Services.AddTheBlazorState();
 ```csharp
 public partial class Weather : ComponentBase
 {
-    [Inject] private WeatherService WeatherSvc { get; set; } = null!;
+    [Inject] private WeatherService WeatherSvc { get; set; } = default!;
 
-    [Slice(TimeToLive = "00:05:00")]
-    private IStateSlice<WeatherForecast[]> _forecasts = null!;
+    [Persist(TimeToLive = "00:05:00")]
+    public partial WeatherForecast[]? Forecasts { get; set; }
 
-    partial void OnInitializeSlices(SliceInitContext ctx)
+    partial void ConfigureState(StateContext ctx)
     {
-        ctx.Forecasts.InitializeFrom(() => WeatherSvc.GetForecastAsync());
+        ctx.Forecasts.LoadFrom(() => WeatherSvc.GetForecastAsync());
     }
 }
 ```
 
-No `IDisposable`, no manual `TryTakeFromJson`, no `RegisterOnPersisting` callback. The source generator handles it all.
+No `IDisposable`, no manual `TryTakeFromJson`, no `RegisterOnPersisting` callback.
 
-## How It Works
+## `[Persist]` -- Prerender-to-Interactive Persistence
 
-1. Mark fields with `[Slice]` on a `partial class` that extends `ComponentBase`
-2. The source generator emits `OnInitialized` / `OnInitializedAsync` / `Dispose` overrides
-3. On prerender: `StateManager` registers an `OnPersisting` callback that serializes each slice's value as JSON into the prerendered HTML
-4. On interactive boot: `StateManager` calls `TryTakeFromJson` to restore each slice's value from the embedded JSON
-
-## Core Concepts
-
-### The `[Slice]` Attribute
-
-Marks a field of type `IStateSlice<T>` for automatic wiring:
+### Simple Property
 
 ```csharp
 public partial class Counter : ComponentBase
 {
-    [Slice]
-    private IStateSlice<int> _counter = null!;
-
-    partial void OnInitializeSlices(SliceInitContext ctx)
-    {
-        ctx.Counter.DefaultValue(Random.Shared.Next(100));
-    }
-
-    private void Increment() => _counter.Value++;
+    [Persist]
+    public partial int Count { get; set; }
 }
 ```
 
-### Runtime Configuration via `OnInitializeSlices`
+### With TTL
 
-The generated `SliceInitContext` provides a fluent builder per field:
+Mark data as stale after a duration. When the value exceeds its TTL, the `LoadFrom` factory runs instead of using the restored value:
 
 ```csharp
-partial void OnInitializeSlices(SliceInitContext ctx)
+[Persist(TimeToLive = "00:05:00")]
+public partial Product? Product { get; set; }
+```
+
+### Async Factory via ConfigureState
+
+The `ConfigureState` partial method provides a `StateContext` for runtime configuration. `LoadFrom` supplies an async factory that runs only when no fresh value was restored:
+
+```csharp
+partial void ConfigureState(StateContext ctx)
 {
-    ctx.Page
-       .KeySuffix(ProductId)          // Dynamic key: "ProductDetail.page:42"
-       .InitializeFrom(async () =>    // Async factory (skipped if restored)
-           new ProductPageState
-           {
-               Product = await Products.GetAsync(ProductId),
-               Reviews = await Reviews.GetSummaryAsync(ProductId)
-           });
+    ctx.Product.LoadFrom(() => ProductService.GetAsync(ProductId));
 }
 ```
 
-**Builder methods:**
-| Method | Description |
-|--------|-------------|
-| `DefaultValue(T value)` | Fallback value when nothing is restored |
-| `KeySuffix(params object[] parts)` | Append dynamic segments to the auto-derived key |
-| `KeyOverride(string key)` | Replace the auto-derived key entirely |
-| `InitializeFrom(Func<Task<T>> factory)` | Async factory called only when no restored value exists (or when stale) |
+### With `[Parameter]`
 
-### Staleness / TTL
-
-Flag state as stale after a duration. When the prerendered data is older than the TTL (e.g., cached by a CDN or delayed by a slow connection), the library falls back to the default and the `InitializeFrom` factory runs instead:
+A property can be both a Blazor parameter and persisted. The persisted value is available immediately when interactive mode starts, before the parent re-renders:
 
 ```csharp
-[Slice(TimeToLive = "00:05:00")]
-private IStateSlice<WeatherForecast[]> _forecasts = null!;
+[Persist, Parameter]
+public partial string? Theme { get; set; }
 ```
 
-### IStateSlice&lt;T&gt; Properties
+### Meta Companion
 
-| Property | Description |
-|----------|-------------|
-| `Value` | Get/set the current value. Fires `OnChanged` on mutation. |
-| `WasRestored` | `true` if the value was restored from prerendered state |
-| `IsDirty` | `true` if the value was modified after creation |
-| `IsStale` | `true` if the value has exceeded its configured TTL |
-| `LastUpdated` | UTC timestamp of last value change |
-| `OnChanged` | Event fired on every value change |
-| `InitializeIfNeeded(T)` | Sets value only if not restored (sync) |
-| `InitializeIfNeededAsync(Func<Task<T>>)` | Calls factory only if not restored (async) |
+Every `[Persist]` property `Foo` gets a generated read-only companion `FooMeta`:
 
-### Direct `StateManager` Usage
+| Property | Type | Description |
+|----------|------|-------------|
+| `WasRestored` | `bool` | `true` if the value was restored from persistence |
+| `IsDirty` | `bool` | `true` if the value was modified after initialization |
+| `IsStale` | `bool` | `true` if the value has exceeded its TTL |
+| `LastUpdated` | `DateTimeOffset` | UTC timestamp of last value change |
+| `OnChanged` | `Action` | Event fired on every value change |
 
-If you cannot use `[Slice]` (e.g., non-partial class), inject `StateManager` directly:
+```razor
+@if (ProductMeta.WasRestored)
+{
+    <span>Cached -- @ProductMeta.LastUpdated.LocalDateTime</span>
+}
+@if (ProductMeta.IsStale)
+{
+    <button @onclick="Refresh">Data is stale -- refresh</button>
+}
+```
+
+## `[Shared]` -- Cross-Component Reactive State
+
+Define a state class with `[Shared]` properties. Any component injecting the class re-renders automatically when a property changes.
+
+### Define State
 
 ```csharp
-@inject StateManager State
-@implements IDisposable
+public partial class CartState
+{
+    [Shared]
+    public partial List<CartItem> Items { get; set; } = [];
 
-@code {
-    private IStateSlice<string> UserName = default!;
+    [Shared]
+    public partial decimal Total { get; set; }
 
-    protected override void OnInitialized()
+    public void AddItem(CartItem item)
     {
-        UserName = State.CreateSlice("username", "Anonymous");
+        Items = [..Items, item];
+        Total = Items.Sum(i => i.Price * i.Quantity);
     }
-
-    void IDisposable.Dispose() => State.Dispose();
 }
 ```
 
-## Security
+Shared state classes are registered as scoped services automatically (one instance per circuit on Server, one per tab on WASM).
 
-Slice values are serialized as JSON into the prerendered HTML response and are visible in the page source. **Do not store sensitive data** (auth tokens, PII, secrets, role information) in state slices.
+### Inject and Use
+
+```razor
+@inject CartState Cart
+
+<span>Items: @Cart.Items.Count</span>
+<span>Total: @Cart.Total.ToString("C")</span>
+<button @onclick="() => Cart.AddItem(item)">Add</button>
+```
+
+No manual subscriptions. The generator wires `OnChanged` from each shared property to `StateHasChanged()` on consuming components and disposes subscriptions automatically.
+
+## `[Shared, Persist]` -- Composition
+
+The two attributes compose naturally. This means reactive across components AND survives browser refresh:
+
+```csharp
+public partial class UserPrefsState
+{
+    [Shared, Persist(TimeToLive = "24:00:00")]
+    public partial string Theme { get; set; } = "light";
+
+    partial void ConfigureState(StateContext ctx)
+    {
+        ctx.Theme.Storage = StorageStrategy.LocalStorage();
+    }
+}
+```
+
+## Storage Strategies
+
+The default storage uses the prerendered HTML (same as raw `PersistentComponentState`). Other strategies extend persistence beyond the prerender handoff.
+
+| Strategy | Survives prerender | Survives refresh | Survives session | Blazor Server | Blazor WASM |
+|----------|:-:|:-:|:-:|:-:|:-:|
+| `StorageStrategy.PrerenderHtml()` | yes | no | no | yes | yes |
+| `StorageStrategy.ServerMemoryCache()` | yes | yes* | no | yes | no |
+| `StorageStrategy.SessionStorage()` | yes | yes | no | no | yes |
+| `StorageStrategy.LocalStorage()` | yes | yes | yes | no | yes |
+| `StorageStrategy.IndexedDb()` | yes | yes | yes | no | yes |
+
+\* with sliding expiration
+
+Storage is resolved in priority order: **Property-level > Component/StateClass-level > Global > PrerenderHtml()**.
+
+### Global Default
+
+```csharp
+builder.Services.AddTheBlazorState(options =>
+{
+    options.DefaultStorage = StorageStrategy.LocalStorage();
+});
+```
+
+### Custom Strategies
+
+Implement `IStorageStrategy` and register:
+
+```csharp
+builder.Services.AddTheBlazorState(options =>
+{
+    options.AddStorage<RedisStorageStrategy>("redis");
+});
+
+// In ConfigureState:
+ctx.Product.Storage = StorageStrategy.Custom("redis");
+```
+
+## ConfigureState Reference
+
+The `ConfigureState` partial method provides a `StateContext` with per-property configuration:
+
+| Method / Property | Description |
+|-------------------|-------------|
+| `LoadFrom(Func<Task<T>> factory)` | Async factory called during `OnInitializedAsync` when value was not restored or is stale |
+| `KeySuffix(params object[] parts)` | Appends dynamic segments to the auto-derived storage key |
+| `KeyOverride(string key)` | Replaces the auto-derived storage key entirely |
+| `Storage` | Sets the storage strategy for this property (overrides component/global default) |
+
+Component-level storage can be set on the context itself:
+
+```csharp
+partial void ConfigureState(StateContext ctx)
+{
+    ctx.Storage = StorageStrategy.SessionStorage(); // applies to all [Persist] in this component
+    ctx.Product.LoadFrom(() => ProductService.GetAsync(ProductId));
+    ctx.Product.KeySuffix(ProductId);
+}
+```
 
 ## Diagnostics
 
 The source generator emits compile-time diagnostics:
 
-| ID | Severity | Description |
-|---|---|---|
-| BSP001 | Error | `[Slice]` on non-partial class |
-| BSP002 | Error | Field type is not `IStateSlice<T>` |
-| BSP003 | Error | Class doesn't inherit `ComponentBase` |
-| BSP005 | Error | Invalid `TimeToLive` format |
-| BSP006 | Warning | Class already implements `IDisposable` — call `__DisposeSlices()` manually |
-| BSP007 | Error | Duplicate slice keys |
-| BSP008 | Error | `[Slice]` on static field |
-| BSP011 | Warning | Class overrides `OnInitialized` — use `OnAfterSlicesCreated` instead |
-| BSP012 | Warning | Field has initializer (will be overwritten by generator) |
+| Code | Severity | Description |
+|------|----------|-------------|
+| `TBS001` | Error | `[Persist]` or `[Shared]` on non-partial property |
+| `TBS002` | Error | `[Persist]` or `[Shared]` on non-partial class |
+| `TBS003` | Warning | `[Persist]` on a shared state class property without `[Shared]` (probably a mistake) |
+| `TBS004` | Error | Invalid `TimeToLive` format |
+| `TBS005` | Warning | `ConfigureState` references a property without `[Persist]` or `[Shared]` |
+
+## Security
+
+Values persisted to browser storage (LocalStorage, SessionStorage, IndexedDb) or prerender HTML are visible to the user in the page source or browser developer tools. **Do not persist sensitive data** (auth tokens, passwords, PII, role claims) without a custom encrypted storage strategy.
+
+## Requirements
+
+- .NET 10+
+- Blazor Server, Blazor WebAssembly, or Blazor United (Auto render mode)
