@@ -13,6 +13,13 @@ public sealed class BrowserStorageService
     private readonly SemaphoreSlim _moduleLock = new(1, 1);
     private IJSObjectReference? _module;
 
+    // Blazor's SignalR hub serializes JS interop arguments with camelCase (JsonSerializerDefaults.Web).
+    // We must deserialize with case-insensitive matching to handle both PascalCase and camelCase.
+    private static readonly JsonSerializerOptions DeserializeOptions = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
+
     public BrowserStorageService(IJSRuntime jsRuntime)
     {
         _jsRuntime = jsRuntime;
@@ -50,7 +57,7 @@ public sealed class BrowserStorageService
             if (raw is null || raw.Value.ValueKind == JsonValueKind.Null || raw.Value.ValueKind == JsonValueKind.Undefined)
                 return new StorageResult<T>(false, default, null);
 
-            var envelope = JsonSerializer.Deserialize<StorageEnvelope<T>>(raw.Value.GetRawText());
+            var envelope = JsonSerializer.Deserialize<StorageEnvelope<T>>(raw.Value.GetRawText(), DeserializeOptions);
             if (envelope is null)
                 return new StorageResult<T>(false, default, null);
 

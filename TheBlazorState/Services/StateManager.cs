@@ -140,10 +140,6 @@ public sealed class StateManager(
         StateMeta meta,
         Action<T> valueSetter)
     {
-        // Skip if already restored by the sync path
-        if (meta.WasRestored)
-            return;
-
         // Resolve effective strategy
         var effective = strategy ?? options.DefaultStorage;
 
@@ -151,6 +147,11 @@ public sealed class StateManager(
         if (effective is PrerenderHtmlStrategy or ServerMemoryCacheStrategy)
             return;
 
+        // For browser strategies (LocalStorage, SessionStorage, IndexedDB), ALWAYS
+        // attempt restore even if the sync path already restored from prerender HTML
+        // or server cache. During prerender, JS interop is unavailable so the factory
+        // may have overwritten user-modified data. Browser storage holds the user's
+        // truth and must get the final word.
         try
         {
             var result = await effective.RestoreAsync<T>(key);
