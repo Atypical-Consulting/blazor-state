@@ -104,7 +104,7 @@
     <div class="bg-white dark:bg-canvas-900 rounded-xl border border-canvas-200 dark:border-canvas-800 p-5">
         <h2 class="text-xs font-mono font-semibold text-canvas-500 dark:text-canvas-400 uppercase tracking-wider mb-4">Dropdown / Menu</h2>
         <div class="flex items-center gap-4">
-            <Dropdown>
+            <Dropdown class="relative">
                 <DropdownTrigger class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-canvas-100 dark:bg-canvas-800 text-canvas-700 dark:text-canvas-300 hover:bg-canvas-200 dark:hover:bg-canvas-700 transition-colors">
                     Actions
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
@@ -131,31 +131,34 @@
 <section class="animate-fade-up stagger-5 mb-8">
     <div class="bg-white dark:bg-canvas-900 rounded-xl border border-canvas-200 dark:border-canvas-800 p-5">
         <h2 class="text-xs font-mono font-semibold text-canvas-500 dark:text-canvas-400 uppercase tracking-wider mb-4">Dialog / Modal</h2>
-        <Dialog @bind-Open="_dialogOpen">
-            <DialogTrigger class="px-4 py-2 rounded-lg text-sm font-medium bg-rose-500 text-white hover:bg-rose-600 transition-colors">
-                Delete Item
-            </DialogTrigger>
-            <DialogOverlay class="fixed inset-0 bg-black/50 z-40" />
-            <DialogContent class="fixed inset-0 z-50 flex items-center justify-center p-4">
-                <div class="bg-white dark:bg-canvas-900 rounded-xl border border-canvas-200 dark:border-canvas-800 shadow-xl max-w-md w-full p-6">
-                    <DialogTitle class="font-display text-lg font-bold text-canvas-900 dark:text-canvas-50">
-                        Confirm Delete
-                    </DialogTitle>
-                    <p class="mt-2 text-sm text-canvas-600 dark:text-canvas-400">
-                        Are you sure you want to delete this item? This action cannot be undone.
-                    </p>
-                    <div class="mt-6 flex gap-3 justify-end">
-                        <DialogClose class="px-4 py-2 rounded-lg text-sm font-medium bg-canvas-100 dark:bg-canvas-800 text-canvas-700 dark:text-canvas-300 hover:bg-canvas-200 dark:hover:bg-canvas-700 transition-colors">
-                            Cancel
-                        </DialogClose>
-                        <button @onclick="ConfirmDelete"
-                                class="px-4 py-2 rounded-lg text-sm font-medium bg-rose-500 text-white hover:bg-rose-600 transition-colors">
-                            Delete
-                        </button>
-                    </div>
-                </div>
-            </DialogContent>
-        </Dialog>
+        <button @onclick="() => _dialogOpen = true"
+                class="px-4 py-2 rounded-lg text-sm font-medium bg-rose-500 text-white hover:bg-rose-600 transition-colors">
+            Delete Item
+        </button>
         <span class="ml-4 text-sm text-canvas-500 dark:text-canvas-500 font-mono">Dialog open: @_dialogOpen</span>
     </div>
 </section>
+
+@* Dialog rendered at page root to avoid ancestor transforms breaking fixed positioning *@
+<Dialog @bind-Open="_dialogOpen">
+    <DialogOverlay class="fixed inset-0 bg-black/50 z-40" />
+    <DialogContent class="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-canvas-900 rounded-xl border border-canvas-200 dark:border-canvas-800 shadow-xl max-w-md w-full p-6">
+            <DialogTitle class="font-display text-lg font-bold text-canvas-900 dark:text-canvas-50">
+                Confirm Delete
+            </DialogTitle>
+            <p class="mt-2 text-sm text-canvas-600 dark:text-canvas-400">
+                Are you sure you want to delete this item? This action cannot be undone.
+            </p>
+            <div class="mt-6 flex gap-3 justify-end">
+                <DialogClose class="px-4 py-2 rounded-lg text-sm font-medium bg-canvas-100 dark:bg-canvas-800 text-canvas-700 dark:text-canvas-300 hover:bg-canvas-200 dark:hover:bg-canvas-700 transition-colors">
+                    Cancel
+                </DialogClose>
+                <button @onclick="ConfirmDelete"
+                        class="px-4 py-2 rounded-lg text-sm font-medium bg-rose-500 text-white hover:bg-rose-600 transition-colors">
+                    Delete
+                </button>
+            </div>
+        </div>
+    </DialogContent>
+</Dialog>
