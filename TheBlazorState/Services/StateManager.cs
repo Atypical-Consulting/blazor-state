@@ -118,6 +118,11 @@ public sealed class StateManager(
             // Always update server cache eagerly
             cache.Set(key, new PersistedEnvelope<T> { Value = value, PersistedAt = now }, CacheEntryOptions);
 
+            // When SuppressPersist is set (e.g. cross-tab sync), skip writing back
+            // to browser storage to prevent infinite feedback loops between tabs.
+            if (meta.SuppressPersist)
+                return;
+
             // Write to browser strategy eagerly (fire-and-forget on circuit thread)
             if (effectiveStrategy is not PrerenderHtmlStrategy and not ServerMemoryCacheStrategy)
             {
@@ -137,6 +142,10 @@ public sealed class StateManager(
                     {
                         valueSetter(envelope.Value);
                         meta.MarkDirty();
+                        // Suppress persist to prevent writing back to localStorage,
+                        // which would trigger a storage event in the originating tab
+                        // and create an infinite loop.
+                        meta.SuppressPersist = true;
                         meta.RaiseChanged();
                     }
                 }

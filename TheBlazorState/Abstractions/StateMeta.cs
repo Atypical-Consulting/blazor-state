@@ -30,6 +30,15 @@ public sealed class StateMeta
     /// <summary>UTC timestamp of last value change or restore.</summary>
     public DateTimeOffset LastUpdated { get; private set; }
 
+    /// <summary>
+    /// When true, the next <see cref="RaiseChanged"/> call should NOT trigger
+    /// persistence side-effects (e.g. writing back to browser storage).
+    /// Used by cross-tab sync to prevent infinite feedback loops.
+    /// Reset automatically after <see cref="RaiseChanged"/> fires.
+    /// </summary>
+    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+    public bool SuppressPersist { get; set; }
+
     /// <summary>Fires whenever the property value changes.</summary>
     public event Action? OnChanged;
 
@@ -51,7 +60,11 @@ public sealed class StateMeta
 
     /// <summary>Called by generated code to raise the OnChanged event.</summary>
     [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-    public void RaiseChanged() => OnChanged?.Invoke();
+    public void RaiseChanged()
+    {
+        OnChanged?.Invoke();
+        SuppressPersist = false;
+    }
 
     /// <summary>Called by generated code during Dispose to detach all handlers.</summary>
     [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
