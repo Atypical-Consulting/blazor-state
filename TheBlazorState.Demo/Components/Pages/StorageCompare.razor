@@ -1,0 +1,103 @@
+@page "/storage-compare"
+
+<PageTitle>Storage Strategies — TaskFlow</PageTitle>
+
+<div class="mb-6 animate-fade-up">
+    <h1 class="font-display text-2xl font-bold text-canvas-900 dark:text-canvas-50">Storage Strategies</h1>
+    <p class="text-sm text-canvas-500 dark:text-canvas-500 mt-1">Live comparison of all five persistence strategies</p>
+</div>
+
+<TryItHint Id="storage-compare" Text="Click 'Set Value' to write a timestamp to all five strategies, then try: refresh the page, close and reopen the tab, or open in a new tab." />
+
+<!-- Set Value Button -->
+<div class="mb-6 animate-fade-up stagger-1">
+    <button @onclick="SetAll"
+            class="px-5 py-2.5 bg-signal-500 hover:bg-signal-600 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        Set Value (timestamp to all strategies)
+    </button>
+</div>
+
+<!-- Strategy Cards -->
+<div class="grid grid-cols-1 md:grid-cols-5 gap-3 mb-8 animate-fade-up stagger-2">
+    @foreach (var s in Strategies)
+    {
+        <div class="bg-white dark:bg-canvas-900 rounded-xl border border-canvas-200 dark:border-canvas-800 p-4 relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-0.5 @s.AccentClass"></div>
+            <p class="font-mono font-medium text-canvas-700 dark:text-canvas-300 text-xs mb-1">@s.Name</p>
+            <p class="text-[10px] text-canvas-400 dark:text-canvas-500 mb-3">@s.Description</p>
+            <div class="bg-canvas-50 dark:bg-canvas-950 rounded-lg px-3 py-2 border border-canvas-200 dark:border-canvas-800 mb-2">
+                <p class="font-mono text-xs text-canvas-700 dark:text-canvas-300 truncate">@s.Value</p>
+            </div>
+            <StateBadge Value="s.WasRestored" TrueLabel="Restored" FalseLabel="Fresh" />
+        </div>
+    }
+</div>
+
+<!-- Survival Matrix -->
+<div class="animate-fade-up stagger-3 bg-white dark:bg-canvas-900 rounded-xl border border-canvas-200 dark:border-canvas-800 overflow-hidden mb-6">
+    <div class="px-5 py-4 border-b border-canvas-100 dark:border-canvas-800">
+        <h2 class="text-xs font-mono font-semibold text-canvas-500 dark:text-canvas-400 uppercase tracking-wider">Survival Matrix</h2>
+    </div>
+    <div class="p-4 overflow-x-auto">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="text-left text-[10px] font-mono text-canvas-400 dark:text-canvas-600 uppercase tracking-widest">
+                    <th class="pb-3 pr-4">Strategy</th>
+                    <th class="pb-3 pr-4 text-center">Prerender</th>
+                    <th class="pb-3 pr-4 text-center">Page Refresh</th>
+                    <th class="pb-3 pr-4 text-center">New Tab</th>
+                    <th class="pb-3 text-center">Browser Restart</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-canvas-100 dark:divide-canvas-800">
+                @{ SurvivalRow("PrerenderHtml", true, false, false, false); }
+                @{ SurvivalRow("ServerMemoryCache", true, true, true, false); }
+                @{ SurvivalRow("SessionStorage", true, true, false, false); }
+                @{ SurvivalRow("LocalStorage", true, true, true, true); }
+                @{ SurvivalRow("IndexedDB", true, true, true, true); }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@{ void SurvivalRow(string name, bool prerender, bool refresh, bool newTab, bool restart)
+{
+    <tr class="hover:bg-canvas-50 dark:hover:bg-canvas-800/50 transition-colors">
+        <td class="py-2.5 pr-4 font-mono text-xs font-medium text-canvas-700 dark:text-canvas-300">@name</td>
+        <td class="py-2.5 pr-4 text-center">@SurvivalIcon(prerender)</td>
+        <td class="py-2.5 pr-4 text-center">@SurvivalIcon(refresh)</td>
+        <td class="py-2.5 pr-4 text-center">@SurvivalIcon(newTab)</td>
+        <td class="py-2.5 text-center">@SurvivalIcon(restart)</td>
+    </tr>
+} }
+
+@{ RenderFragment SurvivalIcon(bool survives) => survives
+    ? @<span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 text-xs">✓</span>
+    : @<span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-canvas-100 dark:bg-canvas-800 text-canvas-400 dark:text-canvas-600 text-xs">✗</span>;
+}
+
+<CodeSnippet Title="View source: Five Storage Strategies"
+             Code="<span class='text-signal-400'>[Persist]</span>
+<span class='text-emerald-400'>public partial string</span>? PrerenderValue { get; set; }  <span class='text-canvas-500'>// default</span>
+
+<span class='text-signal-400'>[Persist]</span>
+<span class='text-emerald-400'>public partial string</span>? ServerCacheValue { get; set; }
+
+<span class='text-signal-400'>[Persist]</span>
+<span class='text-emerald-400'>public partial string</span>? SessionValue { get; set; }
+
+<span class='text-signal-400'>[Persist]</span>
+<span class='text-emerald-400'>public partial string</span>? LocalValue { get; set; }
+
+<span class='text-signal-400'>[Persist]</span>
+<span class='text-emerald-400'>public partial string</span>? IndexedDbValue { get; set; }
+
+<span class='text-emerald-400'>partial void</span> ConfigureState(__StateContext ctx)
+{
+    <span class='text-canvas-500'>// PrerenderValue uses default — no config needed</span>
+    ctx.ServerCacheValue.<span class='text-sky-400'>Storage</span> = StorageStrategy.<span class='text-signal-400'>ServerMemoryCache</span>();
+    ctx.SessionValue.<span class='text-sky-400'>Storage</span> = StorageStrategy.<span class='text-signal-400'>SessionStorage</span>();
+    ctx.LocalValue.<span class='text-sky-400'>Storage</span> = StorageStrategy.<span class='text-signal-400'>LocalStorage</span>();
+    ctx.IndexedDbValue.<span class='text-sky-400'>Storage</span> = StorageStrategy.<span class='text-signal-400'>IndexedDb</span>();
+}" />

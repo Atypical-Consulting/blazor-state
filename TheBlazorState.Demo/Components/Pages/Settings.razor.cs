@@ -3,6 +3,7 @@ using Microsoft.JSInterop;
 using TheBlazorState.Attributes;
 using TheBlazorState.Demo.State;
 using TheBlazorState.Demo.Components.Shared;
+using TheBlazorState.Demo.Services;
 using TheBlazorState.Storage;
 
 namespace TheBlazorState.Demo.Components.Pages;
@@ -11,6 +12,7 @@ public partial class Settings : ComponentBase
 {
     [Inject] public ThemeState Theme { get; set; } = default!;
     [Inject] public IJSRuntime JS { get; set; } = default!;
+    [Inject] private StateInspectorService Inspector { get; set; } = default!;
 
     [Persist]
     public partial string? SavedTheme { get; set; }
@@ -56,9 +58,13 @@ public partial class Settings : ComponentBase
         await JS.InvokeVoidAsync("setDensityClass", density);
     }
 
-    private List<StateInspectorEntry> InspectorEntries =>
-    [
-        new("SavedTheme", "LocalStorage", SavedThemeMeta),
-        new("SavedDensity", "LocalStorage", SavedDensityMeta)
-    ];
+    protected override void OnParametersSet()
+    {
+        Inspector.Register("Settings",
+        [
+            new("SavedTheme", "LocalStorage", SavedThemeMeta),
+            new("SavedDensity", "LocalStorage", SavedDensityMeta)
+        ]);
+    }
+
 }

@@ -7,6 +7,8 @@
     <p class="text-sm text-canvas-500 dark:text-canvas-500 mt-1">Preferences persisted to localStorage</p>
 </div>
 
+<TryItHint Id="settings" Text="Change the theme, close the browser, reopen it — your preference survives thanks to localStorage persistence." />
+
 @if (SavedThemeMeta?.WasRestored == true)
 {
     <div class="mb-6 flex items-center gap-2 text-xs text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 px-3 py-2 rounded-lg animate-fade-up">
@@ -82,7 +84,21 @@
                 <p class="text-xs text-canvas-400 dark:text-canvas-500 mt-0.5">Survives refresh, clears on tab close</p>
             </div>
         </div>
+        <p class="text-xs text-canvas-400 dark:text-canvas-500 mt-4">
+            See the <a href="storage-compare" class="font-mono text-signal-500 hover:text-signal-400 underline underline-offset-2">Storage Strategies</a> page for a live interactive comparison.
+        </p>
     </div>
 </div>
 
-<StateInspector Entries="InspectorEntries" />
+<CodeSnippet Title="View source: Persist + LocalStorage (Preferences)"
+             Code="<span class='text-signal-400'>[Persist]</span>
+<span class='text-emerald-400'>public partial</span> <span class='text-sky-400'>string</span>? SavedTheme { get; set; }
+
+<span class='text-signal-400'>[Persist]</span>
+<span class='text-emerald-400'>public partial</span> <span class='text-sky-400'>string</span>? SavedDensity { get; set; }
+
+<span class='text-emerald-400'>partial void</span> ConfigureState(__StateContext ctx)
+{
+    ctx.SavedTheme.<span class='text-sky-400'>Storage</span> = StorageStrategy.<span class='text-signal-400'>LocalStorage</span>();
+    ctx.SavedDensity.<span class='text-sky-400'>Storage</span> = StorageStrategy.<span class='text-signal-400'>LocalStorage</span>();
+}" />

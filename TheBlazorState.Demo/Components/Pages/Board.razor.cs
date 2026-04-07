@@ -12,6 +12,7 @@ public partial class Board : ComponentBase
 {
     [Inject] public ProjectState Project { get; set; } = default!;
     [Inject] private TaskService TaskService { get; set; } = default!;
+    [Inject] private StateInspectorService Inspector { get; set; } = default!;
 
     private int _lastProjectId;
 
@@ -25,6 +26,11 @@ public partial class Board : ComponentBase
             .KeySuffix(Project.SelectedProject.Id)
             .LoadFrom(async () => (BoardData?)await TaskService.GetBoardAsync(Project.SelectedProject.Id));
         ctx.BoardState.Storage = StorageStrategy.LocalStorage();
+    }
+
+    protected override void OnParametersSet()
+    {
+        Inspector.Register("Board", [new("BoardState", "LocalStorage", BoardStateMeta)]);
     }
 
     private void MoveTask(TaskItem task, string from, string to)
@@ -68,8 +74,4 @@ public partial class Board : ComponentBase
             _ => "bg-sky-500"
         };
 
-    private List<StateInspectorEntry> InspectorEntries =>
-    [
-        new("BoardState", "LocalStorage", BoardStateMeta)
-    ];
 }

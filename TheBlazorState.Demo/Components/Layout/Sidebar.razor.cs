@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using TheBlazorState.Attributes;
 using TheBlazorState.Demo.Models;
 using TheBlazorState.Demo.Services;
@@ -12,6 +13,9 @@ public partial class Sidebar : ComponentBase
     [Inject] public ProjectService ProjectSvc { get; set; } = default!;
     [Inject] public ProjectState ProjectState { get; set; } = default!;
     [Inject] public NavigationManager Nav { get; set; } = default!;
+    [Inject] public IJSRuntime JS { get; set; } = default!;
+
+    [Parameter] public EventCallback OnClose { get; set; }
 
     [Persist]
     public partial int? SavedProjectId { get; set; }
@@ -38,5 +42,11 @@ public partial class Sidebar : ComponentBase
     {
         ProjectState.SelectedProject = project;
         SavedProjectId = project.Id;
+    }
+
+    private async Task ResetAllState()
+    {
+        await JS.InvokeVoidAsync("clearAllBlazorState");
+        Nav.NavigateTo("/", forceLoad: true);
     }
 }

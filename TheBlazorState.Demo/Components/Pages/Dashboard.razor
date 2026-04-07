@@ -7,6 +7,8 @@
     <p class="text-sm text-canvas-500 dark:text-canvas-500 mt-1">@Project.SelectedProject.Name project overview</p>
 </div>
 
+<TryItHint Id="dashboard" Text="Wait 2 minutes for TTL expiry (a stale banner appears), or refresh the page to see prerender cache restore in action." />
+
 @if (Stats is null)
 {
     <div class="flex items-center gap-3 text-canvas-400 dark:text-canvas-600 py-12">
@@ -71,5 +73,16 @@ else
         </ul>
     </div>
 
-    <StateInspector Entries="InspectorEntries" />
+    <CodeSnippet Title="View source: Persist + TTL + Prerender Cache"
+                 Code="<span class='text-signal-400'>[Persist(TimeToLive = &quot;00:02:00&quot;)]</span>
+<span class='text-emerald-400'>public partial</span> DashboardData? <span class='text-sky-400'>Stats</span> { get; set; }
+
+<span class='text-canvas-500'>// ConfigureState — runs during OnInitialized</span>
+<span class='text-emerald-400'>partial void</span> ConfigureState(__StateContext ctx)
+{
+    ctx.Stats
+        .<span class='text-sky-400'>KeySuffix</span>(Project.SelectedProject.Id)
+        .<span class='text-sky-400'>LoadFrom</span>(<span class='text-emerald-400'>async</span> () =&gt;
+            <span class='text-emerald-400'>await</span> StatsService.GetDashboardAsync(id));
+}" />
 }

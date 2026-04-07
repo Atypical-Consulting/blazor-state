@@ -13,8 +13,10 @@ builder.Services.AddTheBlazorState();
 builder.Services.AddScoped<ProjectService>();
 builder.Services.AddScoped<TaskService>();
 builder.Services.AddScoped<StatsService>();
+builder.Services.AddScoped<StateInspectorService>();
 builder.Services.AddScoped<ProjectState>();
 builder.Services.AddScoped<ThemeState>();
+builder.Services.AddScoped<CrossTabState>();
 
 var app = builder.Build();
 

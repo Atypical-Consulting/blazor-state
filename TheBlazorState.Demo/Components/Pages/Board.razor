@@ -7,6 +7,8 @@
     <p class="text-sm text-canvas-500 dark:text-canvas-500 mt-1">@Project.SelectedProject.Name — Kanban view</p>
 </div>
 
+<TryItHint Id="board" Text="Move a task between columns, then refresh the page — your changes persist in localStorage." />
+
 @if (BoardState is null)
 {
     <div class="flex items-center gap-3 text-canvas-400 dark:text-canvas-600 py-12">
@@ -30,7 +32,6 @@ else
         @{ RenderColumn("Done", BoardState.Done, "done", "inprogress", null); }
     </div>
 
-    <StateInspector Entries="InspectorEntries" />
 }
 
 @{ void RenderColumn(string title, List<TaskItem> tasks, string columnId, string? prevColumn, string? nextColumn)
@@ -82,3 +83,16 @@ else
         </div>
     </div>
 } }
+
+    <CodeSnippet Title="View source: Persist + LocalStorage"
+                 Code="<span class='text-signal-400'>[Persist(TimeToLive = &quot;00:05:00&quot;)]</span>
+<span class='text-emerald-400'>public partial</span> BoardData? <span class='text-sky-400'>BoardState</span> { get; set; }
+
+<span class='text-emerald-400'>partial void</span> ConfigureState(__StateContext ctx)
+{
+    ctx.BoardState
+        .<span class='text-sky-400'>KeySuffix</span>(Project.SelectedProject.Id)
+        .<span class='text-sky-400'>LoadFrom</span>(<span class='text-emerald-400'>async</span> () =&gt;
+            <span class='text-emerald-400'>await</span> TaskService.GetBoardAsync(id));
+    ctx.BoardState.<span class='text-sky-400'>Storage</span> = StorageStrategy.<span class='text-signal-400'>LocalStorage</span>();
+}" />

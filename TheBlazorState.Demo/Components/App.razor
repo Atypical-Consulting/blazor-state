@@ -1,6 +1,18 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
+    <script>
+        // Apply saved theme/density immediately to prevent flash of wrong theme
+        (function() {
+            try {
+                var t = localStorage.getItem('Settings.SavedTheme');
+                if (t) { var v = JSON.parse(t).value; if (v === 'dark') document.documentElement.classList.add('dark'); }
+                else { document.documentElement.classList.add('dark'); } // default to dark
+                var d = localStorage.getItem('Settings.SavedDensity');
+                if (d) { var v = JSON.parse(d).value; if (v === 'compact') document.documentElement.classList.add('density-compact'); }
+            } catch(e) { document.documentElement.classList.add('dark'); }
+        })();
+    </script>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <base href="/" />
@@ -52,9 +64,15 @@
             to { opacity: 1; transform: translateX(0); }
         }
 
+        @@keyframes slide-up {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
         .animate-signal { animation: signal-pulse 2s ease-in-out infinite; }
         .animate-fade-up { animation: fade-up 0.4s ease-out both; }
         .animate-slide-in { animation: slide-in 0.3s ease-out both; }
+        .animate-slide-up { animation: slide-up 0.3s ease-out both; }
 
         .stagger-1 { animation-delay: 0.05s; }
         .stagger-2 { animation-delay: 0.1s; }
@@ -131,6 +149,16 @@
             } else {
                 document.documentElement.classList.remove("density-compact");
             }
+        };
+        window.clearAllBlazorState = function () {
+            var keysToRemove = [];
+            for (var i = 0; i < localStorage.length; i++) {
+                keysToRemove.push(localStorage.key(i));
+            }
+            keysToRemove.forEach(function (k) { localStorage.removeItem(k); });
+            sessionStorage.clear();
+            indexedDB.deleteDatabase("TheBlazorState");
+            return true;
         };
     </script>
 </body>

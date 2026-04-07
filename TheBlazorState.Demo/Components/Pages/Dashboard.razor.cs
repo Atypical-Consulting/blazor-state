@@ -11,6 +11,7 @@ public partial class Dashboard : ComponentBase
 {
     [Inject] public ProjectState Project { get; set; } = default!;
     [Inject] private StatsService StatsService { get; set; } = default!;
+    [Inject] private StateInspectorService Inspector { get; set; } = default!;
 
     private int _lastProjectId;
 
@@ -23,18 +24,17 @@ public partial class Dashboard : ComponentBase
         ctx.Stats
             .KeySuffix(Project.SelectedProject.Id)
             .LoadFrom(async () => (DashboardData?)await StatsService.GetDashboardAsync(Project.SelectedProject.Id));
+    }
 
+    protected override void OnParametersSet()
+    {
+        Inspector.Register("Dashboard", [new("Stats", "PrerenderHtml (default)", StatsMeta)]);
     }
 
     private async Task Refresh()
     {
         Stats = await StatsService.GetDashboardAsync(Project.SelectedProject.Id);
     }
-
-    private List<StateInspectorEntry> InspectorEntries =>
-    [
-        new("Stats", "PrerenderHtml (default)", StatsMeta)
-    ];
 
     private static string FormatRelativeTime(DateTimeOffset time)
     {
@@ -44,4 +44,5 @@ public partial class Dashboard : ComponentBase
         if (diff.TotalHours < 24) return $"{(int)diff.TotalHours}h ago";
         return $"{(int)diff.TotalDays}d ago";
     }
+
 }
