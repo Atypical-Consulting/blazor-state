@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -114,8 +114,24 @@
     </style>
     <HeadOutlet />
 </head>
-<body class="font-sans bg-canvas-50 dark:bg-canvas-950 text-canvas-900 dark:text-canvas-100 antialiased">
+<body class="font-sans bg-canvas-50 dark:bg-canvas-950 text-canvas-900 dark:text-canvas-100 antialiased grain">
     <Routes @rendermode="InteractiveServer" />
     <script src="_framework/blazor.web.js"></script>
+    <script>
+        window.setThemeClass = function (theme) {
+            if (theme === "dark") {
+                document.documentElement.classList.add("dark");
+            } else {
+                document.documentElement.classList.remove("dark");
+            }
+        };
+        window.setDensityClass = function (density) {
+            if (density === "compact") {
+                document.documentElement.classList.add("density-compact");
+            } else {
+                document.documentElement.classList.remove("density-compact");
+            }
+        };
+    </script>
 </body>
 </html>

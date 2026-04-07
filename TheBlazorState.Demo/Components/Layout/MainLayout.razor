@@ -1,7 +1,8 @@
 @inherits LayoutComponentBase
 @inject ThemeState Theme
+@inject IJSRuntime JS
 
-<div class="@LayoutClasses">
+<div class="flex min-h-screen">
     <Sidebar />
     <main class="flex-1 overflow-auto bg-gray-50 dark:bg-gray-900">
         <div class="max-w-6xl mx-auto px-8 py-8">
@@ -11,6 +12,20 @@
 </div>
 
 @code {
-    private string LayoutClasses =>
-        $"flex min-h-screen {(Theme.Theme == "dark" ? "dark" : "")} {(Theme.Density == "compact" ? "density-compact" : "")}";
+    private string _lastTheme = "";
+    private string _lastDensity = "";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender || Theme.Theme != _lastTheme)
+        {
+            _lastTheme = Theme.Theme;
+            await JS.InvokeVoidAsync("setThemeClass", Theme.Theme);
+        }
+        if (firstRender || Theme.Density != _lastDensity)
+        {
+            _lastDensity = Theme.Density;
+            await JS.InvokeVoidAsync("setDensityClass", Theme.Density);
+        }
+    }
 }
