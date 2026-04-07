@@ -9,9 +9,9 @@ namespace TheBlazorState.Demo.Components.Pages;
 
 public partial class Board : ComponentBase
 {
-    [Inject] public ProjectState Project { get; set; } = default!;
-    [Inject] private TaskService TaskService { get; set; } = default!;
-    [Inject] private StateInspectorService Inspector { get; set; } = default!;
+    [Inject] public ProjectState Project { get; set; } = null!;
+    [Inject] private TaskService TaskService { get; set; } = null!;
+    [Inject] private StateInspectorService Inspector { get; set; } = null!;
 
     private int _lastProjectId;
 

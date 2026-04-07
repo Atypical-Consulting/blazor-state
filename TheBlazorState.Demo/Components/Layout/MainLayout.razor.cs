@@ -6,8 +6,8 @@ namespace TheBlazorState.Demo.Components.Layout;
 
 public partial class MainLayout
 {
-    [Inject] private ThemeState Theme { get; set; } = default!;
-    [Inject] private AppJsModule AppJs { get; set; } = default!;
+    [Inject] private ThemeState Theme { get; set; } = null!;
+    [Inject] private AppJsModule AppJs { get; set; } = null!;
 
     private bool _sidebarOpen;
     private string _lastTheme = "";
