@@ -2,15 +2,11 @@ using TheBlazorState.Demo.Models;
 
 namespace TheBlazorState.Demo.Services;
 
-public class StatsService
+public class StatsService(TaskService tasks)
 {
-    private readonly TaskService _tasks;
-
-    public StatsService(TaskService tasks) => _tasks = tasks;
-
     public async Task<DashboardData> GetDashboardAsync(int projectId)
     {
-        var board = await _tasks.GetBoardAsync(projectId);
+        var board = await tasks.GetBoardAsync(projectId);
         var total = board.ToDo.Count + board.InProgress.Count + board.Done.Count;
         var now = DateTimeOffset.UtcNow;
 

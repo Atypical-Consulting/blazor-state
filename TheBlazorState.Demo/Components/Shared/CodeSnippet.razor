@@ -23,12 +23,3 @@ else
         </div>
     </div>
 }
-
-@code {
-    [Parameter, EditorRequired] public string Title { get; set; } = "";
-    [Parameter, EditorRequired] public string Code { get; set; } = "";
-
-    private bool _open;
-
-    private void Toggle() => _open = !_open;
-}
