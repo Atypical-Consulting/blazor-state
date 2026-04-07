@@ -33,4 +33,4 @@ app.MapRazorComponents<App>()
 
 app.Run();
 
-namespace TheBlazorState.Demo { public partial class Program { } }
+namespace TheBlazorState.Demo { public class Program { } }

@@ -25,7 +25,7 @@ public partial class MyComponent : ComponentBase
     [Inject]
     public ThemeState Theme { get; set; } = default!;
 }";
-        var (diagnostics, generatedSource) = TestHelper.RunGenerator(source);
+        var (_, generatedSource) = TestHelper.RunGenerator(source);
         generatedSource.ShouldNotBeNull();
         generatedSource.ShouldContain("Theme.StateChanged += __OnSharedStateChanged");
         generatedSource.ShouldContain("Theme.StateChanged -= __OnSharedStateChanged");
@@ -47,7 +47,7 @@ public partial class MyComponent : ComponentBase
     [Inject]
     public RegularService Svc { get; set; } = default!;
 }";
-        var (diagnostics, generatedSource) = TestHelper.RunGenerator(source);
+        var (_, generatedSource) = TestHelper.RunGenerator(source);
         // Should not contain subscription code (only generated code from other generators if any)
         if (generatedSource != null)
         {
@@ -78,7 +78,7 @@ public partial class MyComponent : ComponentBase
     [Persist]
     public partial int Counter { get; set; }
 }";
-        var (diagnostics, generatedSource) = TestHelper.RunGenerator(source);
+        var (_, generatedSource) = TestHelper.RunGenerator(source);
         generatedSource.ShouldNotBeNull();
         // InjectSubscriptionGenerator emits partial methods
         generatedSource.ShouldContain("__SubscribeToSharedState");
@@ -114,7 +114,7 @@ public partial class MyComponent : ComponentBase
     [Inject]
     public ProjectState Project { get; set; } = default!;
 }";
-        var (diagnostics, generatedSource) = TestHelper.RunGenerator(source);
+        var (_, generatedSource) = TestHelper.RunGenerator(source);
         generatedSource.ShouldNotBeNull();
         generatedSource.ShouldContain("Theme.StateChanged += __OnSharedStateChanged");
         generatedSource.ShouldContain("Project.StateChanged += __OnSharedStateChanged");
@@ -140,7 +140,7 @@ public class MyComponent : ComponentBase
     [Inject]
     public ThemeState Theme { get; set; } = default!;
 }";
-        var (diagnostics, generatedSource) = TestHelper.RunGenerator(source);
+        var (_, generatedSource) = TestHelper.RunGenerator(source);
         // No subscription generated for non-partial class
         if (generatedSource != null)
         {

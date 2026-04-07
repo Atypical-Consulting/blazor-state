@@ -29,11 +29,11 @@ public class PersistPropertyRoundtripTests : IDisposable
         _persistentState = _ctx.AddBunitPersistentComponentState();
         _ctx.Services.AddMemoryCache();
         _ctx.Services.AddSingleton<ILogger<StateManager>>(NullLogger<StateManager>.Instance);
-        _ctx.Services.AddSingleton(new TheBlazorState.Configuration.TheBlazorStateOptions());
-        _ctx.Services.AddScoped<TheBlazorState.Extensions.StorageStrategyInitializer>();
-        _ctx.Services.AddScoped<TheBlazorState.Storage.BrowserStorageService>(_ =>
-            new TheBlazorState.Storage.BrowserStorageService(null!));
-        _ctx.Services.AddScoped<TheBlazorState.Storage.CrossTabSyncService>();
+        _ctx.Services.AddSingleton(new Configuration.TheBlazorStateOptions());
+        _ctx.Services.AddScoped<Extensions.StorageStrategyInitializer>();
+        _ctx.Services.AddScoped<Storage.BrowserStorageService>(_ =>
+            new Storage.BrowserStorageService(null!));
+        _ctx.Services.AddScoped<Storage.CrossTabSyncService>();
         _ctx.Services.AddScoped<StateManager>();
     }
 
@@ -114,7 +114,7 @@ public class PersistPropertyRoundtripTests : IDisposable
 
         // Verify value is in cache
         var cache = _ctx.Services.GetRequiredService<IMemoryCache>();
-        cache.TryGetValue<PersistedEnvelope<int>>("TestCounterComponent.Count", out var envelope)
+        cache.TryGetValue("TestCounterComponent.Count", out PersistedEnvelope<int>? envelope)
             .ShouldBeTrue();
         envelope!.Value.ShouldBe(1);
     }
@@ -125,7 +125,6 @@ public class PersistPropertyRoundtripTests : IDisposable
     public void Component_Dispose_CleansUp()
     {
         var cut = _ctx.Render<TestCounterComponent>();
-        var instance = cut.Instance;
 
         cut.Dispose();
 
@@ -166,7 +165,7 @@ public class PersistPropertyRoundtripTests : IDisposable
         protected override void OnInitialized()
         {
             CountMeta.OnChanged += StateHasChanged;
-            StateManager.RestoreProperty<int>(
+            StateManager.RestoreProperty(
                 "TestCounterComponent.Count",
                 null,
                 CountMeta,

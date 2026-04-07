@@ -3,7 +3,6 @@ using TheBlazorState.Attributes;
 using TheBlazorState.Demo.Models;
 using TheBlazorState.Demo.Services;
 using TheBlazorState.Demo.State;
-using TheBlazorState.Demo.Components.Shared;
 
 namespace TheBlazorState.Demo.Components.Pages;
 
@@ -26,9 +25,15 @@ public partial class Dashboard : ComponentBase
             .LoadFrom(async () => (DashboardData?)await StatsService.GetDashboardAsync(Project.SelectedProject.Id));
     }
 
-    protected override void OnParametersSet()
+    protected override async Task OnParametersSetAsync()
     {
         Inspector.Register("Dashboard", [new("Stats", "PrerenderHtml (default)", StatsMeta)]);
+
+        if (Project.SelectedProject.Id != _lastProjectId)
+        {
+            _lastProjectId = Project.SelectedProject.Id;
+            Stats = await StatsService.GetDashboardAsync(Project.SelectedProject.Id);
+        }
     }
 
     private async Task Refresh()

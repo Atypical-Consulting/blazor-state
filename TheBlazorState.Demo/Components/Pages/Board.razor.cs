@@ -3,7 +3,6 @@ using TheBlazorState.Attributes;
 using TheBlazorState.Demo.Models;
 using TheBlazorState.Demo.Services;
 using TheBlazorState.Demo.State;
-using TheBlazorState.Demo.Components.Shared;
 using TheBlazorState.Storage;
 
 namespace TheBlazorState.Demo.Components.Pages;
@@ -28,9 +27,15 @@ public partial class Board : ComponentBase
         ctx.BoardState.Storage = StorageStrategy.LocalStorage();
     }
 
-    protected override void OnParametersSet()
+    protected override async Task OnParametersSetAsync()
     {
         Inspector.Register("Board", [new("BoardState", "LocalStorage", BoardStateMeta)]);
+
+        if (Project.SelectedProject.Id != _lastProjectId)
+        {
+            _lastProjectId = Project.SelectedProject.Id;
+            BoardState = await TaskService.GetBoardAsync(Project.SelectedProject.Id);
+        }
     }
 
     private void MoveTask(TaskItem task, string from, string to)

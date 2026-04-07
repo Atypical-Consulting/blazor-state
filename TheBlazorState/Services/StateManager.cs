@@ -25,12 +25,11 @@ public sealed class StateManager(
 {
     private readonly List<PersistingComponentStateSubscription> _subscriptions = [];
     private readonly List<Func<Task>> _persistCallbacks = [];
-    private readonly HashSet<string> _registeredKeys = [];
     private bool _registered;
     private bool _disposed;
 
-    // Keep compiler happy — initializer is used to force DI ordering
-    private readonly StorageStrategyInitializer _initializer = initializer;
+    // initializer is injected to force DI ordering; suppress CS9113
+    private readonly StorageStrategyInitializer _initializerRef = initializer;
 
     private static readonly MemoryCacheEntryOptions CacheEntryOptions = new()
     {
@@ -57,9 +56,6 @@ public sealed class StateManager(
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
         ArgumentException.ThrowIfNullOrWhiteSpace(key);
-
-        // Allow re-registration when a component re-mounts in the same circuit.
-        _registeredKeys.Add(key);
 
         // Always register persist callback + eager change handler (before any early returns).
         RegisterPersistPropertyCallback(key, strategy, valueGetter);
@@ -285,7 +281,6 @@ public sealed class StateManager(
 
         _subscriptions.Clear();
         _persistCallbacks.Clear();
-        _registeredKeys.Clear();
     }
 
     /// <summary>

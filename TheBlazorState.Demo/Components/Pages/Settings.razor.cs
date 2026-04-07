@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using TheBlazorState.Attributes;
 using TheBlazorState.Demo.State;
-using TheBlazorState.Demo.Components.Shared;
 using TheBlazorState.Demo.Services;
 using TheBlazorState.Storage;
 
@@ -27,7 +26,7 @@ public partial class Settings : ComponentBase
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender && SavedThemeMeta?.WasRestored == true)
+        if (firstRender && SavedThemeMeta.WasRestored)
         {
             if (SavedTheme is not null)
             {

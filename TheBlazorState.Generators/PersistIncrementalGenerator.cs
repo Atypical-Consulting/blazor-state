@@ -93,19 +93,6 @@ internal sealed class PersistIncrementalGenerator : IIncrementalGenerator
             if (isPartialClass) break;
         }
 
-        // Check ComponentBase inheritance
-        bool inheritsFromComponentBase = false;
-        var current = containingType.BaseType;
-        while (current != null)
-        {
-            if (current.ToDisplayString() == "Microsoft.AspNetCore.Components.ComponentBase")
-            {
-                inheritsFromComponentBase = true;
-                break;
-            }
-            current = current.BaseType;
-        }
-
         // Check user implements IDisposable
         bool userImplementsDisposable = false;
         foreach (var member in containingType.GetMembers())
@@ -155,15 +142,13 @@ internal sealed class PersistIncrementalGenerator : IIncrementalGenerator
             BaseKey: baseKey,
             IsPartialProperty: isPartialProperty,
             IsPartialClass: isPartialClass,
-            InheritsFromComponentBase: inheritsFromComponentBase,
             UserImplementsDisposable: userImplementsDisposable,
             UserOverridesOnInitialized: userOverridesOnInitialized,
             UserOverridesOnInitializedAsync: userOverridesOnInitializedAsync);
 
         var locationData = new PersistLocationData
         {
-            PropertyLocation = propertyLocation ?? Location.None,
-            ClassLocation = classLocation ?? Location.None
+            PropertyLocation = propertyLocation ?? Location.None
         };
 
         return (data, locationData);
@@ -284,7 +269,6 @@ internal sealed class PersistIncrementalGenerator : IIncrementalGenerator
     private readonly struct PersistLocationData
     {
         public Location PropertyLocation { get; init; }
-        public Location ClassLocation { get; init; }
     }
 
     private sealed record PersistFieldData(
@@ -296,7 +280,6 @@ internal sealed class PersistIncrementalGenerator : IIncrementalGenerator
         string BaseKey,
         bool IsPartialProperty,
         bool IsPartialClass,
-        bool InheritsFromComponentBase,
         bool UserImplementsDisposable,
         bool UserOverridesOnInitialized,
         bool UserOverridesOnInitializedAsync);

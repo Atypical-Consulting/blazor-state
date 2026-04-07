@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using TheBlazorState.Attributes;
 using TheBlazorState.Demo.Services;
-using TheBlazorState.Demo.Components.Shared;
 using TheBlazorState.Storage;
 
 namespace TheBlazorState.Demo.Components.Pages;

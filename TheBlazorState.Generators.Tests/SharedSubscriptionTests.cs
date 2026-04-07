@@ -28,7 +28,7 @@ public partial class MyComponent : ComponentBase
     [Persist]
     public partial int Counter { get; set; }
 }";
-        var (diagnostics, generatedSource) = TestHelper.RunGenerator(source);
+        var (_, generatedSource) = TestHelper.RunGenerator(source);
         generatedSource.ShouldNotBeNull();
         // PersistEmitter emits partial method hooks
         generatedSource.ShouldContain("__SubscribeToSharedState");
@@ -60,7 +60,7 @@ public partial class MyComponent : ComponentBase
     [Persist]
     public partial int Counter { get; set; }
 }";
-        var (diagnostics, generatedSource) = TestHelper.RunGenerator(source);
+        var (_, generatedSource) = TestHelper.RunGenerator(source);
         generatedSource.ShouldNotBeNull();
         // PersistEmitter calls __UnsubscribeFromSharedState in Dispose
         generatedSource.ShouldContain("__UnsubscribeFromSharedState");
@@ -82,7 +82,7 @@ public partial class MyComponent : ComponentBase
     [Persist]
     public partial int Counter { get; set; }
 }";
-        var (diagnostics, generatedSource) = TestHelper.RunGenerator(source);
+        var (_, generatedSource) = TestHelper.RunGenerator(source);
         generatedSource.ShouldNotBeNull();
         // PersistEmitter still emits the partial method declarations (no-ops without InjectSubscriptionGenerator)
         generatedSource.ShouldContain("partial void __SubscribeToSharedState");

@@ -21,7 +21,7 @@ public static class TestHelper
             var sb = new System.Text.StringBuilder();
             foreach (var tree in result.GeneratedTrees)
             {
-                sb.Append(tree.GetText().ToString());
+                sb.Append(tree.GetText());
             }
             generatedSource = sb.ToString();
         }
@@ -84,7 +84,7 @@ public static class TestHelper
         }
 
         // 2. Add the TheBlazorState library assembly
-        TryAdd(typeof(TheBlazorState.Abstractions.StateMeta).Assembly.Location);
+        TryAdd(typeof(Abstractions.StateMeta).Assembly.Location);
 
         // 3. Add ASP.NET Core shared framework assemblies (ComponentBase, etc.)
         //    These are not loaded at runtime in a test, so we resolve them from disk.
@@ -101,7 +101,7 @@ public static class TestHelper
                 // Pick the version directory that matches our runtime major version
                 var runtimeVersion = Environment.Version; // e.g. 10.0.x
                 var versionDirs = aspNetDirs[0].GetDirectories($"{runtimeVersion.Major}.*");
-                DirectoryInfo? aspNetDir = versionDirs.Length > 0
+                var aspNetDir = versionDirs.Length > 0
                     ? versionDirs.OrderByDescending(d => d.Name).First()
                     : aspNetDirs[0].GetDirectories().OrderByDescending(d => d.Name).FirstOrDefault();
 

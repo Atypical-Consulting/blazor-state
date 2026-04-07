@@ -6,23 +6,3 @@
         <button @onclick="Dismiss" class="text-xs font-mono opacity-60 hover:opacity-100 transition-opacity flex-shrink-0">Dismiss</button>
     </div>
 }
-
-@code {
-    private static readonly HashSet<string> _dismissedHints = new();
-
-    [Parameter, EditorRequired] public string Text { get; set; } = "";
-    [Parameter, EditorRequired] public string Id { get; set; } = "";
-
-    private bool _dismissed;
-
-    protected override void OnInitialized()
-    {
-        _dismissed = _dismissedHints.Contains(Id);
-    }
-
-    private void Dismiss()
-    {
-        _dismissedHints.Add(Id);
-        _dismissed = true;
-    }
-}

@@ -26,7 +26,7 @@ public partial class Sidebar : ComponentBase
 
     protected override void OnAfterRender(bool firstRender)
     {
-        if (firstRender && SavedProjectIdMeta?.WasRestored == true && SavedProjectId is not null)
+        if (firstRender && SavedProjectIdMeta.WasRestored && SavedProjectId is not null)
         {
             var project = ProjectSvc.GetAll().FirstOrDefault(p => p.Id == SavedProjectId);
             if (project is not null)

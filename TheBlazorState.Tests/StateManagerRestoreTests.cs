@@ -69,7 +69,7 @@ public class StateManagerRestoreTests : IDisposable
         int restoredValue = 0;
 
         // Act
-        manager.RestoreProperty<int>(
+        manager.RestoreProperty(
             "TestComponent.Count",
             null,
             meta,
@@ -99,7 +99,7 @@ public class StateManagerRestoreTests : IDisposable
         string restoredValue = "";
 
         // Act
-        manager.RestoreProperty<string>(
+        manager.RestoreProperty(
             "TestComponent.Name",
             null,
             meta,
@@ -129,7 +129,7 @@ public class StateManagerRestoreTests : IDisposable
         int restoredValue = 0;
 
         // Act
-        manager.RestoreProperty<int>(
+        manager.RestoreProperty(
             "TestComponent.Count",
             null,
             meta,
@@ -157,7 +157,7 @@ public class StateManagerRestoreTests : IDisposable
         int restoredValue = 0;
 
         // Act
-        manager.RestoreProperty<int>(
+        manager.RestoreProperty(
             "TestComponent.Count",
             null,
             meta,
@@ -187,7 +187,7 @@ public class StateManagerRestoreTests : IDisposable
         int restoredValue = 0;
 
         // Act
-        manager.RestoreProperty<int>(
+        manager.RestoreProperty(
             "TestComponent.Count",
             null,
             meta,
@@ -209,7 +209,7 @@ public class StateManagerRestoreTests : IDisposable
         int restoredValue = 123; // default already set
 
         // Act
-        manager.RestoreProperty<int>(
+        manager.RestoreProperty(
             "TestComponent.Count",
             null,
             meta,
@@ -239,7 +239,7 @@ public class StateManagerRestoreTests : IDisposable
         int val = 0;
 
         // Act
-        manager.RestoreProperty<int>(
+        manager.RestoreProperty(
             "TestComponent.Count",
             null,
             meta,
@@ -260,7 +260,7 @@ public class StateManagerRestoreTests : IDisposable
         var meta = new StateMeta(ttl: null);
         int currentValue = 42;
 
-        manager.RestoreProperty<int>(
+        manager.RestoreProperty(
             "TestComponent.Count",
             null,
             meta,
@@ -285,11 +285,11 @@ public class StateManagerRestoreTests : IDisposable
         var meta2 = new StateMeta(ttl: null);
         int val = 0;
 
-        manager.RestoreProperty<int>("TestComponent.Count", null, meta1, v => val = v, () => val);
+        manager.RestoreProperty("TestComponent.Count", null, meta1, v => val = v, () => val);
 
         // Should not throw — component may re-mount in the same circuit
         Should.NotThrow(() =>
-            manager.RestoreProperty<int>("TestComponent.Count", null, meta2, v => val = v, () => val));
+            manager.RestoreProperty("TestComponent.Count", null, meta2, v => val = v, () => val));
     }
 
     // --- Null/empty key throws ---
@@ -305,7 +305,7 @@ public class StateManagerRestoreTests : IDisposable
         int val = 0;
 
         Should.Throw<ArgumentException>(() =>
-            manager.RestoreProperty<int>(key!, null, meta, v => val = v, () => val));
+            manager.RestoreProperty(key!, null, meta, v => val = v, () => val));
     }
 
     // --- After dispose throws ---
@@ -320,6 +320,6 @@ public class StateManagerRestoreTests : IDisposable
         int val = 0;
 
         Should.Throw<ObjectDisposedException>(() =>
-            manager.RestoreProperty<int>("TestComponent.Count", null, meta, v => val = v, () => val));
+            manager.RestoreProperty("TestComponent.Count", null, meta, v => val = v, () => val));
     }
 }

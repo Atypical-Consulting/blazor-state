@@ -41,7 +41,7 @@ public partial class MyComponent : ComponentBase
     [Persist]
     public partial int Counter { get; set; }
 }";
-        var (diagnostics, generatedSource) = TestHelper.RunGenerator(source);
+        var (_, generatedSource) = TestHelper.RunGenerator(source);
         generatedSource.ShouldNotBeNull();
         generatedSource.ShouldContain("__StateContext");
         generatedSource.ShouldContain("PropertyConfigurator<int> Counter");
@@ -62,7 +62,7 @@ public partial class MyComponent : ComponentBase
     [Persist]
     public partial string? Name { get; set; }
 }";
-        var (diagnostics, generatedSource) = TestHelper.RunGenerator(source);
+        var (_, generatedSource) = TestHelper.RunGenerator(source);
         generatedSource.ShouldNotBeNull();
         generatedSource.ShouldContain("OnInitialized");
         generatedSource.ShouldContain("RestoreProperty");
@@ -83,7 +83,7 @@ public partial class MyComponent : ComponentBase
     [Persist]
     public partial int Counter { get; set; }
 }";
-        var (diagnostics, generatedSource) = TestHelper.RunGenerator(source);
+        var (_, generatedSource) = TestHelper.RunGenerator(source);
         generatedSource.ShouldNotBeNull();
         generatedSource.ShouldContain("public void Dispose()");
         generatedSource.ShouldContain("ClearHandlers");
@@ -222,7 +222,7 @@ public partial class MyComponent : ComponentBase
     [Persist]
     public partial int Counter { get; set; }
 }";
-        var (diagnostics, generatedSource) = TestHelper.RunGenerator(source);
+        var (_, generatedSource) = TestHelper.RunGenerator(source);
         generatedSource.ShouldNotBeNull();
         generatedSource.ShouldContain("OnInitializedAsync");
         generatedSource.ShouldContain("HasAsyncFactory");
