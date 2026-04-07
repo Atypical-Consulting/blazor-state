@@ -21,10 +21,13 @@ public sealed class StateManager(
     ILogger<StateManager> logger,
     TheBlazorStateOptions options,
     StorageStrategyInitializer initializer,
-    CrossTabSyncService crossTabSync) : IDisposable
+    CrossTabSyncService crossTabSync,
+    CrossTabHub hub) : IDisposable
 {
     private readonly List<PersistingComponentStateSubscription> _subscriptions = [];
     private readonly List<Func<Task>> _persistCallbacks = [];
+    private readonly List<IDisposable> _hubSubscriptions = [];
+    private readonly string _circuitId = Guid.NewGuid().ToString("N");
     private bool _registered;
     private bool _disposed;
 
@@ -34,6 +37,13 @@ public sealed class StateManager(
     private static readonly MemoryCacheEntryOptions CacheEntryOptions = new()
     {
         SlidingExpiration = TimeSpan.FromMinutes(30)
+    };
+
+    // Blazor's SignalR hub serializes JS interop args with camelCase (JsonSerializerDefaults.Web).
+    // Cross-tab sync receives raw JSON from localStorage, so we must match that casing.
+    private static readonly JsonSerializerOptions CaseInsensitiveJson = new()
+    {
+        PropertyNameCaseInsensitive = true
     };
 
     /// <summary>
@@ -110,6 +120,8 @@ public sealed class StateManager(
         string key, IStorageStrategy? strategy, StateMeta meta, Func<T> valueGetter, Action<T> valueSetter)
     {
         var effectiveStrategy = strategy ?? options.DefaultStorage;
+        var previousValue = valueGetter();
+
         meta.OnChanged += () =>
         {
             var value = valueGetter();
@@ -118,8 +130,15 @@ public sealed class StateManager(
             // Always update server cache eagerly
             cache.Set(key, new PersistedEnvelope<T> { Value = value, PersistedAt = now }, CacheEntryOptions);
 
-            // When SuppressPersist is set (e.g. cross-tab sync), skip writing back
-            // to browser storage to prevent infinite feedback loops between tabs.
+            // Log the change (once, in the library — no demo code needed)
+            var source = meta.SuppressPersist
+                ? Abstractions.ChangeSource.CrossTab
+                : Abstractions.ChangeSource.Local;
+            meta.LogChange(previousValue?.ToString(), value?.ToString(), source);
+            previousValue = value;
+
+            // When SuppressPersist is set (e.g. hub notification from another circuit),
+            // skip writing back to browser storage and skip re-publishing to the hub.
             if (meta.SuppressPersist)
                 return;
 
@@ -128,23 +147,54 @@ public sealed class StateManager(
             {
                 _ = PersistToBrowserStrategyAsync(key, value, now, effectiveStrategy, meta.TimeToLive);
             }
+
+            // Notify other circuits via the server-side hub
+            if (effectiveStrategy is LocalStorageStrategy)
+            {
+                var envelope = new PersistedEnvelope<T> { Value = value, PersistedAt = now };
+                var json = JsonSerializer.Serialize(envelope, CaseInsensitiveJson);
+                hub.Publish(key, json, _circuitId);
+            }
         };
 
-        // Register for cross-tab sync if using LocalStorage
+        // Subscribe to hub notifications from other circuits
         if (effectiveStrategy is LocalStorageStrategy)
         {
-            crossTabSync.RegisterKey(key, rawJson =>
+            var hubSub = hub.Subscribe(key, (_, rawJson) =>
             {
+                // Skip if this StateManager was disposed (stale prerender subscription)
+                if (_disposed) return;
+
                 try
                 {
-                    var envelope = JsonSerializer.Deserialize<PersistedEnvelope<T>>(rawJson);
+                    var envelope = JsonSerializer.Deserialize<PersistedEnvelope<T>>(rawJson, CaseInsensitiveJson);
                     if (envelope is not null)
                     {
                         valueSetter(envelope.Value);
                         meta.MarkDirty();
-                        // Suppress persist to prevent writing back to localStorage,
-                        // which would trigger a storage event in the originating tab
-                        // and create an infinite loop.
+                        meta.SuppressPersist = true;
+                        meta.RaiseChanged();
+                    }
+                }
+                catch (JsonException)
+                {
+                    // Ignore malformed data
+                }
+            }, subscriberId: _circuitId);
+            _hubSubscriptions.Add(hubSub);
+
+            // Also keep the JS-based cross-tab sync for Blazor WASM (no server hub)
+            crossTabSync.RegisterKey(key, rawJson =>
+            {
+                if (_disposed) return;
+
+                try
+                {
+                    var envelope = JsonSerializer.Deserialize<PersistedEnvelope<T>>(rawJson, CaseInsensitiveJson);
+                    if (envelope is not null)
+                    {
+                        valueSetter(envelope.Value);
+                        meta.MarkDirty();
                         meta.SuppressPersist = true;
                         meta.RaiseChanged();
                     }
@@ -257,7 +307,7 @@ public sealed class StateManager(
         }
         catch (Exception ex)
         {
-            logger.LogWarning(ex, "Property '{Key}': eager persist to {Strategy} failed",
+            logger.LogWarning(ex, "Property '{Key}': eager persist to {Strategy} FAILED",
                 key, strategy.GetType().Name);
         }
     }
@@ -284,6 +334,10 @@ public sealed class StateManager(
     {
         if (_disposed) return;
         _disposed = true;
+
+        foreach (var sub in _hubSubscriptions)
+            sub.Dispose();
+        _hubSubscriptions.Clear();
 
         foreach (var sub in _subscriptions)
             sub.Dispose();

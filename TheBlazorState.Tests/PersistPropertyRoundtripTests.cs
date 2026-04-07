@@ -33,7 +33,8 @@ public class PersistPropertyRoundtripTests : IDisposable
         _ctx.Services.AddScoped<Extensions.StorageStrategyInitializer>();
         _ctx.Services.AddScoped<Storage.BrowserStorageService>(_ =>
             new Storage.BrowserStorageService(null!));
-        _ctx.Services.AddScoped<Storage.CrossTabSyncService>();
+        _ctx.Services.AddSingleton<Storage.CrossTabHub>();
+        _ctx.Services.AddScoped<Storage.CrossTabSyncService>(_ => new Storage.CrossTabSyncService(null!));
         _ctx.Services.AddScoped<StateManager>();
     }
 

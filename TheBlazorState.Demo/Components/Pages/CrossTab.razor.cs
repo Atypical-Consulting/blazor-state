@@ -1,12 +1,13 @@
 using Microsoft.AspNetCore.Components;
 using TheBlazorState.Attributes;
+using TheBlazorState.Components;
 using TheBlazorState.Demo.State;
 using TheBlazorState.Demo.Services;
 using TheBlazorState.Storage;
 
 namespace TheBlazorState.Demo.Components.Pages;
 
-public partial class CrossTab : ComponentBase
+public partial class CrossTab : StateComponentBase
 {
     [Inject] public CrossTabState CrossState { get; set; } = null!;
     [Inject] private StateInspectorService Inspector { get; set; } = null!;
@@ -25,20 +26,19 @@ public partial class CrossTab : ComponentBase
         ctx.SavedColor.DefaultValue("#F97316");
     }
 
-    private readonly List<string> _eventLog = [];
+    private int DisplayCounter => SavedCounter ?? 0;
+    private string DisplayColor => SavedColor ?? "#F97316";
 
     protected override void OnAfterRender(bool firstRender)
     {
         if (firstRender)
         {
-            // Restore shared state from persisted values
-            if (SavedCounterMeta.WasRestored && SavedCounter is not null)
-                CrossState.SharedCounter = SavedCounter.Value;
-            if (SavedColorMeta.WasRestored && SavedColor is not null)
-                CrossState.SharedColor = SavedColor;
+            SyncToSharedState();
 
-            CrossState.SharedCounterMeta.OnChanged += OnCounterChanged;
-            CrossState.SharedColorMeta.OnChanged += OnColorChanged;
+            // Keep shared state in sync when persisted values change.
+            // No manual logging needed — StateMeta.ChangeLog handles it.
+            SavedCounterMeta.OnChanged += SyncToSharedState;
+            SavedColorMeta.OnChanged += SyncToSharedState;
         }
 
         Inspector.Register("CrossTab",
@@ -48,25 +48,17 @@ public partial class CrossTab : ComponentBase
         ]);
     }
 
-    private void OnCounterChanged()
+    private void SyncToSharedState()
     {
-        SavedCounter = CrossState.SharedCounter;
-        _eventLog.Insert(0, $"[{DateTime.Now:HH:mm:ss.fff}] Counter → {CrossState.SharedCounter}");
-        if (_eventLog.Count > 10) _eventLog.RemoveRange(10, _eventLog.Count - 10);
-        InvokeAsync(StateHasChanged);
+        if (SavedCounter is not null)
+            CrossState.SharedCounter = SavedCounter.Value;
+        if (SavedColor is not null)
+            CrossState.SharedColor = SavedColor;
     }
 
-    private void OnColorChanged()
-    {
-        SavedColor = CrossState.SharedColor;
-        _eventLog.Insert(0, $"[{DateTime.Now:HH:mm:ss.fff}] Color → {CrossState.SharedColor}");
-        if (_eventLog.Count > 10) _eventLog.RemoveRange(10, _eventLog.Count - 10);
-        InvokeAsync(StateHasChanged);
-    }
-
-    private void Increment() => CrossState.SharedCounter++;
-    private void Decrement() => CrossState.SharedCounter = Math.Max(0, CrossState.SharedCounter - 1);
-    private void SetColor(string color) => CrossState.SharedColor = color;
+    private void Increment() => SavedCounter = (SavedCounter ?? 0) + 1;
+    private void Decrement() => SavedCounter = Math.Max(0, (SavedCounter ?? 0) - 1);
+    private void SetColor(string color) => SavedColor = color;
 
     private static readonly string[] Colors =
     [

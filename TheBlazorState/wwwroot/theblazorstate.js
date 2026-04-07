@@ -84,7 +84,7 @@ export async function removeItemIndexedDb(key) {
     });
 }
 
-// --- Cross-tab sync ---
+// --- Cross-tab sync (fallback for Blazor WASM, not used in Server mode) ---
 let _dotNetRef = null;
 
 export function registerCrossTabSync(dotNetReference) {

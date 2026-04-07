@@ -93,7 +93,7 @@ internal sealed class PersistIncrementalGenerator : IIncrementalGenerator
             if (isPartialClass) break;
         }
 
-        // Check user implements IDisposable
+        // Check if the type (or a base type) already implements IDisposable
         bool userImplementsDisposable = false;
         foreach (var member in containingType.GetMembers())
         {
@@ -101,6 +101,24 @@ internal sealed class PersistIncrementalGenerator : IIncrementalGenerator
             {
                 userImplementsDisposable = true;
                 break;
+            }
+        }
+        // Also check base types for a virtual Dispose (e.g., StateComponentBase)
+        if (!userImplementsDisposable)
+        {
+            var baseType = containingType.BaseType;
+            while (baseType is not null && baseType.SpecialType != Microsoft.CodeAnalysis.SpecialType.System_Object)
+            {
+                foreach (var member in baseType.GetMembers())
+                {
+                    if (member is IMethodSymbol { Name: "Dispose", Parameters.Length: 0, IsVirtual: true })
+                    {
+                        userImplementsDisposable = true;
+                        break;
+                    }
+                }
+                if (userImplementsDisposable) break;
+                baseType = baseType.BaseType;
             }
         }
 

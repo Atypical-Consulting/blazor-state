@@ -147,7 +147,7 @@ internal static class PersistEmitter
             sb.AppendLine($"            {metaField},");
             sb.AppendLine($"            __v => {backingField} = __v,");
             sb.AppendLine($"            () => {backingField});");
-            sb.AppendLine($"        {metaField}.OnChanged += () => InvokeAsync(StateHasChanged);");
+            sb.AppendLine($"        {metaField}.OnAfterChanged += () => InvokeAsync(StateHasChanged);");
             sb.AppendLine();
         }
 
@@ -214,13 +214,18 @@ internal static class PersistEmitter
         sb.AppendLine();
 
         // --- Dispose ---
-        sb.AppendLine("    public void Dispose()");
+        if (model.UserImplementsDisposable)
+            sb.AppendLine("    public override void Dispose()");
+        else
+            sb.AppendLine("    public void Dispose()");
         sb.AppendLine("    {");
         foreach (var prop in model.Properties)
         {
             sb.AppendLine($"        __{prop.PropertyName}_meta?.ClearHandlers();");
         }
         sb.AppendLine("        __UnsubscribeFromSharedState();");
+        if (model.UserImplementsDisposable)
+            sb.AppendLine("        base.Dispose();");
         sb.AppendLine("    }");
 
         sb.AppendLine("}");

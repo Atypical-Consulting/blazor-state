@@ -34,6 +34,7 @@ public sealed class CrossTabSyncService : IAsyncDisposable, IDisposable
     public async Task StartListeningAsync()
     {
         if (_listening || _callbacks.Count == 0) return;
+        _listening = true; // Set early to prevent concurrent calls
 
         try
         {
@@ -42,13 +43,19 @@ public sealed class CrossTabSyncService : IAsyncDisposable, IDisposable
 
             _dotNetRef = DotNetObjectReference.Create(this);
             await _module.InvokeVoidAsync("registerCrossTabSync", _dotNetRef);
-            _listening = true;
         }
         catch (InvalidOperationException)
         {
             // JSInterop not available (prerender) — will retry later
+            _listening = false;
         }
     }
+
+    /// <summary>
+    /// Event fired after a cross-tab change has been processed.
+    /// Components can subscribe to this to schedule re-renders.
+    /// </summary>
+    public event Action? AfterCrossTabChange;
 
     [JSInvokable]
     public void OnStorageChanged(string key, string rawJson)
@@ -56,6 +63,7 @@ public sealed class CrossTabSyncService : IAsyncDisposable, IDisposable
         if (_callbacks.TryGetValue(key, out var callback))
         {
             callback(rawJson);
+            AfterCrossTabChange?.Invoke();
         }
     }
 

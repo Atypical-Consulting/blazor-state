@@ -1,4 +1,5 @@
 @page "/cross-tab"
+@inherits TheBlazorState.Components.StateComponentBase
 
 <PageTitle>Cross-Tab Sync — TaskFlow</PageTitle>
 
@@ -9,7 +10,7 @@
 
 <TryItHint Id="cross-tab" Text="Open this page in a second browser tab and watch — changes sync in real-time via localStorage events." />
 
-@if (CrossState.SharedCounterMeta.WasRestored || CrossState.SharedColorMeta.WasRestored)
+@if (SavedCounterMeta?.WasRestored == true || SavedColorMeta?.WasRestored == true)
 {
     <div class="mb-6 flex items-center gap-2 text-xs text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 px-3 py-2 rounded-lg animate-fade-up">
         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
@@ -21,15 +22,15 @@
 <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
     <!-- Shared Counter -->
     <div class="animate-fade-up stagger-1 bg-white dark:bg-canvas-900 rounded-xl border border-canvas-200 dark:border-canvas-800 p-6 relative overflow-hidden">
-        <div class="absolute top-0 left-0 w-full h-0.5" style="background-color: @CrossState.SharedColor"></div>
+        <div class="absolute top-0 left-0 w-full h-0.5" style="background-color: @DisplayColor"></div>
         <h3 class="text-xs font-mono font-semibold text-canvas-500 dark:text-canvas-400 uppercase tracking-wider mb-4">Shared Counter</h3>
         <div class="flex items-center justify-center gap-6 py-6">
             <button @onclick="Decrement"
                     class="w-10 h-10 rounded-lg border border-canvas-200 dark:border-canvas-700 bg-canvas-50 dark:bg-canvas-800 text-canvas-600 dark:text-canvas-300 hover:border-canvas-400 dark:hover:border-canvas-500 transition-colors flex items-center justify-center text-lg font-bold">
                 −
             </button>
-            <span class="font-display text-5xl font-bold tabular-nums" style="color: @CrossState.SharedColor">
-                @CrossState.SharedCounter
+            <span class="font-display text-5xl font-bold tabular-nums" style="color: @DisplayColor">
+                @DisplayCounter
             </span>
             <button @onclick="Increment"
                     class="w-10 h-10 rounded-lg border border-canvas-200 dark:border-canvas-700 bg-canvas-50 dark:bg-canvas-800 text-canvas-600 dark:text-canvas-300 hover:border-canvas-400 dark:hover:border-canvas-500 transition-colors flex items-center justify-center text-lg font-bold">
@@ -43,13 +44,13 @@
 
     <!-- Color Picker -->
     <div class="animate-fade-up stagger-2 bg-white dark:bg-canvas-900 rounded-xl border border-canvas-200 dark:border-canvas-800 p-6 relative overflow-hidden">
-        <div class="absolute top-0 left-0 w-full h-0.5" style="background-color: @CrossState.SharedColor"></div>
+        <div class="absolute top-0 left-0 w-full h-0.5" style="background-color: @DisplayColor"></div>
         <h3 class="text-xs font-mono font-semibold text-canvas-500 dark:text-canvas-400 uppercase tracking-wider mb-4">Shared Color</h3>
         <div class="grid grid-cols-4 gap-3 py-4">
             @foreach (var color in Colors)
             {
                 var c = color;
-                var isActive = CrossState.SharedColor == c;
+                var isActive = DisplayColor == c;
                 <button @onclick="() => SetColor(c)"
                         class="@($"w-full aspect-square rounded-lg border-2 transition-all duration-150 {(isActive ? "scale-110 shadow-lg ring-2 ring-offset-2 dark:ring-offset-canvas-900" : "hover:scale-105")}")"
                         style="background-color: @c; border-color: @(isActive ? c : "transparent"); @(isActive ? $"ring-color: {c}" : "")">
@@ -69,10 +70,11 @@
             <span class="w-1.5 h-1.5 rounded-full bg-signal-500 animate-signal"></span>
             Meta Events Log
         </h2>
-        <span class="text-[10px] font-mono text-canvas-400 dark:text-canvas-600">via StateMeta.OnChanged</span>
+        <span class="text-[10px] font-mono text-canvas-400 dark:text-canvas-600">via StateMeta.ChangeLog</span>
     </div>
     <div class="max-h-48 overflow-y-auto">
-        @if (_eventLog.Count == 0)
+        @{ var allChanges = (SavedCounterMeta?.ChangeLog ?? []).Concat(SavedColorMeta?.ChangeLog ?? []).OrderByDescending(e => e.Timestamp).Take(10).ToList(); }
+        @if (allChanges.Count == 0)
         {
             <p class="px-5 py-6 text-xs font-mono text-canvas-400 dark:text-canvas-500 text-center">
                 Change the counter or color to see events appear here...
@@ -81,10 +83,12 @@
         else
         {
             <ul class="divide-y divide-canvas-100 dark:divide-canvas-800">
-                @foreach (var entry in _eventLog)
+                @foreach (var entry in allChanges)
                 {
+                    var icon = entry.Source == TheBlazorState.Abstractions.ChangeSource.CrossTab ? "⇄" : "●";
                     <li class="px-5 py-2 font-mono text-xs text-canvas-600 dark:text-canvas-400 hover:bg-canvas-50 dark:hover:bg-canvas-800/50 transition-colors">
-                        @entry
+                        <span class="opacity-50">[@entry.Timestamp.ToLocalTime().ToString("HH:mm:ss.fff")]</span>
+                        @icon @entry.OldValue → @entry.NewValue
                     </li>
                 }
             </ul>

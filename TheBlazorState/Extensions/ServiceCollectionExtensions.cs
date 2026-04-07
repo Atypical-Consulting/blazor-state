@@ -19,6 +19,7 @@ public static class ServiceCollectionExtensions
         configure?.Invoke(options);
 
         services.AddSingleton(options);
+        services.AddSingleton<CrossTabHub>();
         services.AddMemoryCache();
         services.AddScoped<BrowserStorageService>();
         services.AddScoped<CrossTabSyncService>();
