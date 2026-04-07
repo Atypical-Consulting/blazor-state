@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
 using TheBlazorState.Attributes;
 using TheBlazorState.Demo.State;
 using TheBlazorState.Demo.Components.Shared;
@@ -11,7 +10,7 @@ namespace TheBlazorState.Demo.Components.Pages;
 public partial class Settings : ComponentBase
 {
     [Inject] public ThemeState Theme { get; set; } = default!;
-    [Inject] public IJSRuntime JS { get; set; } = default!;
+    [Inject] public AppJsModule AppJs { get; set; } = default!;
     [Inject] private StateInspectorService Inspector { get; set; } = default!;
 
     [Persist]
@@ -33,12 +32,12 @@ public partial class Settings : ComponentBase
             if (SavedTheme is not null)
             {
                 Theme.Theme = SavedTheme;
-                await JS.InvokeVoidAsync("setThemeClass", SavedTheme);
+                await AppJs.SetThemeClassAsync(SavedTheme);
             }
             if (SavedDensity is not null)
             {
                 Theme.Density = SavedDensity;
-                await JS.InvokeVoidAsync("setDensityClass", SavedDensity);
+                await AppJs.SetDensityClassAsync(SavedDensity);
             }
             StateHasChanged();
         }
@@ -48,14 +47,14 @@ public partial class Settings : ComponentBase
     {
         Theme.Theme = theme;
         SavedTheme = theme;
-        await JS.InvokeVoidAsync("setThemeClass", theme);
+        await AppJs.SetThemeClassAsync(theme);
     }
 
     private async Task SetDensity(string density)
     {
         Theme.Density = density;
         SavedDensity = density;
-        await JS.InvokeVoidAsync("setDensityClass", density);
+        await AppJs.SetDensityClassAsync(density);
     }
 
     protected override void OnParametersSet()

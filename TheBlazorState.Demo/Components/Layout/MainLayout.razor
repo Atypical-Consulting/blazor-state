@@ -1,6 +1,4 @@
-@inherits LayoutComponentBase
-@inject ThemeState Theme
-@inject IJSRuntime JS
+﻿@inherits LayoutComponentBase
 
 <div class="flex min-h-screen">
     <!-- Mobile top bar -->
@@ -35,43 +33,3 @@
 </div>
 
 <StateInspector />
-
-@code {
-    private bool _sidebarOpen;
-    private string _lastTheme = "";
-    private string _lastDensity = "";
-
-    private void ToggleSidebar() => _sidebarOpen = !_sidebarOpen;
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            // Read saved theme from localStorage to initialize ThemeState.
-            // The inline script in App.razor already applied the correct CSS class,
-            // so we only need to sync the C# state here (no setThemeClass call).
-            var savedTheme = await JS.InvokeAsync<string?>("eval",
-                "(() => { try { var t = localStorage.getItem('Settings.SavedTheme'); return t ? JSON.parse(t).value : null; } catch { return null; } })()");
-            var savedDensity = await JS.InvokeAsync<string?>("eval",
-                "(() => { try { var d = localStorage.getItem('Settings.SavedDensity'); return d ? JSON.parse(d).value : null; } catch { return null; } })()");
-
-            if (savedTheme is not null) Theme.Theme = savedTheme;
-            if (savedDensity is not null) Theme.Density = savedDensity;
-
-            _lastTheme = Theme.Theme;
-            _lastDensity = Theme.Density;
-            StateHasChanged();
-            return;
-        }
-        if (Theme.Theme != _lastTheme)
-        {
-            _lastTheme = Theme.Theme;
-            await JS.InvokeVoidAsync("setThemeClass", Theme.Theme);
-        }
-        if (Theme.Density != _lastDensity)
-        {
-            _lastDensity = Theme.Density;
-            await JS.InvokeVoidAsync("setDensityClass", Theme.Density);
-        }
-    }
-}

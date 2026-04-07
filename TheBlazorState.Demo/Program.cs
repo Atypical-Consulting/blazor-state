@@ -16,6 +16,7 @@ builder.Services.AddScoped<StatsService>();
 builder.Services.AddScoped<StateInspectorService>();
 builder.Services.AddScoped<ProjectState>();
 builder.Services.AddScoped<ThemeState>();
+builder.Services.AddScoped<AppJsModule>();
 builder.Services.AddScoped<CrossTabState>();
 
 var app = builder.Build();

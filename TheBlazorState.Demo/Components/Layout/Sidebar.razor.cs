@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
 using TheBlazorState.Attributes;
 using TheBlazorState.Demo.Models;
 using TheBlazorState.Demo.Services;
@@ -13,7 +12,7 @@ public partial class Sidebar : ComponentBase
     [Inject] public ProjectService ProjectSvc { get; set; } = default!;
     [Inject] public ProjectState ProjectState { get; set; } = default!;
     [Inject] public NavigationManager Nav { get; set; } = default!;
-    [Inject] public IJSRuntime JS { get; set; } = default!;
+    [Inject] public AppJsModule AppJs { get; set; } = default!;
 
     [Parameter] public EventCallback OnClose { get; set; }
 
@@ -46,7 +45,7 @@ public partial class Sidebar : ComponentBase
 
     private async Task ResetAllState()
     {
-        await JS.InvokeVoidAsync("clearAllBlazorState");
+        await AppJs.ClearAllBlazorStateAsync();
         Nav.NavigateTo("/", forceLoad: true);
     }
 }
