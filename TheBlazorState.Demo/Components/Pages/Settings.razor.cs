@@ -8,9 +8,9 @@ namespace TheBlazorState.Demo.Components.Pages;
 
 public partial class Settings : ComponentBase
 {
-    [Inject] public ThemeState Theme { get; set; } = default!;
-    [Inject] public AppJsModule AppJs { get; set; } = default!;
-    [Inject] private StateInspectorService Inspector { get; set; } = default!;
+    [Inject] public ThemeState Theme { get; set; } = null!;
+    [Inject] public AppJsModule AppJs { get; set; } = null!;
+    [Inject] private StateInspectorService Inspector { get; set; } = null!;
 
     [Persist]
     public partial string? SavedTheme { get; set; }

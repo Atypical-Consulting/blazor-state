@@ -8,9 +8,9 @@ namespace TheBlazorState.Demo.Components.Pages;
 
 public partial class Dashboard : ComponentBase
 {
-    [Inject] public ProjectState Project { get; set; } = default!;
-    [Inject] private StatsService StatsService { get; set; } = default!;
-    [Inject] private StateInspectorService Inspector { get; set; } = default!;
+    [Inject] public ProjectState Project { get; set; } = null!;
+    [Inject] private StatsService StatsService { get; set; } = null!;
+    [Inject] private StateInspectorService Inspector { get; set; } = null!;
 
     private int _lastProjectId;
 

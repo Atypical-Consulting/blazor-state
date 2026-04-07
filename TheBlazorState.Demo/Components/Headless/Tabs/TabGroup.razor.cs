@@ -13,8 +13,8 @@ public partial class TabGroup : HeadlessBase
     [Parameter]
     public int DefaultIndex { get; set; }
 
-    private TabsContext _context = default!;
-    private string _id = default!;
+    private TabsContext _context = null!;
+    private string _id = null!;
     private bool _initialized;
 
     protected override void OnInitialized()

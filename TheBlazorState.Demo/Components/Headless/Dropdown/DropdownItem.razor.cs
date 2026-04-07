@@ -6,7 +6,7 @@ namespace TheBlazorState.Demo.Components.Headless.Dropdown;
 public partial class DropdownItem : HeadlessBase
 {
     [CascadingParameter]
-    private DropdownContext Context { get; set; } = default!;
+    private DropdownContext Context { get; set; } = null!;
 
     [Parameter]
     public EventCallback OnClick { get; set; }

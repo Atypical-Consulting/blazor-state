@@ -5,7 +5,7 @@ namespace TheBlazorState.Demo.Components.Headless.Accordion;
 public partial class AccordionPanel : HeadlessBase
 {
     [CascadingParameter]
-    private AccordionItemContext ItemContext { get; set; } = default!;
+    private AccordionItemContext ItemContext { get; set; } = null!;
 
     protected override void AddRootAttributes(Dictionary<string, object> attributes)
     {

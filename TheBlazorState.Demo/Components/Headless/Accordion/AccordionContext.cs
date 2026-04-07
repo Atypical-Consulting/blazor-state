@@ -2,28 +2,20 @@ using Microsoft.AspNetCore.Components;
 
 namespace TheBlazorState.Demo.Components.Headless.Accordion;
 
-public class AccordionContext
+public class AccordionContext(bool multiple, Action stateChanged)
 {
     private readonly HashSet<string> _openItems = [];
-    private readonly Action _stateChanged;
 
-    public bool Multiple { get; }
+    public bool Multiple { get; } = multiple;
 
-    public AccordionContext(bool multiple, Action stateChanged)
+    public bool IsOpen(string itemId)
     {
-        Multiple = multiple;
-        _stateChanged = stateChanged;
+        return _openItems.Contains(itemId);
     }
-
-    public bool IsOpen(string itemId) => _openItems.Contains(itemId);
 
     public void Toggle(string itemId)
     {
-        if (_openItems.Contains(itemId))
-        {
-            _openItems.Remove(itemId);
-        }
-        else
+        if (!_openItems.Remove(itemId))
         {
             if (!Multiple)
                 _openItems.Clear();
@@ -31,7 +23,7 @@ public class AccordionContext
             _openItems.Add(itemId);
         }
 
-        _stateChanged();
+        stateChanged();
     }
 
     public void SetOpen(string itemId)

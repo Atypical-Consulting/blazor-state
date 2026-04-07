@@ -6,7 +6,7 @@ namespace TheBlazorState.Demo.Components.Headless.Dropdown;
 public partial class DropdownPanel : HeadlessBase
 {
     [CascadingParameter]
-    private DropdownContext Context { get; set; } = default!;
+    private DropdownContext Context { get; set; } = null!;
 
     protected override void AddRootAttributes(Dictionary<string, object> attributes)
     {

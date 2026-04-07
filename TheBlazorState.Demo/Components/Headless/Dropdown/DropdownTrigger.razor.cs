@@ -6,7 +6,7 @@ namespace TheBlazorState.Demo.Components.Headless.Dropdown;
 public partial class DropdownTrigger : HeadlessBase
 {
     [CascadingParameter]
-    private DropdownContext Context { get; set; } = default!;
+    private DropdownContext Context { get; set; } = null!;
 
     protected override string DefaultTag => "button";
 

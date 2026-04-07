@@ -6,7 +6,7 @@ namespace TheBlazorState.Demo.Components.Headless.Accordion;
 public partial class AccordionTrigger : HeadlessBase
 {
     [CascadingParameter]
-    private AccordionItemContext ItemContext { get; set; } = default!;
+    private AccordionItemContext ItemContext { get; set; } = null!;
 
     protected override string DefaultTag => "button";
 
@@ -16,10 +16,8 @@ public partial class AccordionTrigger : HeadlessBase
         attributes["type"] = "button";
         attributes["aria-expanded"] = ItemContext.IsOpen.ToString().ToLowerInvariant();
         attributes["aria-controls"] = ItemContext.PanelId;
-        attributes["onclick"] =
-            EventCallback.Factory.Create<MouseEventArgs>(this, ItemContext.Toggle);
-        attributes["onkeydown"] =
-            EventCallback.Factory.Create<KeyboardEventArgs>(this, HandleKeyDown);
+        attributes["onclick"] = EventCallback.Factory.Create<MouseEventArgs>(this, ItemContext.Toggle);
+        attributes["onkeydown"] = EventCallback.Factory.Create<KeyboardEventArgs>(this, HandleKeyDown);
     }
 
     private void HandleKeyDown(KeyboardEventArgs e)

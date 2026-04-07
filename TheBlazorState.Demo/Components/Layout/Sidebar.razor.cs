@@ -9,10 +9,10 @@ namespace TheBlazorState.Demo.Components.Layout;
 
 public partial class Sidebar : ComponentBase
 {
-    [Inject] public ProjectService ProjectSvc { get; set; } = default!;
-    [Inject] public ProjectState ProjectState { get; set; } = default!;
-    [Inject] public NavigationManager Nav { get; set; } = default!;
-    [Inject] public AppJsModule AppJs { get; set; } = default!;
+    [Inject] public ProjectService ProjectSvc { get; set; } = null!;
+    [Inject] public ProjectState ProjectState { get; set; } = null!;
+    [Inject] public NavigationManager Nav { get; set; } = null!;
+    [Inject] public AppJsModule AppJs { get; set; } = null!;
 
     [Parameter] public EventCallback OnClose { get; set; }
 

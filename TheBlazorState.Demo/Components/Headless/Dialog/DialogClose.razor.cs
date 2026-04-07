@@ -6,7 +6,7 @@ namespace TheBlazorState.Demo.Components.Headless.Dialog;
 public partial class DialogClose : HeadlessBase
 {
     [CascadingParameter]
-    private DialogContext Context { get; set; } = default!;
+    private DialogContext Context { get; set; } = null!;
 
     protected override string DefaultTag => "button";
 

@@ -7,10 +7,10 @@ namespace TheBlazorState.Demo.Components.Headless.Dropdown;
 public partial class Dropdown : HeadlessBase, IAsyncDisposable
 {
     [Inject]
-    private HeadlessJsModule JsModule { get; set; } = default!;
+    private HeadlessJsModule JsModule { get; set; } = null!;
 
-    private DropdownContext _context = default!;
-    private string _id = default!;
+    private DropdownContext _context = null!;
+    private string _id = null!;
     private DotNetObjectReference<Dropdown>? _dotNetRef;
     private bool _isOpen;
 

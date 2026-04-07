@@ -5,13 +5,13 @@ namespace TheBlazorState.Demo.Components.Headless.Accordion;
 public partial class AccordionItem : HeadlessBase
 {
     [CascadingParameter]
-    private AccordionContext ParentContext { get; set; } = default!;
+    private AccordionContext ParentContext { get; set; } = null!;
 
     [Parameter]
     public bool DefaultOpen { get; set; }
 
-    private string _itemId = default!;
-    private AccordionItemContext _itemContext = default!;
+    private string _itemId = null!;
+    private AccordionItemContext _itemContext = null!;
 
     protected override void OnInitialized()
     {

@@ -7,7 +7,7 @@ public partial class Accordion : HeadlessBase
     [Parameter]
     public bool Multiple { get; set; }
 
-    private AccordionContext _context = default!;
+    private AccordionContext _context = null!;
 
     protected override void OnInitialized()
     {

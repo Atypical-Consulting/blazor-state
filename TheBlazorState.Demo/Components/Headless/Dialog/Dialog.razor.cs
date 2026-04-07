@@ -13,8 +13,8 @@ public partial class Dialog : ComponentBase
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
 
-    private DialogContext _context = default!;
-    private string _id = default!;
+    private DialogContext _context = null!;
+    private string _id = null!;
 
     protected override void OnInitialized()
     {

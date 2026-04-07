@@ -7,7 +7,7 @@ namespace TheBlazorState.Demo.Components.Pages;
 
 public partial class StorageCompare : ComponentBase
 {
-    [Inject] private StateInspectorService Inspector { get; set; } = default!;
+    [Inject] private StateInspectorService Inspector { get; set; } = null!;
 
     [Persist]
     public partial string? PrerenderValue { get; set; }

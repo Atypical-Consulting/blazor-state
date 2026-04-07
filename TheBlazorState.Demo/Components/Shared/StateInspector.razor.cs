@@ -8,7 +8,7 @@ public record StateInspectorEntry(string Name, string Strategy, StateMeta Meta);
 
 public partial class StateInspector : IDisposable
 {
-    [Inject] private StateInspectorService InspectorService { get; set; } = default!;
+    [Inject] private StateInspectorService InspectorService { get; set; } = null!;
 
     private static bool _hasBeenOpened;
     private bool _open;

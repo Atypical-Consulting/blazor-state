@@ -8,8 +8,8 @@ namespace TheBlazorState.Demo.Components.Pages;
 
 public partial class CrossTab : ComponentBase
 {
-    [Inject] public CrossTabState CrossState { get; set; } = default!;
-    [Inject] private StateInspectorService Inspector { get; set; } = default!;
+    [Inject] public CrossTabState CrossState { get; set; } = null!;
+    [Inject] private StateInspectorService Inspector { get; set; } = null!;
 
     [Persist]
     public partial int? SavedCounter { get; set; }

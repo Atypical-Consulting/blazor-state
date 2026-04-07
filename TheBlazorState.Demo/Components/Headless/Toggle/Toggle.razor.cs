@@ -14,7 +14,7 @@ public partial class Toggle : HeadlessBase
     [Parameter]
     public string? Label { get; set; }
 
-    private ToggleContext _context = default!;
+    private ToggleContext _context = null!;
 
     protected override string DefaultTag => "button";
 

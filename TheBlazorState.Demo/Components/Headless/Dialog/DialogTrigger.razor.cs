@@ -6,9 +6,9 @@ namespace TheBlazorState.Demo.Components.Headless.Dialog;
 public partial class DialogTrigger : HeadlessBase
 {
     [CascadingParameter]
-    private DialogContext Context { get; set; } = default!;
+    private DialogContext Context { get; set; } = null!;
 
-    private string _triggerId = default!;
+    private string _triggerId = null!;
 
     protected override string DefaultTag => "button";
 

@@ -7,10 +7,10 @@ namespace TheBlazorState.Demo.Components.Headless.Dialog;
 public partial class DialogContent : HeadlessBase, IAsyncDisposable
 {
     [CascadingParameter]
-    private DialogContext Context { get; set; } = default!;
+    private DialogContext Context { get; set; } = null!;
 
     [Inject]
-    private HeadlessJsModule JsModule { get; set; } = default!;
+    private HeadlessJsModule JsModule { get; set; } = null!;
 
     private bool _wasPreviouslyOpen;
 

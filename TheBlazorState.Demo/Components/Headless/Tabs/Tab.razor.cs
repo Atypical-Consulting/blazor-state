@@ -6,7 +6,7 @@ namespace TheBlazorState.Demo.Components.Headless.Tabs;
 public partial class Tab : HeadlessBase
 {
     [CascadingParameter]
-    private TabsContext Context { get; set; } = default!;
+    private TabsContext Context { get; set; } = null!;
 
     [Parameter]
     public bool Disabled { get; set; }
