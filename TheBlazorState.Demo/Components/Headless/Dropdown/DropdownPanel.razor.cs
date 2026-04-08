@@ -14,8 +14,7 @@ public partial class DropdownPanel : HeadlessBase
         attributes["role"] = "menu";
         attributes["aria-labelledby"] = Context.TriggerId;
         attributes["tabindex"] = "-1";
-        attributes["onkeydown"] =
-            EventCallback.Factory.Create<KeyboardEventArgs>(this, HandleKeyDown);
+        attributes["onkeydown"] = this.OnKeyDown(HandleKeyDown);
     }
 
     private async Task HandleKeyDown(KeyboardEventArgs e)

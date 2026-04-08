@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
 
 namespace TheBlazorState.Demo.Components.Headless.Dialog;
 
@@ -11,7 +10,6 @@ public partial class DialogOverlay : HeadlessBase
     protected override void AddRootAttributes(Dictionary<string, object> attributes)
     {
         attributes["aria-hidden"] = "true";
-        attributes["onclick"] =
-            EventCallback.Factory.Create<MouseEventArgs>(this, Context.Close);
+        attributes["onclick"] = this.OnClick(Context.Close);
     }
 }

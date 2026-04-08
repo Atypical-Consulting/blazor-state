@@ -20,8 +20,7 @@ public partial class DialogContent : HeadlessBase, IAsyncDisposable
         attributes["role"] = "dialog";
         attributes["aria-modal"] = "true";
         attributes["aria-labelledby"] = Context.TitleId;
-        attributes["onkeydown"] =
-            EventCallback.Factory.Create<KeyboardEventArgs>(this, HandleKeyDown);
+        attributes["onkeydown"] = this.OnKeyDown(HandleKeyDown);
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

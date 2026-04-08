@@ -16,8 +16,8 @@ public partial class AccordionTrigger : HeadlessBase
         attributes["type"] = "button";
         attributes["aria-expanded"] = ItemContext.IsOpen.ToString().ToLowerInvariant();
         attributes["aria-controls"] = ItemContext.PanelId;
-        attributes["onclick"] = EventCallback.Factory.Create<MouseEventArgs>(this, ItemContext.Toggle);
-        attributes["onkeydown"] = EventCallback.Factory.Create<KeyboardEventArgs>(this, HandleKeyDown);
+        attributes["onclick"] = this.OnClick(ItemContext.Toggle);
+        attributes["onkeydown"] = this.OnKeyDown(HandleKeyDown);
     }
 
     private void HandleKeyDown(KeyboardEventArgs e)

@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
 
 namespace TheBlazorState.Demo.Components.Headless.Dropdown;
 
@@ -17,7 +16,6 @@ public partial class DropdownTrigger : HeadlessBase
         attributes["aria-expanded"] = Context.IsOpen.ToString().ToLowerInvariant();
         attributes["aria-haspopup"] = "true";
         attributes["aria-controls"] = Context.PanelId;
-        attributes["onclick"] =
-            EventCallback.Factory.Create<MouseEventArgs>(this, Context.Toggle);
+        attributes["onclick"] = this.OnClick(Context.Toggle);
     }
 }

@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
 
 namespace TheBlazorState.Demo.Components.Headless.Dropdown;
 
@@ -36,8 +35,7 @@ public partial class DropdownItem : HeadlessBase
         if (Context.IsFocused(_index))
             attributes["data-focused"] = "true";
 
-        attributes["onclick"] =
-            EventCallback.Factory.Create<MouseEventArgs>(this, HandleClick);
+        attributes["onclick"] = this.OnClick(HandleClick);
     }
 
     private async Task HandleClick()

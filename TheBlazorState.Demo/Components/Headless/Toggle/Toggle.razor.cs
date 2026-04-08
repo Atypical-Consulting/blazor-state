@@ -32,10 +32,8 @@ public partial class Toggle : HeadlessBase
         if (!string.IsNullOrEmpty(Label))
             attributes["aria-label"] = Label;
 
-        attributes["onclick"] =
-            EventCallback.Factory.Create<MouseEventArgs>(this, HandleToggle);
-        attributes["onkeydown"] =
-            EventCallback.Factory.Create<KeyboardEventArgs>(this, HandleKeyDown);
+        attributes["onclick"] = this.OnClick(HandleToggle);
+        attributes["onkeydown"] = this.OnKeyDown(HandleKeyDown);
     }
 
     private async Task HandleToggle()

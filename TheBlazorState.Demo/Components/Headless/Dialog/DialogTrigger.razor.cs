@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
 
 namespace TheBlazorState.Demo.Components.Headless.Dialog;
 
@@ -22,7 +21,6 @@ public partial class DialogTrigger : HeadlessBase
     {
         attributes["id"] = _triggerId;
         attributes["type"] = "button";
-        attributes["onclick"] =
-            EventCallback.Factory.Create<MouseEventArgs>(this, Context.Open);
+        attributes["onclick"] = this.OnClick(Context.Open);
     }
 }

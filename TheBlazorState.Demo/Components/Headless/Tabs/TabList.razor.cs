@@ -11,8 +11,7 @@ public partial class TabList : HeadlessBase
     protected override void AddRootAttributes(Dictionary<string, object> attributes)
     {
         attributes["role"] = "tablist";
-        attributes["onkeydown"] =
-            EventCallback.Factory.Create<KeyboardEventArgs>(this, HandleKeyDown);
+        attributes["onkeydown"] = this.OnKeyDown(HandleKeyDown);
     }
 
     private async Task HandleKeyDown(KeyboardEventArgs e)

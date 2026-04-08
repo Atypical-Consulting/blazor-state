@@ -27,6 +27,7 @@ public sealed class StateManager(
     private readonly List<PersistingComponentStateSubscription> _subscriptions = [];
     private readonly List<Func<Task>> _persistCallbacks = [];
     private readonly List<IDisposable> _hubSubscriptions = [];
+    private readonly List<(string Key, IStorageStrategy Strategy)> _trackedKeys = [];
     private readonly string _circuitId = Guid.NewGuid().ToString("N");
     private bool _registered;
     private bool _disposed;
@@ -120,6 +121,7 @@ public sealed class StateManager(
         string key, IStorageStrategy? strategy, StateMeta meta, Func<T> valueGetter, Action<T> valueSetter)
     {
         var effectiveStrategy = strategy ?? options.DefaultStorage;
+        _trackedKeys.Add((key, effectiveStrategy));
         var previousValue = valueGetter();
 
         meta.OnChanged += () =>
@@ -339,6 +341,35 @@ public sealed class StateManager(
                     await cb();
             }));
         }
+    }
+
+    /// <summary>
+    /// Clears all persisted state: removes every tracked key from the server
+    /// cache and from its browser storage strategy. Call this before a force
+    /// reload to fully reset application state.
+    /// </summary>
+    public async Task ClearAllAsync()
+    {
+        ObjectDisposedException.ThrowIf(_disposed, this);
+
+        foreach (var (key, strategy) in _trackedKeys)
+        {
+            cache.Remove(key);
+
+            if (strategy is not PrerenderHtmlStrategy and not ServerMemoryCacheStrategy)
+            {
+                try
+                {
+                    await strategy.RemoveAsync(key);
+                }
+                catch (Exception ex)
+                {
+                    logger.LogWarning(ex, "Property '{Key}': failed to remove from {Strategy}", key, strategy.GetType().Name);
+                }
+            }
+        }
+
+        logger.LogDebug("ClearAllAsync: removed {Count} keys", _trackedKeys.Count);
     }
 
     public void Dispose()

@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
 
 namespace TheBlazorState.Demo.Components.Headless.Tabs;
 
@@ -37,8 +36,7 @@ public partial class Tab : HeadlessBase
         if (Disabled)
             attributes["disabled"] = true;
 
-        attributes["onclick"] =
-            EventCallback.Factory.Create<MouseEventArgs>(this, HandleClick);
+        attributes["onclick"] = this.OnClick(HandleClick);
 
         // Merge ActiveClass into Class when selected
         if (isSelected && !string.IsNullOrEmpty(ActiveClass))

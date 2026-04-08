@@ -20,34 +20,14 @@
         </div>
     </div>
 
-    <!-- Projects -->
-    <div class="px-3 py-4">
-        <p class="px-2 mb-2 text-[10px] font-mono font-medium text-canvas-400 dark:text-canvas-600 uppercase tracking-widest">Projects</p>
-        @foreach (var project in ProjectSvc.GetAll())
-        {
-            var isActive = ProjectState.SelectedProject.Id == project.Id;
-            <button @onclick="() => SelectProject(project)"
-                    class="@($"w-full text-left px-3 py-2 rounded-lg text-sm mb-0.5 flex items-center gap-2.5 transition-all duration-150 {(isActive ? "bg-signal-50 dark:bg-signal-500/10 text-signal-700 dark:text-signal-400 font-medium" : "text-canvas-600 dark:text-canvas-400 hover:bg-canvas-50 dark:hover:bg-canvas-800 hover:text-canvas-900 dark:hover:text-canvas-200")}")">
-                <span class="w-2 h-2 rounded-full flex-shrink-0 ring-2 ring-offset-1 dark:ring-offset-canvas-900 transition-all duration-150 @(isActive ? "ring-signal-400/50" : "ring-transparent")" style="background-color: @project.Color"></span>
-                @project.Name
-            </button>
-        }
-    </div>
-
     <!-- Navigation -->
-    <div class="px-3 py-2 border-t border-canvas-100 dark:border-canvas-800">
+    <div class="px-3 py-4">
         <p class="px-2 mb-2 text-[10px] font-mono font-medium text-canvas-400 dark:text-canvas-600 uppercase tracking-widest">Views</p>
         <NavLink href="" Match="NavLinkMatch.All"
                  class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-canvas-500 dark:text-canvas-400 hover:bg-canvas-50 dark:hover:bg-canvas-800 hover:text-canvas-900 dark:hover:text-canvas-200 transition-all duration-150"
                  ActiveClass="nav-active bg-canvas-50 dark:bg-canvas-800 text-canvas-900 dark:text-canvas-100 font-medium">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
             Dashboard
-        </NavLink>
-        <NavLink href="board"
-                 class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-canvas-500 dark:text-canvas-400 hover:bg-canvas-50 dark:hover:bg-canvas-800 hover:text-canvas-900 dark:hover:text-canvas-200 transition-all duration-150"
-                 ActiveClass="nav-active bg-canvas-50 dark:bg-canvas-800 text-canvas-900 dark:text-canvas-100 font-medium">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"/></svg>
-            Board
         </NavLink>
         <NavLink href="cross-tab"
                  class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-canvas-500 dark:text-canvas-400 hover:bg-canvas-50 dark:hover:bg-canvas-800 hover:text-canvas-900 dark:hover:text-canvas-200 transition-all duration-150"
