@@ -28,3 +28,9 @@ TestResults/
 
 ## Worktrees
 .worktrees/
+
+## Playwright MCP logs
+.playwright-mcp/
+
+## Superpowers
+.superpowers/
