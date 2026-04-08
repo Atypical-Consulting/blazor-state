@@ -138,6 +138,93 @@ public class CrossTabHubComponentTests : IDisposable
         cut.Find("[data-testid='count']").TextContent.ShouldBe("43");
     }
 
+    // ---------------------------------------------------------------
+    // Echo-back prevention: publisher should not get CrossTab entries
+    // ---------------------------------------------------------------
+
+    [Fact]
+    public async Task CircuitA_LocalChange_ShouldNotReceiveCrossTabEchoFromHub()
+    {
+        // Reproduces the cross-tab echo-back bug:
+        // When Circuit A changes a value, the hub notifies Circuit B.
+        // Circuit A's ChangeLog should contain ONLY a Local entry.
+        var cut = _ctxB.Render<HubTestComponent>();
+
+        CircuitA_SetValue(42);
+
+        // Wait for hub to dispatch to Circuit B
+        cut.WaitForState(() =>
+            cut.Find("[data-testid='count']").TextContent == "42");
+
+        // Assert: Circuit A's ChangeLog has only Local entries
+        var crossTabEntries = _metaA.ChangeLog
+            .Where(e => e.Source == Abstractions.ChangeSource.CrossTab)
+            .ToList();
+        crossTabEntries.ShouldBeEmpty(
+            "Publisher should not receive its own change back as CrossTab");
+    }
+
+    [Fact]
+    public async Task CircuitA_LocalChange_HubEchoBackWithSameValue_ShouldBeIgnored()
+    {
+        // Simulates a stale prerender circuit: a THIRD subscription on the hub
+        // receives Circuit A's publish and echoes it back via hub (different circuitId).
+        // Circuit A should ignore it because the value is already current.
+        var cut = _ctxB.Render<HubTestComponent>();
+
+        // Create a "stale" subscription that echoes back to Circuit A
+        string? echoJson = null;
+        var staleSub = _hub.Subscribe("Test.Counter", (_, json) =>
+        {
+            echoJson = json;
+        }, subscriberId: "stale-prerender-circuit");
+
+        CircuitA_SetValue(42);
+
+        // Wait for hub to dispatch to all subscribers
+        cut.WaitForState(() =>
+            cut.Find("[data-testid='count']").TextContent == "42");
+        await Task.Delay(50); // ensure stale callback fires
+
+        // The stale subscription received the notification
+        echoJson.ShouldNotBeNull();
+
+        // Now simulate the echo-back: stale circuit publishes with different circuitId
+        // This would reach Circuit A because "stale-prerender-circuit" != circuitA
+        _hub.Publish("Test.Counter", echoJson!, publisherId: "stale-prerender-circuit");
+        await Task.Delay(100); // wait for async dispatch
+
+        // Assert: Circuit A should NOT have a CrossTab entry
+        var crossTabEntries = _metaA.ChangeLog
+            .Where(e => e.Source == Abstractions.ChangeSource.CrossTab)
+            .ToList();
+        crossTabEntries.ShouldBeEmpty(
+            "Echo-back from stale circuit should be suppressed (value already current)");
+    }
+
+    [Fact]
+    public async Task CircuitB_ShouldGetExactlyOneCrossTabEntry()
+    {
+        // Verifies that the receiving circuit doesn't get duplicate entries
+        // from both hub and JS sync paths arriving at different times.
+        var cut = _ctxB.Render<HubTestComponent>();
+        var component = cut.Instance;
+
+        CircuitA_SetValue(42);
+
+        // Wait for Circuit B to receive the update
+        cut.WaitForState(() =>
+            cut.Find("[data-testid='count']").TextContent == "42");
+        await Task.Delay(50); // settle
+
+        // Assert: exactly one CrossTab entry, not duplicates
+        var crossTabEntries = component.CountMeta.ChangeLog
+            .Where(e => e.Source == Abstractions.ChangeSource.CrossTab)
+            .ToList();
+        crossTabEntries.Count.ShouldBe(1,
+            "Receiver should get exactly one CrossTab entry per change");
+    }
+
     /// <summary>
     /// Test component for Circuit B. Inherits StateComponentBase.
     /// </summary>

@@ -170,6 +170,11 @@ public sealed class StateManager(
                     var envelope = JsonSerializer.Deserialize<PersistedEnvelope<T>>(rawJson, CaseInsensitiveJson);
                     if (envelope is not null)
                     {
+                        // Skip if value is already current — prevents echo-back from
+                        // stale prerender subscriptions and duplicate hub notifications.
+                        if (EqualityComparer<T>.Default.Equals(valueGetter(), envelope.Value))
+                            return;
+
                         valueSetter(envelope.Value);
                         meta.MarkDirty();
                         meta.SuppressPersist = true;
@@ -193,6 +198,12 @@ public sealed class StateManager(
                     var envelope = JsonSerializer.Deserialize<PersistedEnvelope<T>>(rawJson, CaseInsensitiveJson);
                     if (envelope is not null)
                     {
+                        // Skip if value is already current — prevents echo-back when
+                        // the hub already delivered this change, or if the JS storage
+                        // event fires in the originating tab (browser quirk).
+                        if (EqualityComparer<T>.Default.Equals(valueGetter(), envelope.Value))
+                            return;
+
                         valueSetter(envelope.Value);
                         meta.MarkDirty();
                         meta.SuppressPersist = true;

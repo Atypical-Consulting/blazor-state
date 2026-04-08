@@ -515,4 +515,64 @@ public class CrossTabSyncTests : IDisposable
         // Assert
         value.ShouldBe("#FF0000");
     }
+
+    // ---------------------------------------------------------------
+    // Echo-back prevention: JS sync with same value should be ignored
+    // ---------------------------------------------------------------
+
+    [Fact]
+    public void OnStorageChanged_SameValueAsCurrentLocal_ShouldNotCreateCrossTabEntry()
+    {
+        // Reproduces: Tab A changes value locally, then receives its own
+        // change back via JS storage event (browser quirk or stale subscription).
+        // The echo-back should be suppressed — no CrossTab log entry.
+        var manager = CreateManager();
+        var meta = new StateMeta(ttl: null);
+        int value = 0;
+
+        manager.RestoreProperty(
+            "Test.Counter",
+            StorageStrategy.LocalStorage(),
+            meta,
+            v => value = v,
+            () => value);
+
+        // Simulate local change (as the generated property setter would)
+        value = 42;
+        meta.MarkDirty();
+        meta.RaiseChanged(); // logs ● (Local) entry
+
+        // Act: simulate echo-back via JS storage event with same value
+        _crossTabSync.OnStorageChanged("Test.Counter",
+            """{"value":42,"persistedAt":"2026-01-01T00:00:00+00:00"}""");
+
+        // Assert: ChangeLog should have only the Local entry, no CrossTab echo
+        meta.ChangeLog.Count.ShouldBe(1);
+        meta.ChangeLog[0].Source.ShouldBe(ChangeSource.Local);
+    }
+
+    [Fact]
+    public void OnStorageChanged_DifferentValue_ShouldCreateCrossTabEntry()
+    {
+        // Verify that legitimate cross-tab updates still work
+        var manager = CreateManager();
+        var meta = new StateMeta(ttl: null);
+        int value = 0;
+
+        manager.RestoreProperty(
+            "Test.Counter",
+            StorageStrategy.LocalStorage(),
+            meta,
+            v => value = v,
+            () => value);
+
+        // Act: cross-tab sync delivers a genuinely new value
+        _crossTabSync.OnStorageChanged("Test.Counter",
+            """{"value":42,"persistedAt":"2026-01-01T00:00:00+00:00"}""");
+
+        // Assert: value updated and CrossTab entry logged
+        value.ShouldBe(42);
+        meta.ChangeLog.Count.ShouldBe(1);
+        meta.ChangeLog[0].Source.ShouldBe(ChangeSource.CrossTab);
+    }
 }
