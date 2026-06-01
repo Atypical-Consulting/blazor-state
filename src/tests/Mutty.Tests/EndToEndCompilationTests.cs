@@ -252,6 +252,102 @@ public class EndToEndCompilationTests : GeneratorTests
     }
 
     [Test]
+    public void DefaultImmutableArray_DoesNotThrowOnWrap()
+    {
+        // A record constructed with default(ImmutableArray<T>) must wrap without throwing
+        // (default ImmutableArray throws on enumeration); the wrapper should yield an empty list.
+        string source = CreateInput("public partial record Bag(ImmutableArray<int> Items);");
+        Assembly assembly = CompileToAssembly(source);
+
+        Type bagType = assembly.GetType("Mutty.Tests.Bag").ShouldNotBeNull();
+        object bag = Activator.CreateInstance(bagType, default(ImmutableArray<int>))!;
+
+        object mutable = ToMutable(assembly, "Mutty.Tests.Bag", bag);
+        object? items = mutable.GetType().GetProperty("Items")!.GetValue(mutable);
+
+        items.ShouldBeOfType<List<int>>();
+        ((List<int>)items!).Count.ShouldBe(0);
+
+        object rebuilt = Build(mutable);
+        bagType.GetProperty("Items")!.GetValue(rebuilt).ShouldBeOfType<ImmutableArray<int>>();
+    }
+
+    [Test]
+    public void InheritedRecordProperties_AreExposedAndRoundTrip()
+    {
+        // Dog inherits Name from Animal; the mutable wrapper must expose and round-trip both the
+        // declared (Breed) and inherited (Name) properties.
+        string source =
+            """
+            using Mutty;
+
+            namespace Mutty.Tests;
+
+            public abstract record Animal(string Name);
+
+            [MutableGeneration]
+            public partial record Dog(string Name, string Breed) : Animal(Name);
+            """;
+
+        Assembly assembly = CompileToAssembly(source);
+
+        Type dogType = assembly.GetType("Mutty.Tests.Dog").ShouldNotBeNull();
+        Type mutableType = assembly.GetType("Mutty.Tests.MutableDog").ShouldNotBeNull();
+
+        mutableType.GetProperty("Name").ShouldNotBeNull();
+        mutableType.GetProperty("Breed").ShouldNotBeNull();
+
+        object dog = Activator.CreateInstance(dogType, "Rex", "Labrador")!;
+        object mutable = ToMutable(assembly, "Mutty.Tests.Dog", dog);
+        mutableType.GetProperty("Name")!.SetValue(mutable, "Max");
+        mutableType.GetProperty("Breed")!.SetValue(mutable, "Poodle");
+
+        object rebuilt = Build(mutable);
+        dogType.GetProperty("Name")!.GetValue(rebuilt).ShouldBe("Max");
+        dogType.GetProperty("Breed")!.GetValue(rebuilt).ShouldBe("Poodle");
+    }
+
+    [Test]
+    public void NestedRecordInDifferentNamespace_CompilesAndRoundTrips()
+    {
+        // Person (namespace Company.App) nests Address (namespace Company.Domain). Both are annotated,
+        // so Person's wrapper must reference Company.Domain.MutableAddress — not a bare MutableAddress,
+        // which would not resolve across namespaces (CS0246).
+        string source =
+            """
+            using Mutty;
+
+            namespace Company.Domain
+            {
+                [MutableGeneration]
+                public partial record Address(string City);
+            }
+
+            namespace Company.App
+            {
+                [MutableGeneration]
+                public partial record Person(string Name, Company.Domain.Address Home);
+            }
+            """;
+
+        Assembly assembly = CompileToAssembly(source);
+
+        Type personType = assembly.GetType("Company.App.Person").ShouldNotBeNull();
+        Type addressType = assembly.GetType("Company.Domain.Address").ShouldNotBeNull();
+        Type mutableAddressType = assembly.GetType("Company.Domain.MutableAddress").ShouldNotBeNull();
+
+        Type mutablePersonType = assembly.GetType("Company.App.MutablePerson").ShouldNotBeNull();
+        mutablePersonType.GetProperty("Home")!.PropertyType.ShouldBe(mutableAddressType);
+
+        object address = Activator.CreateInstance(addressType, "Lyon")!;
+        object person = Activator.CreateInstance(personType, "Jane", address)!;
+        object roundTripped = Build(ToMutable(assembly, "Company.App.Person", person));
+
+        object? home = personType.GetProperty("Home")!.GetValue(roundTripped);
+        addressType.GetProperty("City")!.GetValue(home).ShouldBe("Lyon");
+    }
+
+    [Test]
     public void UnannotatedNestedRecord_CompilesAndRoundTripsByReference()
     {
         // Address is NOT annotated with [MutableGeneration], so Person.Home must be kept as-is

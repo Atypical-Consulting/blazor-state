@@ -91,7 +91,7 @@ public class MutableWrapperTemplate(RecordModel tokens) : IndentedCodeBuilder
                             bool isNullable = property.Type.EndsWith("?", StringComparison.Ordinal);
                             if (isNullable)
                             {
-                                string mutableTypeName = $"Mutable{property.Type.TrimEnd('?').Split('.').Last()}";
+                                string mutableTypeName = property.RecordMutableTypeName!;
                                 Line($"{property.Name} = _record.{property.Name} != null");
                                 Indent(() =>
                                 {
@@ -210,8 +210,7 @@ public class MutableWrapperTemplate(RecordModel tokens) : IndentedCodeBuilder
     private void GenerateNestedMutableProperty(PropertyModel property)
     {
         bool isNullable = property.Type.EndsWith("?", StringComparison.Ordinal);
-        string baseType = (isNullable) ? property.Type.TrimEnd('?') : property.Type;
-        string mutableTypeName = $"Mutable{baseType.Split('.').Last()}";
+        string mutableTypeName = property.RecordMutableTypeName!;
         string finalType = (isNullable) ? $"{mutableTypeName}?" : mutableTypeName;
         string propertyType = property.PropertyType.ToString();
 
@@ -241,9 +240,18 @@ public class MutableWrapperTemplate(RecordModel tokens) : IndentedCodeBuilder
         if (IsListLikeImmutable(property.Type))
         {
             string itemType = GetMutableItemType(property.Type);
-            return (IsBuiltInType(itemType))
+            string conversion = (IsBuiltInType(itemType))
                 ? $"{source}.ToList()"
                 : $"{source}.AsMutable()";
+
+            // A default(ImmutableArray<T>) throws on enumeration; fall back to an empty list.
+            if (GetImmutableShortName(property.Type) == "ImmutableArray")
+            {
+                string mutableArgs = ConvertGenericTypeArguments(itemType);
+                return $"({source}.IsDefault) ? new List<{mutableArgs}>() : {conversion}";
+            }
+
+            return conversion;
         }
 
         // Dictionary / set / queue / stack: construct the concrete mutable collection from the source.
