@@ -215,7 +215,7 @@ public class BuiltInTypeTests
     {
         SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(sourceCode);
         IEnumerable<MetadataReference> references = AppDomain.CurrentDomain.GetAssemblies()
-            .Where(static assembly => !assembly.IsDynamic)
+            .Where(static assembly => !assembly.IsDynamic && !string.IsNullOrWhiteSpace(assembly.Location))
             .Select(static assembly => MetadataReference.CreateFromFile(assembly.Location))
             .Cast<MetadataReference>()
             .Concat([MetadataReference.CreateFromFile(typeof(MutableGenerationAttribute).Assembly.Location)]);
@@ -226,12 +226,10 @@ public class BuiltInTypeTests
             references,
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
-        // Source Generator to test
-        Attributes attributesGenerator = new();
-        MutableRecordGenerator mutableRecordGenerator = new();
-        MutableExtensionsGenerator mutableExtensionsGenerator = new();
+        // Single source generator under test
+        MuttyGenerator generator = new();
 
-        _ = CSharpGeneratorDriver.Create(attributesGenerator, mutableRecordGenerator, mutableExtensionsGenerator)
+        _ = CSharpGeneratorDriver.Create(generator)
             .RunGeneratorsAndUpdateCompilation(
                 compilation,
                 out Compilation outputCompilation,

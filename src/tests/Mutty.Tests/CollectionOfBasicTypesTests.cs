@@ -167,7 +167,7 @@ public class CollectionOfBasicTypesTests
     {
         SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(sourceCode);
         IEnumerable<MetadataReference> references = AppDomain.CurrentDomain.GetAssemblies()
-            .Where(static assembly => !assembly.IsDynamic)
+            .Where(static assembly => !assembly.IsDynamic && !string.IsNullOrWhiteSpace(assembly.Location))
             .Select(static assembly => MetadataReference.CreateFromFile(assembly.Location))
             .Cast<MetadataReference>()
             .Concat([MetadataReference.CreateFromFile(typeof(MutableGenerationAttribute).Assembly.Location)]);
@@ -178,11 +178,9 @@ public class CollectionOfBasicTypesTests
             references,
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
-        Attributes attributesGenerator = new();
-        MutableRecordGenerator mutableRecordGenerator = new();
-        MutableExtensionsGenerator mutableExtensionsGenerator = new();
+        MuttyGenerator generator = new();
 
-        _ = CSharpGeneratorDriver.Create(attributesGenerator, mutableRecordGenerator, mutableExtensionsGenerator)
+        _ = CSharpGeneratorDriver.Create(generator)
             .RunGeneratorsAndUpdateCompilation(
                 compilation,
                 out Compilation outputCompilation,
