@@ -62,6 +62,7 @@ public class MutableWrapperTemplate(RecordModel tokens) : IndentedCodeBuilder
             GenerateImplicitOperatorToMutable();
             GenerateExplicitOperatorToRecord();
             GenerateProperties();
+            GenerateWithMethods();
         });
     }
 
@@ -82,6 +83,16 @@ public class MutableWrapperTemplate(RecordModel tokens) : IndentedCodeBuilder
                     case PropertyType.ImmutableCollection:
                         {
                             Line($"{property.Name} = {GenerateCollectionIngestExpression(property)};");
+                            break;
+                        }
+                    case PropertyType.Array:
+                        {
+                            Line($"{property.Name} = {SequenceCopy($"_record.{property.Name}", property, toArray: true)};");
+                            break;
+                        }
+                    case PropertyType.ReadOnlyCollection:
+                        {
+                            Line($"{property.Name} = {SequenceCopy($"_record.{property.Name}", property, toArray: false)};");
                             break;
                         }
                     case PropertyType.Record:
@@ -148,6 +159,16 @@ public class MutableWrapperTemplate(RecordModel tokens) : IndentedCodeBuilder
                                     Line($"{property.Name} = {GenerateCollectionBuildExpression(property)},");
                                     break;
                                 }
+                            case PropertyType.Array:
+                                {
+                                    Line($"{property.Name} = {SequenceCopy($"this.{property.Name}", property, toArray: true)},");
+                                    break;
+                                }
+                            case PropertyType.ReadOnlyCollection:
+                                {
+                                    Line($"{property.Name} = {SequenceCopy($"this.{property.Name}", property, toArray: false)},");
+                                    break;
+                                }
                             case PropertyType.Other:
                                 {
                                     Line($"{property.Name} = this.{property.Name},");
@@ -196,6 +217,19 @@ public class MutableWrapperTemplate(RecordModel tokens) : IndentedCodeBuilder
                         GenerateCollectionProperty(property);
                         break;
                     }
+                case PropertyType.Array:
+                    {
+                        // Keep the array type; isolation is provided by copying on ingest and build.
+                        Summary($"Gets or sets the {property.Name}.");
+                        Line($"public {property.Type} {property.Name} {{ get; set; }}");
+                        break;
+                    }
+                case PropertyType.ReadOnlyCollection:
+                    {
+                        Summary($"Gets or sets the {property.Name}.");
+                        Line($"public {GetReadOnlyMutableType(property)} {property.Name} {{ get; set; }}");
+                        break;
+                    }
                 case PropertyType.Other:
                     {
                         GenerateSimpleProperty(property);
@@ -204,6 +238,46 @@ public class MutableWrapperTemplate(RecordModel tokens) : IndentedCodeBuilder
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+        }
+    }
+
+    private void GenerateWithMethods()
+    {
+        foreach (PropertyModel property in _properties)
+        {
+            EmptyLine();
+            Summary($"Sets <see cref=\"{property.Name}\"/> and returns this wrapper so calls can be chained.");
+            Line($"public {_mutableRecordName} With{property.Name}({GetMutablePropertyType(property)} value)");
+            Braces(() =>
+            {
+                Line($"{property.Name} = value;");
+                Line("return this;");
+            });
+        }
+    }
+
+    private string GetMutablePropertyType(PropertyModel property)
+    {
+        switch (property.PropertyType)
+        {
+            case PropertyType.Record:
+                {
+                    bool isNullable = property.Type.EndsWith("?", StringComparison.Ordinal);
+                    string mutableTypeName = property.RecordMutableTypeName!;
+                    return (isNullable) ? $"{mutableTypeName}?" : mutableTypeName;
+                }
+            case PropertyType.ImmutableCollection:
+                {
+                    string mutableType = ConvertImmutableToMutable(property.Type);
+                    string convertedTypeArgs = ConvertGenericTypeArguments(GetMutableItemType(property.Type));
+                    return $"{mutableType}<{convertedTypeArgs}>";
+                }
+            case PropertyType.ReadOnlyCollection:
+                return GetReadOnlyMutableType(property);
+            case PropertyType.Array:
+            case PropertyType.Other:
+            default:
+                return property.Type;
         }
     }
 
@@ -289,6 +363,23 @@ public class MutableWrapperTemplate(RecordModel tokens) : IndentedCodeBuilder
             "ImmutableStack" => $"ImmutableStack.CreateRange({source})",
             _ => $"{source}.ToImmutableList()"
         };
+    }
+
+    private string SequenceCopy(string source, PropertyModel property, bool toArray)
+    {
+        // Defensive copy so the wrapper never aliases the source record's array/collection.
+        // ToArray() preserves T[] members; ToList() materialises read-only interfaces as List<T>.
+        string method = (toArray) ? "ToArray()" : "ToList()";
+        bool isNullable = property.Type.EndsWith("?", StringComparison.Ordinal);
+        return (isNullable) ? $"{source}?.{method}" : $"{source}.{method}";
+    }
+
+    private string GetReadOnlyMutableType(PropertyModel property)
+    {
+        bool isNullable = property.Type.EndsWith("?", StringComparison.Ordinal);
+        string baseType = (isNullable) ? property.Type.TrimEnd('?') : property.Type;
+        string element = GetMutableItemType(baseType);
+        return (isNullable) ? $"List<{element}>?" : $"List<{element}>";
     }
 
     private bool IsListLikeImmutable(string immutableType)
