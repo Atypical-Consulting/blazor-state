@@ -304,6 +304,20 @@ Mutty targets `netstandard2.0` and supports **Roslyn 4.8 and later** (Visual Stu
 - **Convert deliberately** — prefer `Build()` / `ToImmutable()` over the explicit cast; never rely on a hidden conversion.
 - **Validate in one place** — use `OnBeforeBuild` for invariants and normalization so every code path goes through the same checks.
 
+<!-- portfolio-techstack:start -->
+
+## Tech Stack
+
+- **.NET 10 · .NET Standard 2.0**
+- Nuke.Common
+- Spectre.Console
+- Microsoft.CodeAnalysis.CSharp
+- BenchmarkDotNet
+- Shouldly
+- Verify.NUnit
+
+<!-- portfolio-techstack:end -->
+
 ## Contributing
 
 Contributions and issues are welcome:
