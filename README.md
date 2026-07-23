@@ -330,6 +330,14 @@ See the [samples](samples/) directory for a complete example application demonst
 
 <!-- portfolio-techstack:end -->
 
+<!-- portfolio-roadmap:start -->
+
+## Roadmap
+
+Planned work and known limitations are tracked in the [open issues](https://github.com/phmatray/Bustand/issues). Contributions toward them are welcome.
+
+<!-- portfolio-roadmap:end -->
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
