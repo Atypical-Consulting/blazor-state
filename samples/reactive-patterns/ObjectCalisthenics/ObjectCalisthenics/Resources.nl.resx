@@ -1,0 +1,95 @@
+<root>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>1.3</value>
+    </resheader>
+    <resheader name="reader">
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <resheader name="writer">
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <data name="OC0001Title" xml:space="preserve">
+        <value>Slechts één indentatieniveau per methode</value>
+    </data>
+    <data name="OC0001Description" xml:space="preserve">
+        <value>Methoden mogen slechts één indentatieniveau hebben om de leesbaarheid te verbeteren.</value>
+    </data>
+    <data name="OC0001MessageFormat" xml:space="preserve">
+        <value>Methode '{0}' bevat meer dan één niveau van indentatie</value>
+    </data>
+    <data name="OC0002Title" xml:space="preserve">
+        <value>Gebruik het sleutelwoord 'else' niet</value>
+    </data>
+    <data name="OC0002Description" xml:space="preserve">
+        <value>Vermijd het gebruik van het sleutelwoord 'else' om functies met één ingang en één uitgang te bevorderen.</value>
+    </data>
+    <data name="OC0002MessageFormat" xml:space="preserve">
+        <value>Sleutelwoord 'else' gedetecteerd in methode '{0}'</value>
+    </data>
+    <data name="OC0003Title" xml:space="preserve">
+        <value>Verpak primitieven en strings</value>
+    </data>
+    <data name="OC0003Description" xml:space="preserve">
+        <value>Verpak alle primitieven en strings in klassen om ze extra gedrag en betekenis te geven.</value>
+    </data>
+    <data name="OC0003MessageFormat" xml:space="preserve">
+        <value>Primitief type of string gedetecteerd zonder verpakking in '{0}'</value>
+    </data>
+    <data name="OC0004Title" xml:space="preserve">
+        <value>Gebruik slechts één punt per regel</value>
+    </data>
+    <data name="OC0004Description" xml:space="preserve">
+        <value>Gebruik slechts één punt per regel om overtreding van de wet van Demeter te voorkomen, bevordert encapsulatie.</value>
+    </data>
+    <data name="OC0004MessageFormat" xml:space="preserve">
+        <value>Meer dan één punt gedetecteerd in '{0}'</value>
+    </data>
+    <data name="OC0005Title" xml:space="preserve">
+        <value>Gebruik geen afkortingen</value>
+    </data>
+    <data name="OC0005Description" xml:space="preserve">
+        <value>Gebruik geen afkortingen bij het benoemen van variabelen, het moet duidelijk en ondubbelzinnig zijn.</value>
+    </data>
+    <data name="OC0005MessageFormat" xml:space="preserve">
+        <value>Afkorting gedetecteerd in '{0}'</value>
+    </data>
+    <data name="OC0006Title" xml:space="preserve">
+        <value>Houd alle entiteiten klein</value>
+    </data>
+    <data name="OC0006Description" xml:space="preserve">
+        <value>Houd uw entiteiten klein, klassen moeten minder dan 50 regels zijn en pakketten moeten minder dan 10 bestanden hebben.</value>
+    </data>
+    <data name="OC0006MessageFormat" xml:space="preserve">
+        <value>Entiteit '{0}' is te groot, het moet minder dan 50 regels zijn</value>
+    </data>
+    <data name="OC0007Title" xml:space="preserve">
+        <value>Geen klassen met meer dan twee instantievariabelen</value>
+    </data>
+    <data name="OC0007Description" xml:space="preserve">
+        <value>Beperk het aantal instantievariabelen in een klasse om meer samenhangende, minder gekoppelde klassen te stimuleren.</value>
+    </data>
+    <data name="OC0007MessageFormat" xml:space="preserve">
+        <value>Klasse '{0}' heeft meer dan twee instantievariabelen</value>
+    </data>
+    <data name="OC0008Title" xml:space="preserve">
+        <value>Gebruik eersteklas collecties</value>
+    </data>
+    <data name="OC0008Description" xml:space="preserve">
+        <value>Gebruik eersteklas collecties, elke klasse die een collectie bevat mag geen andere lidvariabelen bevatten.</value>
+    </data>
+    <data name="OC0008MessageFormat" xml:space="preserve">
+        <value>Klasse '{0}' mag geen andere lidvariabelen bevatten</value>
+    </data>
+    <data name="OC0009Title" xml:space="preserve">
+        <value>Vermijd getters en setters</value>
+    </data>
+    <data name="OC0009Description" xml:space="preserve">
+        <value>Gebruik geen getters/setters/eigenschappen om een betere encapsulatie te stimuleren.</value>
+    </data>
+    <data name="OC0009MessageFormat" xml:space="preserve">
+        <value>Getter of setter gedetecteerd in '{0}'</value>
+    </data>
+</root>

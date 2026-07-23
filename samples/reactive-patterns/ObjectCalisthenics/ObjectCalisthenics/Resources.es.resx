@@ -1,0 +1,95 @@
+<root>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>1.3</value>
+    </resheader>
+    <resheader name="reader">
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <resheader name="writer">
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <data name="OC0001Title" xml:space="preserve">
+        <value>Solo un nivel de indentación por método</value>
+    </data>
+    <data name="OC0001Description" xml:space="preserve">
+        <value>Los métodos solo deben tener un nivel de indentación para mejorar la legibilidad.</value>
+    </data>
+    <data name="OC0001MessageFormat" xml:space="preserve">
+        <value>El método '{0}' contiene más de un nivel de indentación</value>
+    </data>
+    <data name="OC0002Title" xml:space="preserve">
+        <value>No usar la palabra clave 'else'</value>
+    </data>
+    <data name="OC0002Description" xml:space="preserve">
+        <value>Evitar usar la palabra clave 'else' para promover funciones de entrada y salida únicas.</value>
+    </data>
+    <data name="OC0002MessageFormat" xml:space="preserve">
+        <value>Palabra clave 'else' detectada en el método '{0}'</value>
+    </data>
+    <data name="OC0003Title" xml:space="preserve">
+        <value>Envolver primitivas y cadenas</value>
+    </data>
+    <data name="OC0003Description" xml:space="preserve">
+        <value>Envuelva todas las primitivas y cadenas en clases para darles un comportamiento y significado adicionales.</value>
+    </data>
+    <data name="OC0003MessageFormat" xml:space="preserve">
+        <value>Tipo primitivo o cadena detectado sin envoltura en '{0}'</value>
+    </data>
+    <data name="OC0004Title" xml:space="preserve">
+        <value>Usar solo un punto por línea</value>
+    </data>
+    <data name="OC0004Description" xml:space="preserve">
+        <value>Usar solo un punto por línea para evitar la violación de la Ley de Demeter, fomenta la encapsulación.</value>
+    </data>
+    <data name="OC0004MessageFormat" xml:space="preserve">
+        <value>Más de un punto detectado en '{0}'</value>
+    </data>
+    <data name="OC0005Title" xml:space="preserve">
+        <value>No abreviar</value>
+    </data>
+    <data name="OC0005Description" xml:space="preserve">
+        <value>No abreviar al nombrar variables, debe ser claro y sin ambigüedades.</value>
+    </data>
+    <data name="OC0005MessageFormat" xml:space="preserve">
+        <value>Abreviatura detectada en '{0}'</value>
+    </data>
+    <data name="OC0006Title" xml:space="preserve">
+        <value>Mantener todas las entidades pequeñas</value>
+    </data>
+    <data name="OC0006Description" xml:space="preserve">
+        <value>Mantenga sus entidades pequeñas, las clases deben tener menos de 50 líneas y los paquetes menos de 10 archivos.</value>
+    </data>
+    <data name="OC0006MessageFormat" xml:space="preserve">
+        <value>La entidad '{0}' es demasiado grande, debería tener menos de 50 líneas</value>
+    </data>
+    <data name="OC0007Title" xml:space="preserve">
+        <value>No clases con más de dos variables de instancia</value>
+    </data>
+    <data name="OC0007Description" xml:space="preserve">
+        <value>Limite el número de variables de instancia en una clase para fomentar clases más cohesivas y menos acopladas.</value>
+    </data>
+    <data name="OC0007MessageFormat" xml:space="preserve">
+        <value>La clase '{0}' tiene más de dos variables de instancia</value>
+    </data>
+    <data name="OC0008Title" xml:space="preserve">
+        <value>Usar colecciones de primera clase</value>
+    </data>
+    <data name="OC0008Description" xml:space="preserve">
+        <value>Use colecciones de primera clase, cualquier clase que contenga una colección</value>
+    </data>
+    <data name="OC0008MessageFormat" xml:space="preserve">
+        <value>La clase '{0}' no debe contener otras variables miembro</value>
+    </data>
+    <data name="OC0009Title" xml:space="preserve">
+        <value>Evitar getters y setters</value>
+    </data>
+    <data name="OC0009Description" xml:space="preserve">
+        <value>No use getters/setters/propiedades para fomentar una mejor encapsulación.</value>
+    </data>
+    <data name="OC0009MessageFormat" xml:space="preserve">
+        <value>Getter o setter detectado en '{0}'</value>
+    </data>
+</root>
