@@ -159,6 +159,16 @@ You can contact us by opening an issue on this repository.
 
 <!-- portfolio-techstack:end -->
 
+## 🗺️ Roadmap
+
+- [ ] Redux DevTools-style time-travel debugging for Ducky stores
+- [ ] Expand `Ducky.Generator` source generators to cut more action/reducer boilerplate
+- [ ] Additional built-in middlewares (e.g. persistence, undo/redo)
+- [ ] Broaden normalization and selector helpers for large, nested state trees
+- [ ] More end-to-end samples beyond the counter demo (e.g. data-fetching, forms)
+
+See the [open issues](https://github.com/phmatray/Ducky/issues) for details and to propose new ideas.
+
 ## 📜 License
 
 Apache-2.0 License
