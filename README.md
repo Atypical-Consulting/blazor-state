@@ -2,6 +2,28 @@
 
 # Bustand
 
+<!-- portfolio-toc:start -->
+
+## Table of Contents
+
+- [Why Bustand?](#why-bustand)
+- [Features](#features)
+- [Quick Start](#quick-start)
+- [DevTools](#devtools)
+- [Persistence](#persistence)
+- [Selectors](#selectors)
+- [Middleware](#middleware)
+- [Advanced Topics](#advanced-topics)
+- [Documentation](#documentation)
+- [Sample Application](#sample-application)
+- [Tech Stack](#tech-stack)
+- [Contributing](#contributing)
+- [License](#license)
+- [Acknowledgments](#acknowledgments)
+
+<!-- portfolio-toc:end -->
+
+
 [![NuGet](https://img.shields.io/nuget/v/Bustand.svg)](https://www.nuget.org/packages/Bustand)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![.NET](https://img.shields.io/badge/.NET-10.0-512BD4)](https://dotnet.microsoft.com)
