@@ -318,6 +318,16 @@ Mutty targets `netstandard2.0` and supports **Roslyn 4.8 and later** (Visual Stu
 
 <!-- portfolio-techstack:end -->
 
+## Roadmap
+
+- [ ] Lift the `MUTTY002` restriction so generic records (e.g. `record Box<T>`) can opt into `[MutableGeneration]`
+- [ ] Extend wrapper support to more collection types (`IReadOnlyDictionary<TKey, TValue>`, `ConcurrentDictionary`)
+- [ ] Publish BenchmarkDotNet results comparing `Produce` against hand-written `with` chains
+- [ ] Expand the Writerside documentation site with more real-world recipes and a searchable API reference
+- [ ] Explore a Roslyn code-fix that offers to add `[MutableGeneration]` when a diagnostic fires on a candidate record
+
+See the [open issues](https://github.com/phmatray/Mutty/issues) for what's currently planned.
+
 ## Contributing
 
 Contributions and issues are welcome:
