@@ -1,0 +1,70 @@
+// Copyright (c) 2020-2026 Atypical Consulting SRL. All rights reserved.
+// Atypical Consulting SRL licenses this file to you under the Apache-2.0 license.
+// See the LICENSE file in the project root for full license information.
+
+using Ducky.Pipeline;
+using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Logging;
+
+namespace Ducky.Blazor.Components;
+
+/// <summary>
+/// An error boundary component for Ducky Blazor applications that integrates with the Ducky exception handling system.
+/// </summary>
+public partial class DuckyErrorBoundary
+{
+    // Note: ChildContent and ErrorContent are inherited from ErrorBoundary base class
+    // We don't need to redeclare them as that causes parameter conflicts
+
+    /// <summary>
+    /// Gets or sets whether to show detailed error information in the default error UI.
+    /// </summary>
+    [Parameter]
+    public bool ShowDetails { get; set; }
+
+    /// <inheritdoc />
+    protected override Task OnErrorAsync(Exception exception)
+    {
+        Logger.LogError(exception, "Unhandled exception occurred in Blazor component");
+
+        // Create error event args
+        ActionErrorEventArgs errorEventArgs = new(exception, "BlazorComponent", new ActionContext("BlazorError"));
+
+        // Allow exception handlers to handle the exception
+        var isHandled = false;
+        foreach (IExceptionHandler handler in ExceptionHandlers)
+        {
+            try
+            {
+                if (handler.HandleActionError(errorEventArgs))
+                {
+                    isHandled = true;
+                    break;
+                }
+            }
+            catch (Exception handlerException)
+            {
+                Logger.LogError(
+                    handlerException,
+                    "Exception handler {HandlerType} threw an exception while handling {OriginalExceptionType}",
+                    handler.GetType().Name,
+                    exception.GetType().Name);
+            }
+        }
+
+        // Publish the error event
+        ActionErrorEventArgs finalEventArgs =
+            new(exception, "BlazorComponent", new ActionContext("BlazorError"), isHandled);
+        EventPublisher.Publish(finalEventArgs);
+
+        return base.OnErrorAsync(exception);
+    }
+
+    /// <summary>
+    /// Recovers from the error state and re-renders the component.
+    /// </summary>
+    public new void Recover()
+    {
+        base.Recover();
+    }
+}

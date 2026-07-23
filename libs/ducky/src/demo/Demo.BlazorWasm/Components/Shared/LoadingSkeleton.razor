@@ -1,0 +1,36 @@
+@* Loading skeleton component for better perceived performance *@
+
+<div class="skeleton-container">
+    @for (int i = 0; i < Rows; i++)
+    {
+        <div class="skeleton-row">
+            @for (int j = 0; j < Columns; j++)
+            {
+                <div class="skeleton @(GetSkeletonClass(j))" style="@GetSkeletonStyle(j)"></div>
+            }
+        </div>
+    }
+</div>
+
+<style>
+    .skeleton-container {
+        width: 100%;
+    }
+    
+    .skeleton-row {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 0.75rem;
+        align-items: center;
+    }
+    
+    .skeleton-cell {
+        height: 1.5rem;
+        border-radius: 0.25rem;
+    }
+    
+    .skeleton-text {
+        height: 1.5rem;
+        border-radius: 0.25rem;
+    }
+</style>

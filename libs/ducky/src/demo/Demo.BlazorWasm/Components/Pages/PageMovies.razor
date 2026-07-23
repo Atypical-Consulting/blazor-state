@@ -1,0 +1,112 @@
+@page "/movies"
+@inherits DuckyComponent<MoviesState>
+@inject NavigationManager Navigation
+
+<PageTitle>Ducky - Movies</PageTitle>
+
+<MudGrid>
+  <MudItem xs="12">
+    <MudStack>
+      <MudText Typo="Typo.subtitle1">Example</MudText>
+      <MudText Typo="Typo.h3">Movies</MudText>
+      <MudText Typo="Typo.body1">
+        Creates a simple movie example using the Ducky state management library for predictable state handling,<br/>
+        featuring loading state and error handling for displaying movies.
+      </MudText>
+      <MudList T="string" Dense="true">
+        <Goal Condition="() => State.SelectMovieCount() > 0" ConditionKey="movies-exist">
+          Movies loaded successfully.
+        </Goal>
+      </MudList>
+    </MudStack>
+  </MudItem>
+
+  <MudItem xs="12">
+    <MudStack Row AlignItems="AlignItems.Center" Spacing="2">
+      @if (IsLoading)
+      {
+        <MudButton Variant="Variant.Outlined" Disabled>Please wait...</MudButton>
+      }
+      else
+      {
+        <MudButton Variant="Variant.Outlined" OnClick="LoadMovies">Reload Movies</MudButton>
+      }
+      <MudSpacer />
+      <SearchBox Label="Search movies..." 
+                 OnSearch="OnSearchMovies" 
+                 Class="flex-grow-0" 
+                 DebounceInterval="500" />
+    </MudStack>
+  </MudItem>
+  
+  <MudItem xs="12">
+    @if (ErrorMessage != null)
+    {
+      <MudText Color="Color.Error"><strong>@ErrorMessage</strong></MudText>
+    }
+    else if (IsLoading)
+    {
+      <MudText><strong>Loading movies...</strong></MudText>
+      
+      <MudProgressLinear
+        Color="Color.Primary"
+        Size="Size.Large"
+        Rounded
+        Indeterminate/>
+    }
+    else
+    {
+      @if (FilteredMovies.Any())
+      {
+        <MudSimpleTable Hover="true" Class="animate-fadeIn">
+          <thead>
+          <tr>
+            <th>Title</th>
+            <th>Director</th>
+            <th>Year</th>
+            <th>Duration</th>
+            <th>Score</th>
+          </tr>
+          </thead>
+          <tbody>
+          @foreach (var movie in FilteredMovies)
+          {
+            <tr class="transition-fast" style="cursor: pointer;" @onclick="() => GoToMovieDetails(movie.Id)">
+              <td>@movie.Title</td>
+              <td>@movie.Director</td>
+              <td>@movie.Year</td>
+              <td>@movie.Duration</td>
+              <td @onclick:stopPropagation="true">
+                <MudStack Row AlignItems="AlignItems.Baseline">
+                  <MudRating SelectedValue="@movie.Score" ReadOnly Size="Size.Small"/>
+                  <MudIconButton 
+                    Icon="@Icons.Material.Filled.Info"
+                    Size="Size.Small"
+                    OnClick="@(() => GoToMovieDetails(movie.Id))"/>
+                </MudStack>
+              </td>
+            </tr>
+          }
+          </tbody>
+        </MudSimpleTable>
+      }
+      else
+      {
+        <MudAlert Severity="Severity.Info">
+          No movies found matching your search criteria.
+        </MudAlert>
+      }
+    }
+  </MudItem>
+
+  <MudItem xs="12">
+    <MudStack Row Justify="Justify.Center">
+      <MudPagination
+        SelectedChanged="SetCurrentPage"
+        Variant="Variant.Filled"
+        Count="@TotalPages"
+        ShowFirstButton="true"
+        ShowLastButton="true"/>
+    </MudStack>
+  </MudItem>
+</MudGrid>

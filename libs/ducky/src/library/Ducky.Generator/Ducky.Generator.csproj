@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <DebugSymbols>True</DebugSymbols>
+    <DebugType>Embedded</DebugType>
+    <DisableImplicitNamespaceImports>true</DisableImplicitNamespaceImports>
+    <BaseOutputPath>bin\$(RoslynVersion)\</BaseOutputPath>
+    <IsRoslynComponent>true</IsRoslynComponent>
+
+    <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
+
+    <DevelopmentDependency>true</DevelopmentDependency>
+    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+
+    <RootNamespace>Ducky.Generator</RootNamespace>
+    <PackageId>Ducky.Generator</PackageId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" PrivateAssets="all"/>
+    <PackageReference Include="Microsoft.CodeAnalysis.AnalyzerUtilities" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" PrivateAssets="all"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="$(TargetPath)"
+          Pack="true"
+          PackagePath="analyzers/dotnet/cs"
+          Visible="false"/>
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,33 @@
+@* Copyright (c) 2020-2024 Atypical Consulting SRL. All rights reserved. *@
+@* Atypical Consulting SRL licenses this file to you under the GPL-3.0-or-later license. *@
+@* See the LICENSE file in the project root for full license information. *@
+
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.Extensions.Logging
+@inherits ErrorBoundary
+@inject IEnumerable<IExceptionHandler> ExceptionHandlers
+@inject IStoreEventPublisher EventPublisher
+@inject ILogger<DuckyErrorBoundary> Logger
+
+@if (CurrentException is null)
+{
+    @ChildContent
+}
+else if (ErrorContent != null)
+{
+    @ErrorContent(CurrentException)
+}
+else
+{
+    <div class="ducky-error-boundary">
+        <h3>Something went wrong</h3>
+        <p>An error occurred while rendering this component.</p>
+        @if (ShowDetails)
+        {
+            <details>
+                <summary>Error Details</summary>
+                <pre>@CurrentException.ToString()</pre>
+            </details>
+        }
+    </div>
+}

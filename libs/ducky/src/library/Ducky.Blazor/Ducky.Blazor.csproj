@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <RootNamespace>Ducky.Blazor</RootNamespace>
+    <NoWarn>$(NoWarn);RCS1019;CS0618</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Ducky.Blazor.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <SupportedPlatform Include="browser"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Blazored.LocalStorage" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Ducky\Ducky.csproj" />
+  </ItemGroup>
+
+</Project>

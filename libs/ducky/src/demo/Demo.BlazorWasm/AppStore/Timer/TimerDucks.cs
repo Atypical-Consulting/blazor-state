@@ -1,0 +1,76 @@
+// Copyright (c) 2020-2026 Atypical Consulting SRL. All rights reserved.
+// Atypical Consulting SRL licenses this file to you under the Apache-2.0 license.
+// See the LICENSE file in the project root for full license information.
+
+namespace Demo.BlazorWasm.AppStore;
+
+#region State
+
+public record TimerState
+{
+    public int Time { get; init; }
+
+    public bool IsRunning { get; init; }
+
+    // Selectors
+    public string SelectAngle()
+        => $"{Time % 60 * 6}deg";
+}
+
+#endregion
+
+#region Actions
+
+[DuckyAction]
+public partial record StartTimer;
+
+[DuckyAction]
+public partial record StopTimer;
+
+[DuckyAction]
+public partial record ResetTimer;
+
+[DuckyAction]
+public partial record Tick;
+
+#endregion
+
+#region Reducers
+
+public record TimerReducers : SliceReducers<TimerState>
+{
+    public TimerReducers()
+    {
+        On<StartTimer>(Reduce);
+        On<StopTimer>(Reduce);
+        On<ResetTimer>(Reduce);
+        On<Tick>(Reduce);
+    }
+
+    public override TimerState GetInitialState()
+        => new()
+        {
+            Time = 0,
+            IsRunning = false
+        };
+
+    private static TimerState Reduce(TimerState state, StartTimer _)
+        => state with { IsRunning = true };
+
+    private static TimerState Reduce(TimerState state, StopTimer _)
+        => state with { IsRunning = false };
+
+    private static TimerState Reduce(TimerState timerState, ResetTimer resetTimer)
+        => new();
+
+    private static TimerState Reduce(TimerState state, Tick _)
+        => state with { Time = state.Time + 1 };
+}
+
+#endregion
+
+#region Effects
+
+// Timer effects are handled by TimerTickEffect in Features/Feedback/Effects
+
+#endregion

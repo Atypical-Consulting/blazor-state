@@ -1,0 +1,91 @@
+@page "/errors"
+@inherits DuckyComponent<NotificationsState>
+
+<PageTitle>Ducky - Errors & Exception Handling</PageTitle>
+
+<MudGrid>
+  <MudItem xs="12">
+    <MudStack>
+      <MudText Typo="Typo.subtitle1">System</MudText>
+      <MudText Typo="Typo.h3">Error Handling Demo</MudText>
+      <MudText Typo="Typo.body1">
+        Test global error handling and recovery features.
+      </MudText>
+    </MudStack>
+  </MudItem>
+  
+  <MudItem xs="12">
+    <MudPaper Class="pa-4">
+      <MudText Typo="Typo.h6" Class="mb-4">Error Simulation</MudText>
+      <MudGrid>
+        <MudItem xs="12" sm="6" md="3">
+          <MudButton 
+            Variant="Variant.Filled" 
+            Color="Color.Error" 
+            FullWidth="true"
+            OnClick="ThrowException">
+            Throw Exception
+          </MudButton>
+        </MudItem>
+        <MudItem xs="12" sm="6" md="3">
+          <MudButton 
+            Variant="Variant.Filled" 
+            Color="Color.Warning" 
+            FullWidth="true"
+            OnClick="ThrowAsyncExceptionAsync">
+            Throw Async Exception
+          </MudButton>
+        </MudItem>
+        <MudItem xs="12" sm="6" md="3">
+          <MudButton 
+            Variant="Variant.Filled" 
+            Color="Color.Info" 
+            FullWidth="true"
+            OnClick="SimulateActionError">
+            Simulate Action Error
+          </MudButton>
+        </MudItem>
+        <MudItem xs="12" sm="6" md="3">
+          <MudButton 
+            Variant="Variant.Filled" 
+            Color="Color.Secondary" 
+            FullWidth="true"
+            OnClick="ClearErrors">
+            Clear All Errors
+          </MudButton>
+        </MudItem>
+      </MudGrid>
+    </MudPaper>
+  </MudItem>
+  
+  <MudItem xs="12">
+    <MudTextField
+      @bind-Value="@_searchTerm"
+      AdornmentIcon="@Icons.Material.Filled.FindInPage"
+      Adornment="Adornment.End"
+      Immediate="true"
+      Variant="Variant.Outlined"
+      Label="Search" />
+    
+    @if (ErrorNotifications.Any())
+    {
+      <MudTimeline TimelineOrientation="TimelineOrientation.Vertical" TimelinePosition="TimelinePosition.Start">
+        @foreach (var notification in ErrorNotifications)
+        {
+          <MudTimelineItem @key="notification.Id" Color="@notification.Severity.ToMudColor()" Variant="Variant.Filled">
+            <ItemContent>
+              <ExceptionDetailsAlert Notification="@notification" SearchTerm="@_searchTerm"/>
+            </ItemContent>
+          </MudTimelineItem>
+        }
+      </MudTimeline>
+    }
+    else
+    {
+      <MudStack Row Class="ml-6">
+        <MudIcon Icon="@Icons.Material.Filled.Info" Color="Color.Secondary"/>
+        <MudText>There are no error notifications.</MudText>
+      </MudStack>
+    }
+  </MudItem>
+</MudGrid>

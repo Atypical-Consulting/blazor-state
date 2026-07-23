@@ -1,0 +1,557 @@
+// Copyright (c) 2020-2026 Atypical Consulting SRL. All rights reserved.
+// Atypical Consulting SRL licenses this file to you under the Apache-2.0 license.
+// See the LICENSE file in the project root for full license information.
+
+using System.Collections.Immutable;
+using System.Diagnostics;
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.Json;
+using Ducky.Pipeline;
+using Microsoft.Extensions.Logging;
+
+namespace Ducky.Blazor.Middlewares.Persistence;
+
+/// <summary>
+/// Modern middleware that handles state persistence and hydration with comprehensive features.
+/// </summary>
+public sealed class PersistenceMiddleware : MiddlewareBase, IDisposable
+{
+    private readonly IEnhancedPersistenceProvider<Dictionary<string, object>> _persistenceProvider;
+    private readonly HydrationManager _hydrationManager;
+    private readonly PersistenceOptions _options;
+    private readonly ILogger<PersistenceMiddleware> _logger;
+    private IDispatcher? _dispatcher;
+    private IStore? _store;
+
+    private bool _isEnabled;
+    private bool _isHydrated;
+    private readonly object _persistenceLock = new();
+    private DateTime _lastPersistenceTime = DateTime.MinValue;
+    private readonly Timer _debounceTimer;
+    private readonly Timer _throttleTimer;
+    private Timer? _hydrationWarningTimer;
+    private string? _lastPersistedStateHash;
+
+    /// <summary>
+    /// Gets a value indicating whether hydration has completed.
+    /// </summary>
+    public bool IsHydrated => _isHydrated;
+
+    /// <summary>
+    /// Gets a value indicating whether persistence is enabled.
+    /// </summary>
+    public bool IsEnabled => _isEnabled;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PersistenceMiddleware"/> class.
+    /// </summary>
+    /// <param name="persistenceProvider">The enhanced persistence provider.</param>
+    /// <param name="hydrationManager">The hydration manager.</param>
+    /// <param name="options">Configuration options for persistence.</param>
+    /// <param name="logger">The logger instance.</param>
+    public PersistenceMiddleware(
+        IEnhancedPersistenceProvider<Dictionary<string, object>> persistenceProvider,
+        HydrationManager hydrationManager,
+        PersistenceOptions options,
+        ILogger<PersistenceMiddleware> logger)
+    {
+        _persistenceProvider = persistenceProvider ?? throw new ArgumentNullException(nameof(persistenceProvider));
+        _hydrationManager = hydrationManager ?? throw new ArgumentNullException(nameof(hydrationManager));
+        _options = options ?? throw new ArgumentNullException(nameof(options));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
+        _isEnabled = _options.Enabled;
+
+        // Initialize timers for debouncing and throttling
+        _debounceTimer = new Timer(OnDebounceElapsed, null, Timeout.Infinite, Timeout.Infinite);
+        _throttleTimer = new Timer(OnThrottleElapsed, null, Timeout.Infinite, Timeout.Infinite);
+    }
+
+    /// <inheritdoc />
+    public override Task InitializeAsync(IDispatcher dispatcher, IStore store)
+    {
+        _dispatcher = dispatcher;
+        _store = store;
+
+        LogIfEnabled($"[InitializeAsync] PersistenceMiddleware initialized with store: {store?.GetType().Name}");
+
+        // In Blazor apps, hydration should be handled by PersistenceInitializer component
+        // to ensure proper timing after the store is fully initialized
+        // We don't auto-hydrate here to avoid race conditions
+
+        if (_options.HydrationTimeoutWarningMs > 0)
+        {
+            _hydrationWarningTimer = new Timer(
+                _ =>
+                {
+                    if (_hydrationManager.IsHydrating || _isHydrated)
+                    {
+                        return;
+                    }
+
+                    _logger.LogWarning(
+                        "Persistence is configured but HydrateAsync() has not been called after {Timeout}ms. "
+                        + "Did you forget to add <PersistenceInitializer> to your Blazor layout?",
+                        _options.HydrationTimeoutWarningMs);
+                },
+                null,
+                _options.HydrationTimeoutWarningMs,
+                Timeout.Infinite);
+        }
+
+        return Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// Performs hydration from persisted state.
+    /// </summary>
+    public async Task HydrateAsync()
+    {
+        if (!_isEnabled || _isHydrated || _dispatcher is null)
+        {
+            return;
+        }
+
+        string hydrationId = Guid.NewGuid().ToString();
+        Stopwatch stopwatch = Stopwatch.StartNew();
+
+        // Cancel the hydration warning timer since hydration is now starting
+        _hydrationWarningTimer?.Change(Timeout.Infinite, Timeout.Infinite);
+
+        try
+        {
+            _hydrationManager.StartHydrating();
+            _dispatcher.Dispatch(new HydrationStartedAction("persistence", hydrationId));
+
+            PersistedStateContainer<Dictionary<string, object>>? container = await LoadPersistedStateWithRetryAsync().ConfigureAwait(false);
+
+            if (container?.State is not null)
+            {
+                Dictionary<string, object> stateDict = container.State;
+                LogIfEnabled($"Loaded state dictionary with {stateDict.Count} slices");
+
+                // Dispatch hydrate actions for each slice
+                Dictionary<string, object> slices = stateDict;
+                LogIfEnabled($"Found {slices.Count} slices to hydrate");
+                foreach ((string sliceKey, object sliceState) in slices)
+                {
+                    LogIfEnabled($"Dispatching HydrateSliceAction for slice '{sliceKey}' with state type {sliceState.GetType().Name}");
+                    _dispatcher.Dispatch(new HydrateSliceAction(sliceKey, sliceState));
+                    LogIfEnabled($"Hydrated slice '{sliceKey}' with type {sliceState.GetType().Name}");
+                }
+
+                LogIfEnabled($"Hydrated {slices.Count} slices from version {container.Metadata.Version} "
+                    + $"(persisted at {container.Metadata.Timestamp})");
+
+                _dispatcher.Dispatch(new HydrationCompletedAction("persistence", hydrationId, true, stopwatch.Elapsed));
+            }
+            else
+            {
+                LogIfEnabled("No persisted state found for hydration");
+                _dispatcher.Dispatch(new HydrationCompletedAction("persistence", hydrationId, false, stopwatch.Elapsed));
+            }
+
+            _hydrationManager.FinishHydrating();
+            _isHydrated = true;
+
+            // Replay queued actions if enabled
+            if (_options.QueueActionsOnHydration)
+            {
+                foreach (object action in _hydrationManager.DequeueAll())
+                {
+                    _dispatcher.Dispatch(action);
+                }
+            }
+
+            // Persist initial state if configured
+            if (_options.PersistInitialState)
+            {
+                await PersistCurrentStateAsync("initial").ConfigureAwait(false);
+            }
+        }
+        catch (Exception ex)
+        {
+            LogIfEnabled($"Hydration failed: {ex.Message}");
+            _dispatcher.Dispatch(new HydrationFailedAction("persistence", hydrationId, ex.Message, stopwatch.Elapsed));
+
+            if (_options.ErrorHandling == PersistenceErrorHandling.Throw)
+            {
+                throw;
+            }
+
+            if (_options.ErrorHandling == PersistenceErrorHandling.LogAndDisable)
+            {
+                _isEnabled = false;
+            }
+        }
+    }
+
+    /// <inheritdoc />
+    public override void BeforeReduce(object action)
+    {
+        // Queue actions during hydration if enabled
+        if (!_options.QueueActionsOnHydration || !_hydrationManager.IsHydrating || IsHydrationAction(action))
+        {
+            return;
+        }
+
+        _hydrationManager.EnqueueAction(action);
+    }
+
+    /// <inheritdoc />
+    public override void AfterReduce(object action)
+    {
+        LogIfEnabled($"[AfterReduce] Action: {action.GetType().Name}");
+        
+        if (_store is null)
+        {
+            LogIfEnabled("[AfterReduce] Store is null, skipping persistence");
+            return;
+        }
+
+        // Skip persistence during hydration or for hydration actions
+        if (!_isEnabled || _hydrationManager.IsHydrating || IsHydrationAction(action))
+        {
+            LogIfEnabled($"[AfterReduce] Skipping - Enabled: {_isEnabled}, "
+                + $"IsHydrating: {_hydrationManager.IsHydrating}, "
+                + $"IsHydrationAction: {IsHydrationAction(action)}");
+            return;
+        }
+
+        // Check if action should trigger persistence
+        if (!ShouldPersistForAction(action))
+        {
+            LogIfEnabled($"[AfterReduce] Action {action.GetType().Name} should not trigger persistence");
+            return;
+        }
+
+        // Check if state should be persisted
+        if (!ShouldPersistState(_store))
+        {
+            LogIfEnabled("[AfterReduce] State should not be persisted");
+            return;
+        }
+
+        LogIfEnabled($"[AfterReduce] Scheduling persistence for action {action.GetType().Name}");
+        // Schedule persistence based on throttling/debouncing configuration
+        SchedulePersistence("action");
+    }
+
+    /// <summary>
+    /// Schedules persistence based on throttling and debouncing settings.
+    /// </summary>
+    /// <param name="trigger">What triggered the persistence.</param>
+    private void SchedulePersistence(string trigger)
+    {
+        lock (_persistenceLock)
+        {
+            DateTime now = DateTime.UtcNow;
+
+            // Apply throttling
+            if (_options.ThrottleDelayMs > 0)
+            {
+                if (now - _lastPersistenceTime < TimeSpan.FromMilliseconds(_options.ThrottleDelayMs))
+                {
+                    LogIfEnabled($"[SchedulePersistence] Throttled - Last: {_lastPersistenceTime}, "
+                        + $"Now: {now}, Delay: {_options.ThrottleDelayMs}ms");
+                    return; // Skip this persistence due to throttling
+                }
+            }
+
+            // Apply debouncing
+            if (_options.DebounceDelayMs > 0)
+            {
+                LogIfEnabled($"[SchedulePersistence] Debouncing with {_options.DebounceDelayMs}ms delay");
+                _debounceTimer.Change(_options.DebounceDelayMs, Timeout.Infinite);
+                return;
+            }
+
+            LogIfEnabled($"[SchedulePersistence] Immediate persistence triggered by: {trigger}");
+            // Immediate persistence
+            _ = Task.Run(() => PersistCurrentStateAsync(trigger));
+        }
+    }
+
+    /// <summary>
+    /// Called when debounce timer elapses.
+    /// </summary>
+    private void OnDebounceElapsed(object? state)
+    {
+        _ = Task.Run(() => PersistCurrentStateAsync("debounced"));
+    }
+
+    /// <summary>
+    /// Called when throttle timer elapses.
+    /// </summary>
+    private void OnThrottleElapsed(object? state)
+    {
+        _ = Task.Run(() => PersistCurrentStateAsync("throttled"));
+    }
+
+    /// <summary>
+    /// Persists the current state.
+    /// </summary>
+    /// <param name="trigger">What triggered the persistence.</param>
+    public async Task PersistCurrentStateAsync(string trigger)
+    {
+        if (!_isEnabled || _dispatcher is null || _store is null)
+        {
+            LogIfEnabled($"[PersistCurrentStateAsync] Cannot persist - Enabled: {_isEnabled}, "
+                + $"Dispatcher: {_dispatcher is not null}, Store: {_store is not null}");
+            return;
+        }
+
+        string persistenceId = Guid.NewGuid().ToString();
+        Stopwatch stopwatch = Stopwatch.StartNew();
+
+        try
+        {
+            _dispatcher.Dispatch(new PersistenceTriggeredAction(trigger, persistenceId));
+
+            IStateProvider currentState = _store;
+
+            // Apply filtering based on whitelist/blacklist
+            IStateProvider filteredState = ApplyStateFiltering(currentState);
+
+            // Get the state dictionary from the filtered state
+            Dictionary<string, object> stateDict = filteredState.GetStateDictionary().ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            // Check if state has actually changed
+            string stateHash = ComputeStateHash(stateDict);
+            if (stateHash == _lastPersistedStateHash)
+            {
+                LogIfEnabled("State unchanged, skipping persistence");
+                return;
+            }
+
+            // Create metadata
+            PersistenceMetadata metadata = new()
+            {
+                Version = _options.Version,
+                Timestamp = DateTime.UtcNow,
+                ApplicationVersion = GetApplicationVersion(),
+                UserAgent = GetUserAgent(),
+                Checksum = stateHash
+            };
+
+            LogIfEnabled($"Persisting {stateDict.Count} slices to storage");
+            
+            // Persist the state dictionary
+            PersistenceResult result = await _persistenceProvider.SaveWithMetadataAsync(stateDict, metadata).ConfigureAwait(false);
+
+            if (result.Success)
+            {
+                _lastPersistedStateHash = stateHash;
+                _lastPersistenceTime = DateTime.UtcNow;
+
+                long bytesApprox = Encoding.UTF8.GetByteCount(JsonSerializer.Serialize(filteredState));
+
+                LogIfEnabled($"State persisted successfully ({bytesApprox} bytes)");
+                _dispatcher.Dispatch(new PersistenceCompletedAction(persistenceId, bytesApprox, stopwatch.Elapsed));
+            }
+            else
+            {
+                LogIfEnabled($"Persistence failed: {result.Error}");
+                _dispatcher.Dispatch(new PersistenceFailedAction(persistenceId, result.Error ?? "Unknown error", stopwatch.Elapsed));
+
+                HandlePersistenceError(result.Error ?? "Unknown error");
+            }
+        }
+        catch (Exception ex)
+        {
+            LogIfEnabled($"Persistence error: {ex.Message}");
+            _dispatcher.Dispatch(new PersistenceFailedAction(persistenceId, ex.Message, stopwatch.Elapsed));
+
+            HandlePersistenceError(ex.Message);
+        }
+    }
+
+    /// <summary>
+    /// Loads persisted state with retry logic.
+    /// </summary>
+    private async Task<PersistedStateContainer<Dictionary<string, object>>?> LoadPersistedStateWithRetryAsync()
+    {
+        int retryCount = 0;
+
+        while (retryCount <= _options.MaxHydrationRetries)
+        {
+            try
+            {
+                return await _persistenceProvider.LoadWithMetadataAsync().ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                retryCount++;
+                LogIfEnabled($"Hydration attempt {retryCount} failed: {ex.Message}");
+
+                if (retryCount > _options.MaxHydrationRetries)
+                {
+                    throw;
+                }
+
+                await Task.Delay(_options.HydrationRetryDelayMs).ConfigureAwait(false);
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Applies whitelist/blacklist filtering to state.
+    /// </summary>
+    private IStateProvider ApplyStateFiltering(IStateProvider state)
+    {
+        ImmutableSortedDictionary<string, object> stateDict = state.GetStateDictionary();
+        ImmutableSortedDictionary<string, object>.Builder filteredDict = stateDict.ToBuilder();
+
+        // Apply blacklist
+        foreach (string blacklistedKey in _options.BlacklistedStateKeys)
+        {
+            filteredDict.Remove(blacklistedKey);
+        }
+
+        // Apply whitelist if specified
+        if (_options.WhitelistedStateKeys?.Length > 0)
+        {
+            HashSet<string> whitelistedKeys = _options.WhitelistedStateKeys.ToHashSet();
+            List<string> keysToRemove = filteredDict.Keys.Where(key => !whitelistedKeys.Contains(key)).ToList();
+
+            foreach (string keyToRemove in keysToRemove)
+            {
+                filteredDict.Remove(keyToRemove);
+            }
+        }
+
+        // Return a filtered state provider wrapper
+        return new FilteredStateProvider(_store!, filteredDict.ToImmutable());
+    }
+
+    /// <summary>
+    /// Computes a hash of the state for change detection.
+    /// </summary>
+    private static string ComputeStateHash(Dictionary<string, object> stateDict)
+    {
+        string json = JsonSerializer.Serialize(stateDict);
+        byte[] hash = SHA256.HashData(Encoding.UTF8.GetBytes(json));
+        return Convert.ToBase64String(hash);
+    }
+
+    /// <summary>
+    /// Determines if an action should trigger persistence.
+    /// </summary>
+    private bool ShouldPersistForAction(object action)
+    {
+        // Use custom predicate if provided
+        if (_options.ShouldPersistAction is not null)
+        {
+            bool result = _options.ShouldPersistAction(action);
+            LogIfEnabled($"[ShouldPersistForAction] Custom predicate for {action.GetType().Name}: {result}");
+            return result;
+        }
+
+        // Check excluded action types
+        string actionType = action.GetType().Name;
+        bool isExcluded = _options.ExcludedActionTypes.Contains(actionType, StringComparer.OrdinalIgnoreCase);
+        LogIfEnabled($"[ShouldPersistForAction] Action {actionType} excluded: {isExcluded}, "
+            + $"ExcludedTypes: [{string.Join(", ", _options.ExcludedActionTypes)}]");
+        return !isExcluded;
+    }
+
+    /// <summary>
+    /// Determines if the current state should be persisted.
+    /// </summary>
+    private bool ShouldPersistState(IStateProvider state)
+    {
+        return _options.ShouldPersistState?.Invoke(state) ?? true;
+    }
+
+    /// <summary>
+    /// Determines if an action is a hydration-related action.
+    /// </summary>
+    private static bool IsHydrationAction(object action)
+    {
+        return action is HydrateSliceAction or
+               HydrationStartedAction or
+               HydrationCompletedAction or
+               HydrationFailedAction or
+               PersistenceTriggeredAction or
+               PersistenceCompletedAction or
+               PersistenceFailedAction;
+    }
+
+    /// <summary>
+    /// Handles persistence errors based on configuration.
+    /// </summary>
+    private void HandlePersistenceError(string error)
+    {
+        switch (_options.ErrorHandling)
+        {
+            case PersistenceErrorHandling.LogAndContinue:
+                // Already logged, just continue
+                break;
+            case PersistenceErrorHandling.LogAndDisable:
+                {
+                    _isEnabled = false;
+                    LogIfEnabled("Persistence disabled due to error");
+                    break;
+                }
+            case PersistenceErrorHandling.Throw:
+                throw new InvalidOperationException($"Persistence failed: {error}");
+        }
+    }
+
+    /// <summary>
+    /// Logs a message if logging is enabled.
+    /// </summary>
+    private void LogIfEnabled(string message)
+    {
+        if (!_options.EnableLogging)
+        {
+            return;
+        }
+
+        _logger.LogDebug("[PersistenceMiddleware] {Message}", message);
+    }
+
+    /// <summary>
+    /// Gets the application version for metadata.
+    /// </summary>
+    private static string? GetApplicationVersion()
+    {
+        try
+        {
+            return typeof(PersistenceMiddleware).Assembly.GetName().Version?.ToString();
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// Gets the user agent for metadata.
+    /// </summary>
+    private static string? GetUserAgent()
+    {
+        try
+        {
+            // In Blazor WebAssembly, we could potentially get this from JSInterop
+            // For now, just return a generic identifier
+            return "Blazor WebAssembly";
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// Disposes the middleware and its resources.
+    /// </summary>
+    public void Dispose()
+    {
+        _debounceTimer?.Dispose();
+        _throttleTimer?.Dispose();
+        _hydrationWarningTimer?.Dispose();
+    }
+}

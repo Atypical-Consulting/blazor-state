@@ -1,0 +1,35 @@
+// Copyright (c) 2020-2026 Atypical Consulting SRL. All rights reserved.
+// Atypical Consulting SRL licenses this file to you under the Apache-2.0 license.
+// See the LICENSE file in the project root for full license information.
+
+using System.Text.Json;
+using Microsoft.JSInterop;
+
+namespace Ducky.Blazor.Middlewares.JsLogging;
+
+/// <summary>
+/// Provides methods to log to the browser console via JSInterop.
+/// </summary>
+public sealed class JsConsoleLoggerModule : JsModule
+{
+    /// <summary>
+    /// Create a new JS Console logger module.
+    /// </summary>
+    /// <param name="js">The Blazor JS runtime.</param>
+    public JsConsoleLoggerModule(IJSRuntime js)
+        : base(js, "./_content/Ducky.Blazor/jsConsoleLogger.js")
+    {
+    }
+
+    /// <summary>
+    /// Logs a state/action/state group to the browser's developer console.
+    /// </summary>
+    /// <param name="label">Label for the console group.</param>
+    /// <param name="prevState">State before the action.</param>
+    /// <param name="action">The dispatched action.</param>
+    /// <param name="nextState">State after the action.</param>
+    public async Task LogAsync(string label, JsonElement prevState, JsonElement action, JsonElement nextState)
+    {
+        await InvokeVoidAsync("logGroup", label, prevState, action, nextState).ConfigureAwait(false);
+    }
+}

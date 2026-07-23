@@ -1,0 +1,14 @@
+@inherits DuckyComponent<Demo.BlazorWasm.AppStore.NotificationsState>
+
+<MudBadge
+  Content="@UnreadNotificationCount"
+  Overlap Color="Color.Secondary"
+  Class="mt-2"
+  Visible="@NotificationBadgeVisible">
+  <MudIconButton
+    Icon="@Icons.Material.Filled.Notifications"
+    Color="Color.Inherit"
+    Edge="Edge.End"
+    OnClick="ToggleNotifications"
+    Class="mt-n2"/>
+</MudBadge>

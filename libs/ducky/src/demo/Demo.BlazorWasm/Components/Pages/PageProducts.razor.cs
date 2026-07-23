@@ -1,0 +1,42 @@
+// Copyright (c) 2020-2026 Atypical Consulting SRL. All rights reserved.
+// Atypical Consulting SRL licenses this file to you under the Apache-2.0 license.
+// See the LICENSE file in the project root for full license information.
+
+using Demo.BlazorWasm.AppStore;
+
+namespace Demo.BlazorWasm.Components.Pages;
+
+public partial class PageProducts
+{
+    private string _newProductName = string.Empty;
+    private decimal _newProductPrice;
+    private string _newProductCategory = "Electronics";
+
+    private ImmutableArray<Product> Electronics => State.SelectElectronics();
+    private int ElectronicsCount => Electronics.Length;
+    private bool HasElectronics => ElectronicsCount > 0;
+    private decimal TotalPriceOfElectronics => State.SelectTotalPriceOfElectronics();
+    private ImmutableArray<Product> Clothing => State.SelectClothing();
+    private int ClothingCount => Clothing.Length;
+    private bool HasClothing => ClothingCount > 0;
+    private decimal TotalPriceOfClothing => State.SelectTotalPriceOfClothing();
+
+    private void CreateProduct()
+    {
+        if (string.IsNullOrWhiteSpace(_newProductName) || _newProductPrice <= 0)
+        {
+            return;
+        }
+
+        Product newProduct = new(Guid.NewGuid(), _newProductName, _newProductPrice, _newProductCategory);
+        Dispatcher.AddProduct(newProduct);
+        _newProductName = string.Empty;
+        _newProductPrice = 0;
+        _newProductCategory = "Electronics";
+    }
+
+    private void DeleteProduct(Guid id)
+    {
+        Dispatcher.RemoveProduct(id);
+    }
+}

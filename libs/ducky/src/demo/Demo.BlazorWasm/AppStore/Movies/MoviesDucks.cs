@@ -1,0 +1,129 @@
+// Copyright (c) 2020-2026 Atypical Consulting SRL. All rights reserved.
+// Atypical Consulting SRL licenses this file to you under the Apache-2.0 license.
+// See the LICENSE file in the project root for full license information.
+
+namespace Demo.BlazorWasm.AppStore;
+
+#region State
+
+public record Pagination
+{
+    public int CurrentPage { get; init; }
+
+    public int TotalPages { get; init; }
+
+    public int TotalItems { get; init; }
+}
+
+public record MoviesState
+{
+    public required ImmutableDictionary<int, Movie> Movies { get; init; }
+
+    public required bool IsLoading { get; init; }
+
+    public required string? ErrorMessage { get; init; }
+
+    public required Pagination Pagination { get; init; }
+
+    // Selectors
+    // ==========
+    // We can define selectors as methods in the state record
+    // to encapsulate the logic of selecting data from the state.
+    // Each method should begin with the word "Select".
+    public int SelectMovieCount()
+        => Movies.Count;
+
+    public Movie? SelectMovieById(int id)
+        => Movies.GetValueOrDefault(id);
+
+    public ImmutableDictionary<int, Movie> SelectMoviesByYear()
+        => Movies
+            .OrderByDescending(pair => pair.Value.Year)
+            .ToImmutableDictionary();
+}
+
+#endregion
+
+#region Actions
+
+[DuckyAction]
+public partial record LoadMovies;
+
+[DuckyAction]
+public partial record LoadMoviesSuccess(ImmutableArray<Movie> Movies, int TotalItems);
+
+[DuckyAction]
+public partial record LoadMoviesFailure(string ErrorMessage);
+
+[DuckyAction]
+public partial record SetCurrentPage(int CurrentPage);
+
+[DuckyAction]
+public partial record SearchMovies(string Query);
+
+#endregion
+
+#region Reducers
+
+public record MoviesReducers : SliceReducers<MoviesState>
+{
+    public MoviesReducers()
+    {
+        On<LoadMovies>(Reduce);
+        On<LoadMoviesSuccess>(Reduce);
+        On<LoadMoviesFailure>(Reduce);
+        On<SetCurrentPage>(Reduce);
+    }
+
+    public override MoviesState GetInitialState()
+        => new()
+        {
+            Movies = ImmutableDictionary<int, Movie>.Empty,
+            IsLoading = false,
+            ErrorMessage = null,
+            Pagination = new Pagination
+            {
+                CurrentPage = 1,
+                TotalPages = 1,
+                TotalItems = 0
+            }
+        };
+
+    private static MoviesState Reduce(MoviesState state, LoadMovies _)
+        => state with
+        {
+            IsLoading = true,
+            ErrorMessage = null
+        };
+
+    private static MoviesState Reduce(MoviesState state, LoadMoviesSuccess action)
+        => state with
+        {
+            Movies = action.Movies.ToImmutableDictionary(movie => movie.Id),
+            IsLoading = false,
+            Pagination = state.Pagination with
+            {
+                TotalItems = action.TotalItems,
+                TotalPages = (int)Math.Ceiling(action.TotalItems / 5.0)
+            }
+        };
+
+    private static MoviesState Reduce(MoviesState state, LoadMoviesFailure action)
+        => state with
+        {
+            Movies = ImmutableDictionary<int, Movie>.Empty,
+            ErrorMessage = action.ErrorMessage,
+            IsLoading = false
+        };
+
+    private static MoviesState Reduce(MoviesState state, SetCurrentPage action)
+        => state with
+        {
+            Pagination = state.Pagination with
+            {
+                CurrentPage = action.CurrentPage
+            }
+        };
+}
+
+#endregion

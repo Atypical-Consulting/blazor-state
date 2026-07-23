@@ -1,0 +1,112 @@
+// Copyright (c) 2020-2026 Atypical Consulting SRL. All rights reserved.
+// Atypical Consulting SRL licenses this file to you under the Apache-2.0 license.
+// See the LICENSE file in the project root for full license information.
+
+using FakeItEasy;
+using Microsoft.Extensions.Logging;
+using Microsoft.JSInterop;
+
+namespace Ducky.Blazor.Tests;
+
+public class DevToolsInitializationTests
+{
+    [Fact]
+    public void ReduxDevToolsModule_CanBeCreated_WithoutStoreAndDispatcher()
+    {
+        // Arrange
+        IJSRuntime mockJsRuntime = A.Fake<IJSRuntime>();
+        DevToolsStateManager stateManager = new(A.Fake<ILogger<DevToolsStateManager>>());
+        DevToolsOptions options = new();
+
+        // Act
+        ReduxDevToolsModule devTools = new(mockJsRuntime, stateManager, A.Fake<ILogger<ReduxDevToolsModule>>(), options);
+
+        // Assert
+        devTools.ShouldNotBeNull();
+        devTools.IsEnabled.ShouldBeFalse();
+    }
+
+    [Fact]
+    public async Task ReduxDevToolsModule_InitAsync_ReturnsWhenDisabledAsync()
+    {
+        // Arrange
+        IJSRuntime mockJsRuntime = A.Fake<IJSRuntime>();
+        DevToolsStateManager stateManager = new(A.Fake<ILogger<DevToolsStateManager>>());
+        DevToolsOptions options = new() { Enabled = false };
+        ReduxDevToolsModule devTools = new(mockJsRuntime, stateManager, A.Fake<ILogger<ReduxDevToolsModule>>(), options);
+
+        // Act
+        await devTools.InitAsync().ConfigureAwait(true);
+
+        // Assert
+        devTools.IsEnabled.ShouldBeFalse();
+        A.CallTo(() => mockJsRuntime.InvokeAsync<IJSObjectReference>(
+            A<string>.Ignored,
+            A<object[]>.Ignored))
+            .MustNotHaveHappened();
+    }
+
+    [Fact]
+    public void DevToolsMiddleware_CanInitialize_WithDevTools()
+    {
+        // Arrange
+        IJSRuntime mockJsRuntime = A.Fake<IJSRuntime>();
+        DevToolsStateManager stateManager = new(A.Fake<ILogger<DevToolsStateManager>>());
+        ReduxDevToolsModule devTools = new(mockJsRuntime, stateManager, A.Fake<ILogger<ReduxDevToolsModule>>());
+        DevToolsMiddleware middleware = new(devTools, stateManager, A.Fake<ILogger<DevToolsMiddleware>>());
+
+        IStore mockStore = A.Fake<IStore>();
+        IDispatcher mockDispatcher = A.Fake<IDispatcher>();
+
+        // Act & Assert (should not throw)
+        Task task = middleware.InitializeAsync(mockDispatcher, mockStore);
+        task.ShouldNotBeNull();
+        task.IsCompletedSuccessfully.ShouldBeTrue();
+    }
+
+    [Fact]
+    public void DuckyBlazor_Registration_Works()
+    {
+        // Arrange
+        ServiceCollection services = [];
+
+        // Add required dependencies
+        services.AddSingleton(A.Fake<IJSRuntime>());
+        services.AddLogging();
+
+        // Save original environment variables
+        string? originalAspNetCoreEnv = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+        string? originalDotNetEnv = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT");
+
+        try
+        {
+            // Set environment to avoid development defaults
+            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Test");
+            Environment.SetEnvironmentVariable("DOTNET_ENVIRONMENT", "Test");
+
+            // Act
+            services.AddDuckyBlazor(ducky => ducky
+                .EnableDevTools(options =>
+                {
+                    options.StoreName = "TestStore";
+                    options.Enabled = false; // Disable for testing
+                }));
+
+            // Assert
+            ServiceProvider provider = services.BuildServiceProvider();
+            ReduxDevToolsModule? devToolsModule = provider.GetService<ReduxDevToolsModule>();
+            DevToolsOptions? devToolsOptions = provider.GetService<DevToolsOptions>();
+
+            devToolsModule.ShouldNotBeNull();
+            devToolsOptions.ShouldNotBeNull();
+            devToolsOptions.StoreName.ShouldBe("TestStore");
+            devToolsOptions.Enabled.ShouldBeFalse();
+        }
+        finally
+        {
+            // Restore original environment variables
+            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", originalAspNetCoreEnv);
+            Environment.SetEnvironmentVariable("DOTNET_ENVIRONMENT", originalDotNetEnv);
+        }
+    }
+}
