@@ -10,6 +10,16 @@
 
 TheBlazorState is a source-generator-powered state management library for Blazor. Drop `[Persist]` and `[Shared]` on your properties — the generator handles serialization, restoration, change tracking, cross-tab sync, and component re-rendering. No actions, no reducers, no dispatch.
 
+## Features
+
+- **Zero-boilerplate persistence** — `[Persist(TimeToLive = "...")]` on a partial property auto-generates serialization, cache restoration, and TTL-based expiry.
+- **Reactive shared state** — `[Shared]` wires automatic component re-rendering through `INotifyStateChanged`, with no manual subscribe/unsubscribe code.
+- **Compile-time source generation** — Roslyn incremental generators (`PersistIncrementalGenerator`, `SharedIncrementalGenerator`) emit backing fields, `StateMeta`, and lifecycle hooks at build time, not via reflection.
+- **Five pluggable storage strategies** — `PrerenderHtml`, `ServerMemoryCache`, `LocalStorage`, `SessionStorage`, and `IndexedDB`, selectable per property via `ConfigureState`.
+- **Cross-tab synchronization** — `LocalStorage`-backed properties broadcast changes to every open tab through `CrossTabHub`/`CrossTabSyncService`, no SignalR plumbing required.
+- **Built-in observability** — every `[Persist]` property gets a `StateMeta` companion exposing `WasRestored`, `IsDirty`, `IsStale`, `LastUpdated`, and a `ChangeLog`.
+- **Works with Blazor Server and WebAssembly** — same attributes, generator picks the right storage defaults for the hosting model.
+
 ---
 
 ## The Problem
@@ -122,6 +132,38 @@ public partial class Dashboard : ComponentBase
 ```
 
 On first render, `Stats` loads from the async factory. On subsequent navigations within the TTL window, it restores instantly from cache. After TTL expires, the factory is called again.
+
+---
+
+## Usage
+
+Explore the library interactively by running the bundled **TaskFlow** demo (`TheBlazorState.Demo`), which exercises persistence, shared state, storage strategies, and cross-tab sync end to end:
+
+```bash
+git clone https://github.com/Atypical-Consulting/TheBlazorState.git
+cd TheBlazorState
+dotnet run --project TheBlazorState.Demo
+```
+
+This launches an Interactive Server Blazor app (Dashboard, Board, Settings, Cross-Tab and Storage-Compare pages) wired up in `Program.cs` via `builder.Services.AddTheBlazorState()`.
+
+For a specific property, override storage or add a per-property key suffix in `ConfigureState`:
+
+```csharp
+partial void ConfigureState(__StateContext ctx)
+{
+    ctx.Stats
+        .KeySuffix(Project.SelectedProject.Id)
+        .Storage = StorageStrategy.ServerMemoryCache();
+}
+```
+
+Run the test suites to see the generator output and behavior directly:
+
+```bash
+dotnet test TheBlazorState.Tests
+dotnet test TheBlazorState.Generators.Tests
+```
 
 ---
 
@@ -257,6 +299,16 @@ No extra configuration. Inherit from `StateComponentBase` to opt in to cross-tab
 - Microsoft.AspNetCore.Mvc.Testing
 
 <!-- portfolio-techstack:end -->
+
+## Roadmap
+
+- [ ] Stabilize on .NET 10 GA and drop the Preview SDK requirement
+- [ ] Additional built-in storage strategies (e.g. cookie-backed, IndexedDB compression)
+- [ ] Source-generator diagnostics/analyzer package for common `[Persist]`/`[Shared]` misuse
+- [ ] Publish the TaskFlow demo as a hosted live sample
+- [ ] Expand documentation with recipes for common patterns (forms, wizards, optimistic updates)
+
+See the [open issues](https://github.com/Atypical-Consulting/TheBlazorState/issues) for details and to propose new ideas.
 
 ## Contributing
 
