@@ -1,3 +1,5 @@
+![Mutty banner](.github/banner.png)
+
 # Mutty
 
 Immutable Record Mutation Made Easy
