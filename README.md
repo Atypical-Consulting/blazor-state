@@ -1,3 +1,5 @@
+![Reactif banner](.github/banner.png)
+
 # Reactif — Reactive Programming Patterns in C#
 
 A collection of reactive programming patterns implemented in C# with Object Calisthenics discipline. Demonstrates clean reactive code with observable streams and functional composition.
