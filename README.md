@@ -55,6 +55,22 @@ are independent packages — you use one, not all.
 Each folder was merged with **full git history preserved** (`git subtree`). The
 original repositories are archived and redirect here.
 
+<!-- portfolio-techstack:start -->
+
+## Tech Stack
+
+- **.NET 10**
+- Microsoft.AspNetCore.Components.WebAssembly
+- Microsoft.AspNetCore.Components.WebAssembly.Server
+- Bustand
+- CompareNETObjects
+- Scrutor
+- bunit
+- NSubstitute
+- xunit.v3
+
+<!-- portfolio-techstack:end -->
+
 ## License
 
 MIT — see [`LICENSE`](LICENSE).
