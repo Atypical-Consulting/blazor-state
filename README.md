@@ -244,6 +244,20 @@ No extra configuration. Inherit from `StateComponentBase` to opt in to cross-tab
 - .NET 10 (Preview or later)
 - Blazor Server or Blazor WebAssembly
 
+<!-- portfolio-techstack:start -->
+
+## Tech Stack
+
+- **.NET 10 · .NET Standard 2.0**
+- Microsoft.CodeAnalysis.CSharp
+- Shouldly
+- xunit
+- xunit.runner.visualstudio
+- bunit
+- Microsoft.AspNetCore.Mvc.Testing
+
+<!-- portfolio-techstack:end -->
+
 ## Contributing
 
 Contributions are welcome! Please open an issue first to discuss what you'd like to change.
