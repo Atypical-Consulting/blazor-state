@@ -292,6 +292,22 @@ See the [samples](samples/) directory for a complete example application demonst
 - TodoList (list operations)
 - ShoppingCart (nested objects and complex state)
 
+<!-- portfolio-techstack:start -->
+
+## Tech Stack
+
+- **.NET 10**
+- Microsoft.AspNetCore.Components.WebAssembly
+- Microsoft.AspNetCore.Components.WebAssembly.Server
+- Bustand
+- CompareNETObjects
+- Scrutor
+- bunit
+- NSubstitute
+- xunit.v3
+
+<!-- portfolio-techstack:end -->
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
