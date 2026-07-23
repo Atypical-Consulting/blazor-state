@@ -1,3 +1,5 @@
+![BlazorMvvmApp banner](.github/banner.png)
+
 # Blazor MVVM Todo App
 
 Welcome to the **Blazor MVVM Todo App**, a modern, scalable, and maintainable web application built using the [Blazor](https://dotnet.microsoft.com/apps/aspnet/web-apps/blazor) framework and adhering to the [Model-View-ViewModel (MVVM)](https://en.wikipedia.org/wiki/Model–view–viewmodel) architectural pattern. This application leverages the [CommunityToolkit.Mvvm](https://github.com/CommunityToolkit/dotnet/tree/main/src/CommunityToolkit.Mvvm) package to streamline MVVM implementations, reducing boilerplate code and enhancing developer productivity.
