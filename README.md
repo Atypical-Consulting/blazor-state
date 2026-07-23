@@ -1,3 +1,5 @@
+![BlazorMVU banner](.github/banner.png)
+
 # BlazorMVU [![Sparkline](https://stars.medv.io/Atypical-Consulting/BlazorMVU.svg)](https://stars.medv.io/Atypical-Consulting/BlazorMVU)
 A Model-View-Update (MVU) pattern implementation for Blazor.
 ---
