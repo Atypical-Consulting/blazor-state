@@ -1,5 +1,20 @@
 # Blazor State
 
+<!-- portfolio-badges:start -->
+<!-- Identity -->
+[![Atypical-Consulting - blazor-state](https://img.shields.io/static/v1?label=Atypical-Consulting&message=blazor-state&color=blue&logo=github)](https://github.com/Atypical-Consulting/blazor-state)
+![Top language](https://img.shields.io/github/languages/top/Atypical-Consulting/blazor-state)
+[![Stars](https://img.shields.io/github/stars/Atypical-Consulting/blazor-state?style=social)](https://github.com/Atypical-Consulting/blazor-state/stargazers)
+[![Forks](https://img.shields.io/github/forks/Atypical-Consulting/blazor-state?style=social)](https://github.com/Atypical-Consulting/blazor-state/network/members)
+[![License](https://img.shields.io/github/license/Atypical-Consulting/blazor-state)](https://github.com/Atypical-Consulting/blazor-state/blob/HEAD/LICENSE)
+
+<!-- Activity -->
+[![Issues](https://img.shields.io/github/issues/Atypical-Consulting/blazor-state)](https://github.com/Atypical-Consulting/blazor-state/issues)
+[![Pull requests](https://img.shields.io/github/issues-pr/Atypical-Consulting/blazor-state)](https://github.com/Atypical-Consulting/blazor-state/pulls)
+[![Last commit](https://img.shields.io/github/last-commit/Atypical-Consulting/blazor-state)](https://github.com/Atypical-Consulting/blazor-state/commits)
+<!-- portfolio-badges:end -->
+
+
 > **State management for Blazor — four paradigms, one home.** Pick the approach
 > that fits how you think: Elm-style MVU, source-generated state, Redux, or Zustand.
 
