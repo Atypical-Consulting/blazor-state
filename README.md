@@ -14,6 +14,23 @@
 [![Last commit](https://img.shields.io/github/last-commit/Atypical-Consulting/blazor-state)](https://github.com/Atypical-Consulting/blazor-state/commits)
 <!-- portfolio-badges:end -->
 
+<!-- portfolio-toc:start -->
+
+## Table of Contents
+
+- [Libraries](#libraries)
+- [Utility](#utility)
+- [Samples](#samples)
+- [Which should I use?](#which-should-i-use)
+- [History](#history)
+- [Tech Stack](#tech-stack)
+- [Roadmap](#roadmap)
+- [License](#license)
+- [Contributing](#contributing)
+
+<!-- portfolio-toc:end -->
+
+
 
 > **State management for Blazor — four paradigms, one home.** Pick the approach
 > that fits how you think: Elm-style MVU, source-generated state, Redux, or Zustand.
