@@ -1,0 +1,31 @@
+@using System.Security.Cryptography
+@inherits MvuComponent<MvuFetchRandomError.Model, MvuFetchRandomError.Msg>
+
+<button @onclick="@FetchWeather">
+  @State.ButtonLabel
+</button>
+
+@if (State.HasData)
+{
+  <div class="grid">
+    <input 
+      type="text"
+      placeholder="Temperature"
+      value="@State.WeatherData!.Temperature"
+      readonly
+    />
+    <input 
+      type="text"
+      placeholder="Humidity"
+      value="@State.WeatherData!.Humidity"
+      readonly
+    />
+  </div>
+}
+
+@if (State.HasError)
+{
+  <div class="error">
+    @State.ErrorMessage
+  </div>
+}

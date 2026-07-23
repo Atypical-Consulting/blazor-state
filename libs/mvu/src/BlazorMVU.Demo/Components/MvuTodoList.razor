@@ -1,0 +1,17 @@
+@inherits MvuComponent<MvuTodoList.Model, MvuTodoList.Msg>
+
+<div class="grid" style="margin-bottom: 20px">
+  <input type="text" value="@State.NewTodo" placeholder="New task" @oninput="@HandleNewTodoChange"/>
+  <button @onclick="@AddTodo">Add</button>
+</div>
+
+@foreach (var todo in State.Todos)
+{
+  <div class="grid">
+    <div class="todo-item">
+      <input type="checkbox" checked="@todo.IsDone" @onchange="@(() => ToggleDone(todo))"/>
+      @todo.Description
+    </div>
+    <button class="secondary" @onclick="@(() => DeleteTodo(todo))">Delete</button>
+  </div>
+}
