@@ -143,6 +143,22 @@ before submitting an issue, please ensure it is not a duplicate of an existing o
 
 You can contact us by opening an issue on this repository.
 
+<!-- portfolio-techstack:start -->
+
+## Tech Stack
+
+- **.NET 10 · .NET Standard 2.0**
+- Nuke.Common
+- System.Runtime.Serialization.Formatters
+- Microsoft.AspNetCore.Components.WebAssembly
+- Microsoft.AspNetCore.Components.WebAssembly.DevServer
+- Humanizer.Core
+- MudBlazor
+- PublishSPAforGitHubPages.Build
+- Microsoft.Extensions.DependencyInjection
+
+<!-- portfolio-techstack:end -->
+
 ## 📜 License
 
 Apache-2.0 License
