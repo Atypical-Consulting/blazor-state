@@ -1,0 +1,93 @@
+@page "/counter-wasm"
+@rendermode InteractiveWebAssembly
+
+@*
+    Counter Page - Interactive WebAssembly Rendering
+
+    KEY CONCEPTS:
+    - @rendermode InteractiveWebAssembly means UI interactions are processed in the BROWSER
+    - .NET runtime runs in browser via WebAssembly (downloaded on first visit)
+    - User clicks button -> WASM processes event locally -> state updates -> UI re-renders
+    - State lives in browser memory, persisted to LocalStorage
+    - Good for: offline-capable apps, reduced server load, fastest interactions
+    - Tradeoff: larger initial download (~2MB), limited server access
+
+    WHY THIS FILE IS IN THE CLIENT PROJECT:
+    Components using InteractiveWebAssembly or InteractiveAuto MUST be in the
+    .Client project because they need to be compiled to WebAssembly.
+    The Server project references the Client project and serves these components.
+
+    BUSTAND WORKS THE SAME:
+    - Same ZustandComponent inheritance pattern
+    - Same UseState() subscription pattern
+    - Same Store.Method() calls
+    - Bustand is rendering-mode agnostic!
+
+    STORE LOCATION:
+    CounterStore is also in this Client project (Bustand.Sample.Client.Stores).
+    This is intentional - stores must be in Client for WASM/Auto components to use them.
+*@
+
+@inherits ZustandComponent<CounterStore, CounterState>
+
+<PageTitle>Counter (WebAssembly)</PageTitle>
+
+<h1>Counter (WebAssembly)</h1>
+
+<p class="render-mode-info">
+    <strong>Render Mode:</strong> Interactive WebAssembly
+    <br />
+    <small>State changes are processed in the browser via .NET WASM runtime.</small>
+</p>
+
+<div class="counter-display">
+    <p>Current count: <strong>@count</strong></p>
+</div>
+
+<div class="counter-buttons">
+    <button class="btn btn-primary" @onclick="Store.Increment">
+        Increment
+    </button>
+
+    <button class="btn btn-secondary" @onclick="Store.Decrement">
+        Decrement
+    </button>
+
+    <button class="btn btn-outline-secondary" @onclick="Store.Reset">
+        Reset
+    </button>
+</div>
+
+<div class="counter-custom">
+    <h4>Increment by custom amount:</h4>
+    <input type="number" @bind="customAmount" min="1" />
+    <button class="btn btn-info" @onclick="() => Store.IncrementBy(customAmount)">
+        Add @customAmount
+    </button>
+</div>
+
+<div class="explanation">
+    <h4>How it works:</h4>
+    <ol>
+        <li>This page uses <code>@("@")rendermode InteractiveWebAssembly</code></li>
+        <li>On first visit, .NET runtime + app DLLs are downloaded (~2MB)</li>
+        <li>Subsequent visits use cached runtime (fast startup)</li>
+        <li>The CounterStore runs entirely in the browser</li>
+        <li>Button clicks are handled locally - no server round-trip!</li>
+        <li>Persistence writes directly to browser's LocalStorage</li>
+    </ol>
+    <p><em>Try it offline - it works without a server connection!</em></p>
+</div>
+
+@code {
+    // Subscribe to the Count slice of state
+    // UseStateResult<int> has implicit conversion to int, so we can use @count in markup
+    private UseStateResult<int> count;
+    private int customAmount = 5;
+
+    protected override void OnInitialized()
+    {
+        // UseState subscribes to state changes and triggers re-render automatically
+        count = UseState(state => state.Count);
+    }
+}

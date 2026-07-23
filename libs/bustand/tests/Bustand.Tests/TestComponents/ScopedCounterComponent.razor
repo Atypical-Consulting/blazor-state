@@ -1,0 +1,18 @@
+@namespace Bustand.Tests.TestComponents
+@inherits ZustandComponentScoped<CounterStore, CounterState>
+@using Bustand.Components
+@using Bustand.Tests.TestStores
+
+<div class="scoped-counter">
+    <span class="count">@_count.Value</span>
+    <button class="increment" @onclick="@(() => Store.Increment())">+</button>
+</div>
+
+@code {
+    private UseStateResult<int> _count = default!;
+
+    protected override void OnInitialized()
+    {
+        _count = UseState(s => s.Count);
+    }
+}

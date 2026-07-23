@@ -1,0 +1,60 @@
+@page "/bustand-devtools"
+@using Microsoft.AspNetCore.Components.Web
+@using static Microsoft.AspNetCore.Components.Web.RenderMode
+@rendermode InteractiveServer
+@using Bustand.DevTools.Services
+@using Microsoft.Extensions.Hosting
+@implements IDisposable
+@inject IDevToolsStore DevToolsStore
+@inject IHostEnvironment Environment
+
+@if (!Environment.IsDevelopment())
+{
+    <div class="devtools-error">
+        <h2>DevTools Unavailable</h2>
+        <p>Bustand DevTools is only available in Development environment.</p>
+    </div>
+}
+else
+{
+    <div class="devtools-container">
+        <StoreSidebar DevToolsStore="DevToolsStore"
+                      SelectedStore="@SelectedStore"
+                      OnStoreSelected="SelectStore" />
+
+        <main class="devtools-main">
+            @if (SelectedStore != null)
+            {
+                <div class="tab-bar">
+                    <button class="tab @(ActiveTab == "state" ? "active" : "")"
+                            @onclick='() => ActiveTab = "state"'>Current State</button>
+                    <button class="tab @(ActiveTab == "history" ? "active" : "")"
+                            @onclick='() => ActiveTab = "history"'>History</button>
+                    <button class="tab @(ActiveTab == "diff" ? "active" : "")"
+                            @onclick='() => ActiveTab = "diff"'>Diff View</button>
+                </div>
+
+                <div class="tab-content">
+                    @switch (ActiveTab)
+                    {
+                        case "state":
+                            <StateInspectorPanel StoreName="@SelectedStore" />
+                            break;
+                        case "history":
+                            <ActionHistoryPanel StoreName="@SelectedStore" />
+                            break;
+                        case "diff":
+                            <DiffViewerPanel StoreName="@SelectedStore" />
+                            break;
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="empty-state">
+                    <p>Select a store to inspect</p>
+                </div>
+            }
+        </main>
+    </div>
+}

@@ -1,0 +1,165 @@
+@using Bustand.DevTools.Services
+@using Bustand.DevTools.Models
+
+@inject IDevToolsStore DevToolsStore
+
+<div class="diff-viewer-panel">
+    <div class="diff-header">
+        <div class="diff-selector">
+            <label>Compare:</label>
+            <select @bind="LeftIndex">
+                @foreach (var snapshot in History)
+                {
+                    <option value="@snapshot.Index">
+                        #@snapshot.Index - @(snapshot.ActionName ?? "Unknown") (@snapshot.Timestamp.ToString("HH:mm:ss"))
+                    </option>
+                }
+            </select>
+            <span class="diff-arrow">vs</span>
+            <select @bind="RightIndex">
+                @foreach (var snapshot in History)
+                {
+                    <option value="@snapshot.Index">
+                        #@snapshot.Index - @(snapshot.ActionName ?? "Unknown") (@snapshot.Timestamp.ToString("HH:mm:ss"))
+                    </option>
+                }
+            </select>
+        </div>
+    </div>
+
+    @if (DiffResult != null)
+    {
+        <div class="diff-summary">
+            @if (DiffResult.AreEqual)
+            {
+                <span class="no-changes">No changes</span>
+            }
+            else
+            {
+                <span class="change-count">@DiffResult.Differences.Count change(s)</span>
+            }
+        </div>
+
+        <div class="diff-container">
+            <div class="diff-panel diff-left">
+                <div class="diff-panel-header">Old State (#@LeftIndex)</div>
+                <pre class="diff-content">@DiffResult.OldStateJson</pre>
+            </div>
+            <div class="diff-panel diff-right">
+                <div class="diff-panel-header">New State (#@RightIndex)</div>
+                <pre class="diff-content">@DiffResult.NewStateJson</pre>
+            </div>
+        </div>
+
+        @if (DiffResult.Differences.Count > 0)
+        {
+            <div class="diff-details">
+                <h4>Changes</h4>
+                <ul class="diff-list">
+                    @foreach (var diff in DiffResult.Differences)
+                    {
+                        <li class="diff-item @diff.Type.ToString().ToLower()">
+                            <span class="diff-path">@diff.PropertyPath</span>
+                            <span class="diff-type">@diff.Type</span>
+                            @if (diff.Type == DiffType.Modified)
+                            {
+                                <span class="diff-values">
+                                    <span class="old-val">@diff.OldValue</span>
+                                    <span class="arrow">-></span>
+                                    <span class="new-val">@diff.NewValue</span>
+                                </span>
+                            }
+                            else if (diff.Type == DiffType.Added)
+                            {
+                                <span class="diff-values">
+                                    <span class="new-val">@diff.NewValue</span>
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="diff-values">
+                                    <span class="old-val">@diff.OldValue</span>
+                                </span>
+                            }
+                        </li>
+                    }
+                </ul>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="no-diff">
+            <p>Select two states to compare</p>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public string StoreName { get; set; } = "";
+
+    private DiffService _diffService = new();
+    private int _leftIndex = 0;
+    private int _rightIndex = 0;
+    private DiffResult? _diffResult;
+
+    private IReadOnlyList<StateSnapshot> History => DevToolsStore.GetHistory(StoreName);
+
+    private int LeftIndex
+    {
+        get => _leftIndex;
+        set
+        {
+            _leftIndex = value;
+            ComputeDiff();
+        }
+    }
+
+    private int RightIndex
+    {
+        get => _rightIndex;
+        set
+        {
+            _rightIndex = value;
+            ComputeDiff();
+        }
+    }
+
+    private DiffResult? DiffResult => _diffResult;
+
+    protected override void OnParametersSet()
+    {
+        // Default: compare second-to-last with last (most recent change)
+        if (History.Count >= 2)
+        {
+            _leftIndex = History.Count - 2;
+            _rightIndex = History.Count - 1;
+        }
+        else if (History.Count == 1)
+        {
+            _leftIndex = 0;
+            _rightIndex = 0;
+        }
+        ComputeDiff();
+    }
+
+    private void ComputeDiff()
+    {
+        if (History.Count == 0)
+        {
+            _diffResult = null;
+            return;
+        }
+
+        var leftSnapshot = History.ElementAtOrDefault(_leftIndex);
+        var rightSnapshot = History.ElementAtOrDefault(_rightIndex);
+
+        if (leftSnapshot == null || rightSnapshot == null)
+        {
+            _diffResult = null;
+            return;
+        }
+
+        _diffResult = _diffService.ComputeDiff(leftSnapshot.State, rightSnapshot.State);
+    }
+}

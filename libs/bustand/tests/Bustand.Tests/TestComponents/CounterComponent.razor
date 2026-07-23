@@ -1,0 +1,19 @@
+@namespace Bustand.Tests.TestComponents
+@inherits ZustandComponent<CounterStore, CounterState>
+@using Bustand.Components
+@using Bustand.Tests.TestStores
+
+<div class="counter">
+    <span class="count">@_count.Value</span>
+    <button class="increment" @onclick="@(() => Store.Increment())">+</button>
+    <button class="decrement" @onclick="@(() => Store.Decrement())">-</button>
+</div>
+
+@code {
+    private UseStateResult<int> _count = default!;
+
+    protected override void OnInitialized()
+    {
+        _count = UseState(s => s.Count);
+    }
+}

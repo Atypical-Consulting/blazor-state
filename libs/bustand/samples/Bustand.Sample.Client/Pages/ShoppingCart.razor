@@ -1,0 +1,179 @@
+@page "/shopping-cart"
+@rendermode InteractiveAuto
+
+@*
+    Shopping Cart Page - Advanced Complexity Example
+
+    KEY CONCEPTS DEMONSTRATED:
+    - Nested objects (CartItem contains Product)
+    - ImmutableDictionary for keyed collections
+    - Complex derived state (TotalPrice, TotalItemCount)
+    - Async operations (CheckoutAsync)
+    - Multiple computed properties
+
+    ADVANCED PATTERNS:
+    - Dictionary-based state for O(1) lookups by key
+    - Loading state during async operations
+    - Session storage (clears when browser closes)
+*@
+
+@inherits ZustandComponent<ShoppingCartStore, ShoppingCartState>
+
+<PageTitle>Shopping Cart</PageTitle>
+
+<h1>Shopping Cart</h1>
+
+<p class="render-mode-info">
+    <strong>Render Mode:</strong> Interactive Auto
+    <br />
+    <small>This example demonstrates nested objects and async operations.</small>
+</p>
+
+<div class="row">
+    @* Product catalog *@
+    <div class="col-md-8">
+        <h3>Products</h3>
+        <div class="row">
+            @foreach (var product in SampleProducts)
+            {
+                <div class="col-md-6 mb-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">@product.Name</h5>
+                            <p class="card-text">
+                                <span class="badge bg-secondary">@product.Category</span>
+                                <br />
+                                <strong>@product.Price.ToString("C")</strong>
+                            </p>
+                            <button class="btn btn-primary btn-sm"
+                                    @onclick="() => Store.AddToCart(product)"
+                                    disabled="@state.Value.IsCheckingOut">
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    @* Shopping cart *@
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="mb-0">
+                    Cart
+                    @if (Store.UniqueItemCount > 0)
+                    {
+                        <span class="badge bg-primary">@Store.TotalItemCount</span>
+                    }
+                </h3>
+            </div>
+            <div class="card-body">
+                @if (Store.IsEmpty)
+                {
+                    <p class="text-muted">Your cart is empty.</p>
+                }
+                else
+                {
+                    <ul class="list-group list-group-flush">
+                        @foreach (var item in Store.Items)
+                        {
+                            <li class="list-group-item">
+                                <div class="d-flex justify-content-between">
+                                    <span>@item.Product.Name</span>
+                                    <span>@item.Total.ToString("C")</span>
+                                </div>
+                                <div class="d-flex align-items-center mt-2">
+                                    <button class="btn btn-sm btn-outline-secondary"
+                                            @onclick="() => Store.UpdateQuantity(item.Product.Id, item.Quantity - 1)"
+                                            disabled="@state.Value.IsCheckingOut">
+                                        -
+                                    </button>
+                                    <span class="mx-2">@item.Quantity</span>
+                                    <button class="btn btn-sm btn-outline-secondary"
+                                            @onclick="() => Store.UpdateQuantity(item.Product.Id, item.Quantity + 1)"
+                                            disabled="@state.Value.IsCheckingOut">
+                                        +
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger ms-auto"
+                                            @onclick="() => Store.RemoveFromCart(item.Product.Id)"
+                                            disabled="@state.Value.IsCheckingOut">
+                                        Remove
+                                    </button>
+                                </div>
+                            </li>
+                        }
+                    </ul>
+
+                    <hr />
+
+                    <div class="d-flex justify-content-between">
+                        <strong>Total:</strong>
+                        <strong>@Store.TotalPrice.ToString("C")</strong>
+                    </div>
+
+                    <div class="mt-3 d-grid gap-2">
+                        <button class="btn btn-success"
+                                @onclick="HandleCheckout"
+                                disabled="@state.Value.IsCheckingOut">
+                            @if (state.Value.IsCheckingOut)
+                            {
+                                <span class="spinner-border spinner-border-sm me-2"></span>
+                                <span>Processing...</span>
+                            }
+                            else
+                            {
+                                <span>Checkout</span>
+                            }
+                        </button>
+                        <button class="btn btn-outline-secondary"
+                                @onclick="Store.ClearCart"
+                                disabled="@state.Value.IsCheckingOut">
+                            Clear Cart
+                        </button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="explanation mt-4">
+    <h4>Patterns demonstrated:</h4>
+    <ul>
+        <li><strong>Nested records:</strong> CartItem contains Product</li>
+        <li><strong>ImmutableDictionary:</strong> Items keyed by ProductId for O(1) access</li>
+        <li><strong>Derived state:</strong> TotalPrice, TotalItemCount, IsEmpty computed</li>
+        <li><strong>Async operations:</strong> CheckoutAsync with loading state</li>
+        <li><strong>Session storage:</strong> Cart clears when browser closes (try it!)</li>
+    </ul>
+</div>
+
+@code {
+    // Subscribe to the full ShoppingCartState
+    private UseStateResult<ShoppingCartState> state;
+
+    // Sample product catalog (in real app, would come from API)
+    private static readonly Product[] SampleProducts =
+    [
+        new("laptop-1", "Laptop Pro", 1299.99m, "Electronics"),
+        new("headphones-1", "Wireless Headphones", 199.99m, "Electronics"),
+        new("keyboard-1", "Mechanical Keyboard", 149.99m, "Electronics"),
+        new("mouse-1", "Ergonomic Mouse", 79.99m, "Electronics"),
+        new("book-1", "Blazor in Action", 49.99m, "Books"),
+        new("book-2", "C# 12 Deep Dive", 54.99m, "Books")
+    ];
+
+    protected override void OnInitialized()
+    {
+        // UseState() subscribes to all state changes and triggers re-render automatically
+        state = UseState();
+    }
+
+    private async Task HandleCheckout()
+    {
+        await Store.CheckoutAsync();
+        // In real app: navigate to confirmation page, show toast, etc.
+    }
+}

@@ -1,0 +1,156 @@
+@page "/todolist"
+@rendermode InteractiveAuto
+
+@*
+    TodoList Page - Intermediate Complexity Example
+
+    KEY CONCEPTS DEMONSTRATED:
+    - List management (add, remove, update items)
+    - Working with ImmutableList in state
+    - Derived state (FilteredItems, ActiveCount)
+    - Multiple UI interactions with a single store
+    - Filter state (All/Active/Completed)
+
+    COMPONENT PATTERN:
+    - Uses ZustandComponent<TStore, TState> for automatic subscriptions
+    - Call UseState() in OnInitialized to subscribe to state changes
+    - Accesses Store.FilteredItems (derived state) for display
+    - Calls Store methods for all state mutations
+*@
+
+@inherits ZustandComponent<TodoStore, TodoState>
+
+<PageTitle>TodoList</PageTitle>
+
+<h1>TodoList</h1>
+
+<p class="render-mode-info">
+    <strong>Render Mode:</strong> Interactive Auto
+    <br />
+    <small>This example demonstrates list management with ImmutableList.</small>
+</p>
+
+@* Add new todo *@
+<div class="todo-input">
+    <input type="text"
+           @bind="newTodoText"
+           @bind:event="oninput"
+           @onkeypress="HandleKeyPress"
+           placeholder="What needs to be done?"
+           class="form-control" />
+    <button class="btn btn-primary" @onclick="AddTodo" disabled="@string.IsNullOrWhiteSpace(newTodoText)">
+        Add
+    </button>
+</div>
+
+@* Todo list *@
+<div class="todo-list">
+    @if (!Store.FilteredItems.Any())
+    {
+        <p class="text-muted">
+            @(state.Value.Filter == TodoFilter.All ? "No todos yet. Add one above!" : "No items match this filter.")
+        </p>
+    }
+    else
+    {
+        <ul class="list-group">
+            @foreach (var item in Store.FilteredItems)
+            {
+                <li class="list-group-item d-flex align-items-center @(item.IsCompleted ? "completed" : "")">
+                    @* Toggle checkbox *@
+                    <input type="checkbox"
+                           checked="@item.IsCompleted"
+                           @onchange="() => Store.ToggleTodo(item.Id)"
+                           class="form-check-input me-2" />
+
+                    @* Todo text (editable on double-click in a real app) *@
+                    <span class="flex-grow-1 @(item.IsCompleted ? "text-decoration-line-through text-muted" : "")">
+                        @item.Text
+                    </span>
+
+                    @* Delete button *@
+                    <button class="btn btn-sm btn-outline-danger" @onclick="() => Store.RemoveTodo(item.Id)">
+                        Delete
+                    </button>
+                </li>
+            }
+        </ul>
+    }
+</div>
+
+@* Filter and actions *@
+<div class="todo-footer mt-3">
+    <span class="text-muted">@Store.ActiveCount items left</span>
+
+    <div class="btn-group ms-3" role="group">
+        <button class="btn btn-sm @(state.Value.Filter == TodoFilter.All ? "btn-primary" : "btn-outline-primary")"
+                @onclick="() => Store.SetFilter(TodoFilter.All)">
+            All
+        </button>
+        <button class="btn btn-sm @(state.Value.Filter == TodoFilter.Active ? "btn-primary" : "btn-outline-primary")"
+                @onclick="() => Store.SetFilter(TodoFilter.Active)">
+            Active
+        </button>
+        <button class="btn btn-sm @(state.Value.Filter == TodoFilter.Completed ? "btn-primary" : "btn-outline-primary")"
+                @onclick="() => Store.SetFilter(TodoFilter.Completed)">
+            Completed
+        </button>
+    </div>
+
+    @if (state.Value.Items.Any(i => i.IsCompleted))
+    {
+        <button class="btn btn-sm btn-outline-secondary ms-3" @onclick="Store.ClearCompleted">
+            Clear completed
+        </button>
+    }
+</div>
+
+@* Mark all complete *@
+@if (state.Value.Items.Any())
+{
+    <div class="mt-3">
+        <button class="btn btn-outline-success" @onclick="Store.CompleteAll" disabled="@Store.AllCompleted">
+            Mark all complete
+        </button>
+    </div>
+}
+
+<div class="explanation mt-4">
+    <h4>Patterns demonstrated:</h4>
+    <ul>
+        <li><strong>ImmutableList operations:</strong> Add(), RemoveAll(), Replace()</li>
+        <li><strong>Derived state:</strong> FilteredItems, ActiveCount, AllCompleted computed on access</li>
+        <li><strong>Multiple mutations:</strong> AddTodo, RemoveTodo, ToggleTodo, SetFilter</li>
+        <li><strong>Persistence:</strong> Todos saved to LocalStorage - refresh to verify!</li>
+    </ul>
+</div>
+
+@code {
+    // Subscribe to the full TodoState
+    // UseStateResult<TodoState> has .Value property for accessing the state
+    private UseStateResult<TodoState> state;
+    private string newTodoText = "";
+
+    protected override void OnInitialized()
+    {
+        // UseState() subscribes to all state changes and triggers re-render automatically
+        state = UseState();
+    }
+
+    private void AddTodo()
+    {
+        if (!string.IsNullOrWhiteSpace(newTodoText))
+        {
+            Store.AddTodo(newTodoText);
+            newTodoText = "";
+        }
+    }
+
+    private void HandleKeyPress(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            AddTodo();
+        }
+    }
+}

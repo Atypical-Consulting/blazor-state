@@ -1,0 +1,57 @@
+@using Bustand.DevTools.Services
+
+<aside class="devtools-sidebar">
+    <div class="sidebar-header">
+        <h2>Stores</h2>
+        <input type="search"
+               @bind="SearchFilter"
+               @bind:event="oninput"
+               placeholder="Filter stores..."
+               class="store-search" />
+    </div>
+    <ul class="store-list">
+        @foreach (var storeName in FilteredStores)
+        {
+            var snapshot = DevToolsStore.GetCurrentSnapshot(storeName);
+            <li @key="storeName"
+                class="store-item @(SelectedStore == storeName ? "selected" : "")"
+                @onclick="() => SelectStore(storeName)">
+                <span class="store-name">@storeName</span>
+                <span class="store-timestamp">@(snapshot?.Timestamp.ToString("HH:mm:ss"))</span>
+            </li>
+        }
+    </ul>
+</aside>
+
+@code {
+    /// <summary>
+    /// The DevToolsStore service providing access to registered stores.
+    /// </summary>
+    [Parameter]
+    public IDevToolsStore DevToolsStore { get; set; } = default!;
+
+    /// <summary>
+    /// The currently selected store name, or null if none selected.
+    /// </summary>
+    [Parameter]
+    public string? SelectedStore { get; set; }
+
+    /// <summary>
+    /// Callback invoked when a store is selected from the sidebar.
+    /// </summary>
+    [Parameter]
+    public EventCallback<string> OnStoreSelected { get; set; }
+
+    private string SearchFilter = "";
+
+    private IEnumerable<string> FilteredStores =>
+        string.IsNullOrWhiteSpace(SearchFilter)
+            ? DevToolsStore.RegisteredStoreNames
+            : DevToolsStore.RegisteredStoreNames
+                .Where(n => n.Contains(SearchFilter, StringComparison.OrdinalIgnoreCase));
+
+    private async Task SelectStore(string storeName)
+    {
+        await OnStoreSelected.InvokeAsync(storeName);
+    }
+}

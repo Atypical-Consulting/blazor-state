@@ -1,0 +1,58 @@
+@using Microsoft.JSInterop
+@inject IJSRuntime JS
+
+<div class="json-exporter">
+    <button class="export-btn" @onclick="CopyToClipboard" title="Copy to clipboard">
+        <span class="btn-icon">@((MarkupString)CopyIcon)</span>
+        <span class="btn-text">@CopyButtonText</span>
+    </button>
+    <button class="export-btn" @onclick="DownloadFile" title="Download as JSON">
+        <span class="btn-icon">@((MarkupString)DownloadIcon)</span>
+        <span class="btn-text">Download</span>
+    </button>
+</div>
+
+@code {
+    [Parameter] public string Json { get; set; } = "";
+    [Parameter] public string FileName { get; set; } = "state.json";
+
+    private string CopyButtonText = "Copy";
+    private const string CopyIcon = "&#128203;"; // clipboard icon
+    private const string DownloadIcon = "&#128190;"; // floppy disk icon
+
+    private async Task CopyToClipboard()
+    {
+        try
+        {
+            await JS.InvokeVoidAsync("navigator.clipboard.writeText", Json);
+            CopyButtonText = "Copied!";
+            StateHasChanged();
+
+            // Reset after 2 seconds
+            await Task.Delay(2000);
+            CopyButtonText = "Copy";
+            StateHasChanged();
+        }
+        catch
+        {
+            CopyButtonText = "Failed";
+            StateHasChanged();
+        }
+    }
+
+    private async Task DownloadFile()
+    {
+        // Create blob and download via JS
+        var dataUrl = $"data:application/json;charset=utf-8,{Uri.EscapeDataString(Json)}";
+        await JS.InvokeVoidAsync("eval", $@"
+            (function() {{
+                var a = document.createElement('a');
+                a.href = '{dataUrl}';
+                a.download = '{FileName}';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            }})();
+        ");
+    }
+}

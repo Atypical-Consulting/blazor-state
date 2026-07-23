@@ -1,0 +1,31 @@
+<Project>
+  <!--
+    DefaultDocumentation Configuration
+    Generates markdown API docs from XML documentation comments.
+    Output: docs/api/
+
+    Documentation is generated during build for library projects.
+    See: https://github.com/Doraku/DefaultDocumentation
+  -->
+
+  <ItemGroup Condition="'$(IsPackable)' != 'false'">
+    <PackageReference Include="DefaultDocumentation" Version="1.2.2" PrivateAssets="all" />
+  </ItemGroup>
+
+  <PropertyGroup Condition="'$(IsPackable)' != 'false'">
+    <!-- Output directory (relative to solution root) -->
+    <DefaultDocumentationFolder>$(MSBuildThisFileDirectory)docs/api</DefaultDocumentationFolder>
+
+    <!-- Only document public API -->
+    <DefaultDocumentationGeneratedAccessModifiers>Public</DefaultDocumentationGeneratedAccessModifiers>
+
+    <!-- Skip items without documentation -->
+    <DefaultDocumentationIncludeUndocumentedItems>false</DefaultDocumentationIncludeUndocumentedItems>
+
+    <!-- Generate pages for namespaces, types, and members -->
+    <DefaultDocumentationGeneratedPages>Namespaces,Types,Members</DefaultDocumentationGeneratedPages>
+
+    <!-- File naming: use full type name for clarity -->
+    <DefaultDocumentationFileNameMode>FullName</DefaultDocumentationFileNameMode>
+  </PropertyGroup>
+</Project>

@@ -1,0 +1,61 @@
+@using System.Text.Json
+@using Bustand.DevTools.Models
+@using Bustand.DevTools.Services
+
+@inject IDevToolsStore DevToolsStore
+
+<div class="state-inspector-panel">
+    @if (_snapshot != null)
+    {
+        <JsonExporter Json="@_snapshot.StateJson" FileName="@($"{StoreName}-state.json")" />
+
+        <div class="tree-view-container">
+            @if (_parsedJson.HasValue)
+            {
+                <StateTreeView Value="_parsedJson.Value" />
+            }
+            else
+            {
+                <div class="parse-error">
+                    <p>Unable to parse state as JSON</p>
+                    <pre>@_snapshot.StateJson</pre>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="no-state">
+            <p>No state recorded yet</p>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public string StoreName { get; set; } = "";
+
+    private StateSnapshot? _snapshot;
+    private JsonElement? _parsedJson;
+
+    protected override void OnParametersSet()
+    {
+        LoadSnapshot();
+    }
+
+    private void LoadSnapshot()
+    {
+        _snapshot = DevToolsStore.GetCurrentSnapshot(StoreName);
+        if (_snapshot != null)
+        {
+            try
+            {
+                using var doc = JsonDocument.Parse(_snapshot.StateJson);
+                _parsedJson = doc.RootElement.Clone();
+            }
+            catch
+            {
+                _parsedJson = null;
+            }
+        }
+    }
+}

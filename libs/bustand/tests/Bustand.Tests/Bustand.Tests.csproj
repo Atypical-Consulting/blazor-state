@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <!-- Test on net10.0 to match primary dev framework -->
+    <TargetFramework>net10.0</TargetFramework>
+    <!-- Required by xunit v3 -->
+    <OutputType>Exe</OutputType>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <!-- Disable TreatWarningsAsErrors for test project -->
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <!-- Required by xunit v3 -->
+    <UseAppHost>true</UseAppHost>
+    <!-- Resolve static web assets by disabling collection from all targets -->
+    <ResolveStaticWebAssetsInputsDependsOn>RemoveDuplicateStaticWebAssets;$(ResolveStaticWebAssetsInputsDependsOn)</ResolveStaticWebAssetsInputsDependsOn>
+  </PropertyGroup>
+
+  <!-- Workaround for multi-targeted project static web asset conflicts -->
+  <Target Name="RemoveDuplicateStaticWebAssets" BeforeTargets="AssignTargetPaths">
+    <ItemGroup>
+      <_StaticWebAssetWithConflict Include="@(StaticWebAsset)" Condition="'%(SourceId)' == 'Microsoft.AspNetCore.Components.WebAssembly.Authentication' and '%(SourceType)' == 'Package'" />
+      <StaticWebAsset Remove="@(_StaticWebAssetWithConflict)" />
+    </ItemGroup>
+  </Target>
+
+  <ItemGroup>
+    <PackageReference Include="bunit" Version="2.5.3" />
+    <PackageReference Include="coverlet.collector" Version="6.0.4" />
+    <PackageReference Include="NSubstitute" Version="5.3.0" />
+    <!-- Use xunit v3 for .NET 10 compatibility (does not use Microsoft.NET.Test.Sdk) -->
+    <PackageReference Include="xunit.v3" Version="1.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Bustand\Bustand.csproj" />
+    <ProjectReference Include="..\..\src\Bustand.DevTools\Bustand.DevTools.csproj" />
+  </ItemGroup>
+
+</Project>
