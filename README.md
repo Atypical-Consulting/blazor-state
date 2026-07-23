@@ -18,6 +18,21 @@
 
 <!-- portfolio-toc:start -->
 
+
+## Features
+
+- **Four state-management paradigms** — MVU, source-generated, Redux and Zustand — as independent packages
+- **A mutation utility** (`utils/mutty`) the libs can build on
+- **Runnable samples** for MVVM and reactive patterns
+
+## Usage
+
+```bash
+git clone https://github.com/Atypical-Consulting/blazor-state.git
+cd blazor-state/libs/mvu   # or ducky / bustand / the-blazor-state
+dotnet build
+```
+
 ## Table of Contents
 
 - [Libraries](#libraries)
