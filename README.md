@@ -2,6 +2,31 @@
 
 # TheBlazorState
 
+<!-- portfolio-toc:start -->
+
+## Table of Contents
+
+- [Features](#features)
+- [The Problem](#the-problem)
+- [The Solution](#the-solution)
+- [Why Not Redux / Fluxor?](#why-not-redux--fluxor)
+- [Quick Start](#quick-start)
+- [Usage](#usage)
+- [Before & After](#before--after)
+- [Storage Strategies](#storage-strategies)
+- [StateMeta: Built-in Observability](#statemeta-built-in-observability)
+- [Cross-Tab Sync](#cross-tab-sync)
+- [Documentation](#documentation)
+- [Project Structure](#project-structure)
+- [Requirements](#requirements)
+- [Tech Stack](#tech-stack)
+- [Roadmap](#roadmap)
+- [Contributing](#contributing)
+- [License](#license)
+
+<!-- portfolio-toc:end -->
+
+
 [![CI](https://github.com/Atypical-Consulting/TheBlazorState/actions/workflows/ci.yml/badge.svg)](https://github.com/Atypical-Consulting/TheBlazorState/actions/workflows/ci.yml)
 [![.NET 10](https://img.shields.io/badge/.NET-10-512BD4)](https://dotnet.microsoft.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
