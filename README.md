@@ -1,3 +1,5 @@
+![Ducky banner](.github/banner.png)
+
 # Ducky 🦆
 
 A Predictable State Management Library for Blazor
