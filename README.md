@@ -2,6 +2,21 @@
 
 # Blazor MVVM Todo App
 
+<!-- portfolio-badges:start -->
+<!-- Identity -->
+[![phmatray - BlazorMvvmApp](https://img.shields.io/static/v1?label=phmatray&message=BlazorMvvmApp&color=blue&logo=github)](https://github.com/phmatray/BlazorMvvmApp)
+![Top language](https://img.shields.io/github/languages/top/phmatray/BlazorMvvmApp)
+[![Stars](https://img.shields.io/github/stars/phmatray/BlazorMvvmApp?style=social)](https://github.com/phmatray/BlazorMvvmApp/stargazers)
+[![Forks](https://img.shields.io/github/forks/phmatray/BlazorMvvmApp?style=social)](https://github.com/phmatray/BlazorMvvmApp/network/members)
+[![License](https://img.shields.io/github/license/phmatray/BlazorMvvmApp)](https://github.com/phmatray/BlazorMvvmApp/blob/HEAD/LICENSE)
+
+<!-- Activity -->
+[![Issues](https://img.shields.io/github/issues/phmatray/BlazorMvvmApp)](https://github.com/phmatray/BlazorMvvmApp/issues)
+[![Pull requests](https://img.shields.io/github/issues-pr/phmatray/BlazorMvvmApp)](https://github.com/phmatray/BlazorMvvmApp/pulls)
+[![Last commit](https://img.shields.io/github/last-commit/phmatray/BlazorMvvmApp)](https://github.com/phmatray/BlazorMvvmApp/commits)
+<!-- portfolio-badges:end -->
+
+
 Welcome to the **Blazor MVVM Todo App**, a modern, scalable, and maintainable web application built using the [Blazor](https://dotnet.microsoft.com/apps/aspnet/web-apps/blazor) framework and adhering to the [Model-View-ViewModel (MVVM)](https://en.wikipedia.org/wiki/Model–view–viewmodel) architectural pattern. This application leverages the [CommunityToolkit.Mvvm](https://github.com/CommunityToolkit/dotnet/tree/main/src/CommunityToolkit.Mvvm) package to streamline MVVM implementations, reducing boilerplate code and enhancing developer productivity.
 
 ## 📋 Table of Contents
