@@ -1,3 +1,5 @@
+![TheBlazorState banner](.github/banner.png)
+
 # TheBlazorState
 
 [![CI](https://github.com/Atypical-Consulting/TheBlazorState/actions/workflows/ci.yml/badge.svg)](https://github.com/Atypical-Consulting/TheBlazorState/actions/workflows/ci.yml)
