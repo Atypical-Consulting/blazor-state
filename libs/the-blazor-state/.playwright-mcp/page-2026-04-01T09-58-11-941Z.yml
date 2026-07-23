@@ -1,0 +1,26 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - link "BlazorStatePlus Demo" [ref=e6] [cursor=pointer]:
+      - /url: ""
+    - navigation [ref=e8]:
+      - link "Home" [ref=e10] [cursor=pointer]:
+        - /url: ""
+        - text: Home
+      - link "Counter" [ref=e13] [cursor=pointer]:
+        - /url: counter
+        - text: Counter
+      - link "Weather" [ref=e16] [cursor=pointer]:
+        - /url: weather
+        - text: Weather
+      - link "Product" [ref=e19] [cursor=pointer]:
+        - /url: product/1
+        - text: Product
+  - main [ref=e21]:
+    - link "About" [ref=e23] [cursor=pointer]:
+      - /url: https://learn.microsoft.com/aspnet/core/
+    - article [ref=e24]:
+      - heading "Persistent Counter" [level=1] [ref=e25]
+      - status [ref=e26]: "Current count: 40"
+      - paragraph [ref=e27]:
+        - emphasis [ref=e28]: Restored from prerender
+      - button "Click me" [ref=e29] [cursor=pointer]

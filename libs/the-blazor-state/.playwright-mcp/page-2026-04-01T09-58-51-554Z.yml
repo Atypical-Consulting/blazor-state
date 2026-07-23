@@ -1,0 +1,49 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - link "BlazorStatePlus Demo" [ref=e6] [cursor=pointer]:
+      - /url: ""
+    - navigation [ref=e8]:
+      - link "Home" [ref=e10] [cursor=pointer]:
+        - /url: ""
+        - text: Home
+      - link "Counter" [ref=e13] [cursor=pointer]:
+        - /url: counter
+        - text: Counter
+      - link "Weather" [ref=e16] [cursor=pointer]:
+        - /url: weather
+        - text: Weather
+      - link "Product" [ref=e19] [cursor=pointer]:
+        - /url: product/1
+        - text: Product
+  - main [ref=e21]:
+    - link "About" [ref=e23] [cursor=pointer]:
+      - /url: https://learn.microsoft.com/aspnet/core/
+    - article [ref=e24]:
+      - heading "Weather Dashboard" [level=1] [ref=e25]
+      - table [ref=e26]:
+        - rowgroup [ref=e27]:
+          - row "Date Temp (C) Summary" [ref=e28]:
+            - columnheader "Date" [ref=e29]
+            - columnheader "Temp (C)" [ref=e30]
+            - columnheader "Summary" [ref=e31]
+        - rowgroup [ref=e32]:
+          - row "4/2/2026 -10 Chilly" [ref=e33]:
+            - cell "4/2/2026" [ref=e34]
+            - cell "-10" [ref=e35]
+            - cell "Chilly" [ref=e36]
+          - row "4/3/2026 39 Freezing" [ref=e37]:
+            - cell "4/3/2026" [ref=e38]
+            - cell "39" [ref=e39]
+            - cell "Freezing" [ref=e40]
+          - row "4/4/2026 -2 Bracing" [ref=e41]:
+            - cell "4/4/2026" [ref=e42]
+            - cell "-2" [ref=e43]
+            - cell "Bracing" [ref=e44]
+          - row "4/5/2026 49 Scorching" [ref=e45]:
+            - cell "4/5/2026" [ref=e46]
+            - cell "49" [ref=e47]
+            - cell "Scorching" [ref=e48]
+          - row "4/6/2026 36 Sweltering" [ref=e49]:
+            - cell "4/6/2026" [ref=e50]
+            - cell "36" [ref=e51]
+            - cell "Sweltering" [ref=e52]

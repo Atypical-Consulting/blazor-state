@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+        // Apply saved theme/density immediately to prevent flash of wrong theme
+        (function() {
+            try {
+                var t = localStorage.getItem('Settings.SavedTheme');
+                if (t) { var v = JSON.parse(t).value; if (v === 'dark') document.documentElement.classList.add('dark'); }
+                else { document.documentElement.classList.add('dark'); } // default to dark
+                var d = localStorage.getItem('Settings.SavedDensity');
+                if (d) { var v = JSON.parse(d).value; if (v === 'compact') document.documentElement.classList.add('density-compact'); }
+            } catch(e) { document.documentElement.classList.add('dark'); }
+        })();
+    </script>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="/" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Outfit:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <script src="https://cdn.jsdelivr.net/npm/@@tailwindcss/browser@@4"></script>
+    <style type="text/tailwindcss">
+        @@custom-variant dark (&:where(.dark, .dark *));
+
+        @@theme {
+            --font-display: 'Syne', ui-sans-serif, system-ui, sans-serif;
+            --font-sans: 'Outfit', ui-sans-serif, system-ui, sans-serif;
+            --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+            --color-signal-50: #FFF7ED;
+            --color-signal-100: #FFEDD5;
+            --color-signal-200: #FED7AA;
+            --color-signal-300: #FDBA74;
+            --color-signal-400: #FB923C;
+            --color-signal-500: #F97316;
+            --color-signal-600: #EA580C;
+            --color-signal-700: #C2410C;
+            --color-signal-800: #9A3412;
+            --color-signal-900: #7C2D12;
+            --color-canvas-50: #FAFAF9;
+            --color-canvas-100: #F5F5F4;
+            --color-canvas-200: #E7E5E4;
+            --color-canvas-300: #D6D3D1;
+            --color-canvas-400: #A8A29E;
+            --color-canvas-500: #78716C;
+            --color-canvas-600: #57534E;
+            --color-canvas-700: #44403C;
+            --color-canvas-800: #292524;
+            --color-canvas-900: #1C1917;
+            --color-canvas-950: #0C0A09;
+        }
+
+        @@keyframes signal-pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+        @@keyframes fade-up {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @@keyframes slide-in {
+            from { opacity: 0; transform: translateX(-6px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @@keyframes slide-up {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        .animate-signal { animation: signal-pulse 2s ease-in-out infinite; }
+        .animate-fade-up { animation: fade-up 0.4s ease-out both; }
+        .animate-slide-in { animation: slide-in 0.3s ease-out both; }
+        .animate-slide-up { animation: slide-up 0.3s ease-out both; }
+
+        .stagger-1 { animation-delay: 0.05s; }
+        .stagger-2 { animation-delay: 0.1s; }
+        .stagger-3 { animation-delay: 0.15s; }
+        .stagger-4 { animation-delay: 0.2s; }
+        .stagger-5 { animation-delay: 0.25s; }
+
+        /* Grain overlay for texture */
+        .grain::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            opacity: 0.015;
+            pointer-events: none;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+            z-index: 9999;
+        }
+        .dark .grain::after { opacity: 0.03; }
+
+        /* Sidebar active indicator */
+        .nav-active {
+            position: relative;
+        }
+        .nav-active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 60%;
+            border-radius: 0 3px 3px 0;
+            background: var(--color-signal-500);
+        }
+
+        /* Density overrides */
+        .density-compact { font-size: 0.875rem; line-height: 1.25rem; }
+        .density-compact .px-5 { padding-left: 0.75rem; padding-right: 0.75rem; }
+        .density-compact .py-4 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+        .density-compact .py-3 { padding-top: 0.375rem; padding-bottom: 0.375rem; }
+        .density-compact .py-2 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
+        .density-compact .gap-5 { gap: 0.75rem; }
+        .density-compact .mb-6 { margin-bottom: 0.75rem; }
+        .density-compact .mb-8 { margin-bottom: 1rem; }
+        .density-compact .text-3xl { font-size: 1.5rem; }
+        .density-compact .text-2xl { font-size: 1.25rem; }
+        .density-compact .p-3 { padding: 0.5rem; }
+        .density-compact .p-5 { padding: 0.75rem; }
+        .density-compact .px-8 { padding-left: 1.5rem; padding-right: 1.5rem; }
+        .density-compact .py-8 { padding-top: 1rem; padding-bottom: 1rem; }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--color-canvas-600); border-radius: 3px; }
+        .dark ::-webkit-scrollbar-thumb { background: var(--color-canvas-700); }
+    </style>
+    <HeadOutlet />
+</head>
+<body class="font-sans bg-canvas-50 dark:bg-canvas-950 text-canvas-900 dark:text-canvas-100 antialiased grain">
+    <Routes @rendermode="InteractiveServer" />
+    <script src="_framework/blazor.web.js"></script>
+</body>
+</html>

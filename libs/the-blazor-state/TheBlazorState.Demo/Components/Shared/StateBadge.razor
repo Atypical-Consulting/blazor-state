@@ -1,0 +1,8 @@
+@if (Value)
+{
+    <span class="@($"inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-mono font-medium tracking-wide {TrueClass}")">@TrueLabel</span>
+}
+else
+{
+    <span class="@($"inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-mono font-medium tracking-wide {FalseClass}")">@FalseLabel</span>
+}

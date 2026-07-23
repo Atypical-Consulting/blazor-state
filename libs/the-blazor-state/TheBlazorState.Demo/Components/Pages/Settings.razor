@@ -1,0 +1,104 @@
+@page "/settings"
+
+<PageTitle>Settings — TaskFlow</PageTitle>
+
+<div class="mb-6 animate-fade-up">
+    <h1 class="font-display text-2xl font-bold text-canvas-900 dark:text-canvas-50">Settings</h1>
+    <p class="text-sm text-canvas-500 dark:text-canvas-500 mt-1">Preferences persisted to localStorage</p>
+</div>
+
+<TryItHint Id="settings" Text="Change the theme, close the browser, reopen it — your preference survives thanks to localStorage persistence." />
+
+@if (SavedThemeMeta.WasRestored)
+{
+    <div class="mb-6 flex items-center gap-2 text-xs text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 px-3 py-2 rounded-lg animate-fade-up">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+        <span class="font-mono">Preferences restored from localStorage — survives browser refresh</span>
+    </div>
+}
+
+<!-- Appearance -->
+<div class="animate-fade-up stagger-1 bg-white dark:bg-canvas-900 rounded-xl border border-canvas-200 dark:border-canvas-800 mb-6 overflow-hidden">
+    <div class="px-5 py-4 border-b border-canvas-100 dark:border-canvas-800">
+        <h2 class="text-xs font-mono font-semibold text-canvas-500 dark:text-canvas-400 uppercase tracking-wider">Appearance</h2>
+    </div>
+    <div class="p-5 space-y-6">
+        <!-- Theme -->
+        <div>
+            <label class="block text-sm font-medium text-canvas-700 dark:text-canvas-200 mb-2">Theme</label>
+            <div class="flex gap-2">
+                <button @onclick='() => SetTheme("light")'
+                        class="@($"px-4 py-2 rounded-lg text-sm font-medium border transition-all duration-150 {(Theme.Theme == "light" ? "bg-signal-50 dark:bg-signal-500/10 border-signal-300 dark:border-signal-700 text-signal-700 dark:text-signal-400" : "bg-white dark:bg-canvas-800 border-canvas-200 dark:border-canvas-700 text-canvas-500 dark:text-canvas-400 hover:border-canvas-300 dark:hover:border-canvas-600")}")">
+                    Light
+                </button>
+                <button @onclick='() => SetTheme("dark")'
+                        class="@($"px-4 py-2 rounded-lg text-sm font-medium border transition-all duration-150 {(Theme.Theme == "dark" ? "bg-signal-50 dark:bg-signal-500/10 border-signal-300 dark:border-signal-700 text-signal-700 dark:text-signal-400" : "bg-white dark:bg-canvas-800 border-canvas-200 dark:border-canvas-700 text-canvas-500 dark:text-canvas-400 hover:border-canvas-300 dark:hover:border-canvas-600")}")">
+                    Dark
+                </button>
+            </div>
+        </div>
+
+        <!-- Density -->
+        <div>
+            <label class="block text-sm font-medium text-canvas-700 dark:text-canvas-200 mb-2">Density</label>
+            <div class="flex gap-2">
+                <button @onclick='() => SetDensity("comfortable")'
+                        class="@($"px-4 py-2 rounded-lg text-sm font-medium border transition-all duration-150 {(Theme.Density == "comfortable" ? "bg-signal-50 dark:bg-signal-500/10 border-signal-300 dark:border-signal-700 text-signal-700 dark:text-signal-400" : "bg-white dark:bg-canvas-800 border-canvas-200 dark:border-canvas-700 text-canvas-500 dark:text-canvas-400 hover:border-canvas-300 dark:hover:border-canvas-600")}")">
+                    Comfortable
+                </button>
+                <button @onclick='() => SetDensity("compact")'
+                        class="@($"px-4 py-2 rounded-lg text-sm font-medium border transition-all duration-150 {(Theme.Density == "compact" ? "bg-signal-50 dark:bg-signal-500/10 border-signal-300 dark:border-signal-700 text-signal-700 dark:text-signal-400" : "bg-white dark:bg-canvas-800 border-canvas-200 dark:border-canvas-700 text-canvas-500 dark:text-canvas-400 hover:border-canvas-300 dark:hover:border-canvas-600")}")">
+                    Compact
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Storage Strategy Info -->
+<div class="animate-fade-up stagger-2 bg-white dark:bg-canvas-900 rounded-xl border border-canvas-200 dark:border-canvas-800 mb-6 overflow-hidden">
+    <div class="px-5 py-4 border-b border-canvas-100 dark:border-canvas-800">
+        <h2 class="text-xs font-mono font-semibold text-canvas-500 dark:text-canvas-400 uppercase tracking-wider">About Storage Strategies</h2>
+    </div>
+    <div class="p-5">
+        <p class="text-sm text-canvas-600 dark:text-canvas-400 mb-4">
+            These preferences use <code class="text-xs font-mono bg-canvas-100 dark:bg-canvas-800 text-signal-600 dark:text-signal-400 px-1.5 py-0.5 rounded border border-canvas-200 dark:border-canvas-700">StorageStrategy.LocalStorage()</code>,
+            so they survive browser refresh. Try changing a setting, then refresh the page.
+        </p>
+        <div class="grid grid-cols-2 gap-3 text-sm">
+            <div class="bg-canvas-50 dark:bg-canvas-950 rounded-lg p-3 border border-canvas-200 dark:border-canvas-800">
+                <p class="font-mono font-medium text-canvas-700 dark:text-canvas-300 text-xs">PrerenderHtml</p>
+                <p class="text-xs text-canvas-400 dark:text-canvas-500 mt-0.5">Survives prerender only (default)</p>
+            </div>
+            <div class="bg-canvas-50 dark:bg-canvas-950 rounded-lg p-3 border border-canvas-200 dark:border-canvas-800">
+                <p class="font-mono font-medium text-canvas-700 dark:text-canvas-300 text-xs">ServerMemoryCache</p>
+                <p class="text-xs text-canvas-400 dark:text-canvas-500 mt-0.5">Survives page reload (server only)</p>
+            </div>
+            <div class="bg-signal-50 dark:bg-signal-500/10 rounded-lg p-3 border border-signal-200 dark:border-signal-800 relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-0.5 bg-signal-400"></div>
+                <p class="font-mono font-medium text-signal-700 dark:text-signal-400 text-xs">LocalStorage <span class="text-[10px] uppercase tracking-wider">(active)</span></p>
+                <p class="text-xs text-signal-500 dark:text-signal-500 mt-0.5">Survives browser restart</p>
+            </div>
+            <div class="bg-canvas-50 dark:bg-canvas-950 rounded-lg p-3 border border-canvas-200 dark:border-canvas-800">
+                <p class="font-mono font-medium text-canvas-700 dark:text-canvas-300 text-xs">SessionStorage</p>
+                <p class="text-xs text-canvas-400 dark:text-canvas-500 mt-0.5">Survives refresh, clears on tab close</p>
+            </div>
+        </div>
+        <p class="text-xs text-canvas-400 dark:text-canvas-500 mt-4">
+            See the <a href="storage-compare" class="font-mono text-signal-500 hover:text-signal-400 underline underline-offset-2">Storage Strategies</a> page for a live interactive comparison.
+        </p>
+    </div>
+</div>
+
+<CodeSnippet Title="View source: Persist + LocalStorage (Preferences)"
+             Code="<span class='text-signal-400'>[Persist]</span>
+<span class='text-emerald-400'>public partial</span> <span class='text-sky-400'>string</span>? SavedTheme { get; set; }
+
+<span class='text-signal-400'>[Persist]</span>
+<span class='text-emerald-400'>public partial</span> <span class='text-sky-400'>string</span>? SavedDensity { get; set; }
+
+<span class='text-emerald-400'>partial void</span> ConfigureState(__StateContext ctx)
+{
+    ctx.SavedTheme.<span class='text-sky-400'>Storage</span> = StorageStrategy.<span class='text-signal-400'>LocalStorage</span>();
+    ctx.SavedDensity.<span class='text-sky-400'>Storage</span> = StorageStrategy.<span class='text-signal-400'>LocalStorage</span>();
+}" />

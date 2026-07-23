@@ -1,0 +1,14 @@
+[      62ms] [INFO] [2026-04-01T09:58:51.525Z] Information: Normalizing '_blazor' to 'http://localhost:5273/_blazor'. @ http://localhost:5273/_framework/blazor.web.mgww215af1.js:0
+[      70ms] [INFO] [2026-04-01T09:58:51.534Z] Information: WebSocket connected to ws://localhost:5273/_blazor?id=mQGbwKo6CIYIhKlXAHlQ0g. @ http://localhost:5273/_framework/blazor.web.mgww215af1.js:0
+[  157108ms] [INFO] [2026-04-01T10:01:28.572Z] Information: Normalizing '_blazor' to 'http://localhost:5273/_blazor'. @ http://localhost:5273/_framework/blazor.web.mgww215af1.js:0
+[  157112ms] [INFO] [2026-04-01T10:01:28.576Z] Information: WebSocket connected to ws://localhost:5273/_blazor?id=2w4EsfH8jBgHVyMZj0AePA. @ http://localhost:5273/_framework/blazor.web.mgww215af1.js:0
+[  157544ms] [INFO] [2026-04-01T10:01:29.007Z] Information: Normalizing '_blazor' to 'http://localhost:5273/_blazor'. @ http://localhost:5273/_framework/blazor.web.mgww215af1.js:0
+[  157548ms] [INFO] [2026-04-01T10:01:29.011Z] Information: WebSocket connected to ws://localhost:5273/_blazor?id=i_HJebaP084C76mKmT8CAA. @ http://localhost:5273/_framework/blazor.web.mgww215af1.js:0
+[  157813ms] [INFO] [2026-04-01T10:01:29.276Z] Information: Normalizing '_blazor' to 'http://localhost:5273/_blazor'. @ http://localhost:5273/_framework/blazor.web.mgww215af1.js:0
+[  157817ms] [INFO] [2026-04-01T10:01:29.281Z] Information: WebSocket connected to ws://localhost:5273/_blazor?id=NbteYsDTXBks0pi4FsykOQ. @ http://localhost:5273/_framework/blazor.web.mgww215af1.js:0
+[  158048ms] [INFO] [2026-04-01T10:01:29.511Z] Information: Normalizing '_blazor' to 'http://localhost:5273/_blazor'. @ http://localhost:5273/_framework/blazor.web.mgww215af1.js:0
+[  158053ms] [INFO] [2026-04-01T10:01:29.516Z] Information: WebSocket connected to ws://localhost:5273/_blazor?id=Y_IyTM3xZqA0ABv5246kow. @ http://localhost:5273/_framework/blazor.web.mgww215af1.js:0
+[  158254ms] [INFO] [2026-04-01T10:01:29.717Z] Information: Normalizing '_blazor' to 'http://localhost:5273/_blazor'. @ http://localhost:5273/_framework/blazor.web.mgww215af1.js:0
+[  158257ms] [INFO] [2026-04-01T10:01:29.721Z] Information: WebSocket connected to ws://localhost:5273/_blazor?id=KyyUy5asWKXYIZ7tvqUKRA. @ http://localhost:5273/_framework/blazor.web.mgww215af1.js:0
+[  158475ms] [INFO] [2026-04-01T10:01:29.939Z] Information: Normalizing '_blazor' to 'http://localhost:5273/_blazor'. @ http://localhost:5273/_framework/blazor.web.mgww215af1.js:0
+[  158480ms] [INFO] [2026-04-01T10:01:29.943Z] Information: WebSocket connected to ws://localhost:5273/_blazor?id=Q2T0Iyea7HmcIVGAn0r9bA. @ http://localhost:5273/_framework/blazor.web.mgww215af1.js:0

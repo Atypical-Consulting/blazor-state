@@ -1,0 +1,76 @@
+- generic [ref=e2]:
+  - complementary [ref=e3]:
+    - generic [ref=e4]:
+      - heading "TaskFlow" [active] [level=1] [ref=e5]
+      - paragraph [ref=e6]: TheBlazorState Demo
+    - generic [ref=e7]:
+      - paragraph [ref=e8]: Projects
+      - button "Marketing" [ref=e9]: Marketing
+      - button "Engineering" [ref=e11]: Engineering
+      - button "Design" [ref=e13]: Design
+    - generic [ref=e15]:
+      - paragraph [ref=e16]: Views
+      - link "Dashboard" [ref=e17] [cursor=pointer]:
+        - /url: ""
+        - img [ref=e18]
+        - text: Dashboard
+      - link "Board" [ref=e20] [cursor=pointer]:
+        - /url: board
+        - img [ref=e21]
+        - text: Board
+      - link "Settings" [ref=e23] [cursor=pointer]:
+        - /url: settings
+        - img [ref=e24]
+        - text: Settings
+    - paragraph [ref=e28]: Powered by TheBlazorState
+  - main [ref=e29]:
+    - generic [ref=e30]:
+      - generic [ref=e31]:
+        - heading "Dashboard" [level=1] [ref=e32]
+        - paragraph [ref=e33]: Marketing project overview
+      - generic [ref=e34]:
+        - img [ref=e35]
+        - text: Restored from prerender cache — no redundant API call
+      - generic [ref=e37]:
+        - generic [ref=e38]:
+          - paragraph [ref=e39]: Total Tasks
+          - paragraph [ref=e40]: "12"
+        - generic [ref=e41]:
+          - paragraph [ref=e42]: In Progress
+          - paragraph [ref=e43]: "3"
+        - generic [ref=e44]:
+          - paragraph [ref=e45]: Completed
+          - paragraph [ref=e46]: "5"
+      - generic [ref=e47]:
+        - heading "Recent Activity" [level=2] [ref=e49]
+        - list [ref=e50]:
+          - listitem [ref=e51]:
+            - generic [ref=e52]:
+              - text: Launch newsletter
+              - generic [ref=e53]: completed by Bob
+            - generic [ref=e54]: 13m ago
+          - listitem [ref=e55]:
+            - generic [ref=e56]:
+              - text: Set up tracking pixels
+              - generic [ref=e57]: completed by Carol
+            - generic [ref=e58]: 50m ago
+          - listitem [ref=e59]:
+            - generic [ref=e60]:
+              - text: Redesign email template
+              - generic [ref=e61]: completed by Alice
+            - generic [ref=e62]: 1h ago
+          - listitem [ref=e63]:
+            - generic [ref=e64]:
+              - text: Create brand guidelines
+              - generic [ref=e65]: completed by Bob
+            - generic [ref=e66]: 2h ago
+          - listitem [ref=e67]:
+            - generic [ref=e68]:
+              - text: Audit competitor content
+              - generic [ref=e69]: completed by Carol
+            - generic [ref=e70]: 2h ago
+      - button "State Inspector" [ref=e72]:
+        - generic [ref=e73]:
+          - img [ref=e74]
+          - text: State Inspector
+        - img [ref=e76]

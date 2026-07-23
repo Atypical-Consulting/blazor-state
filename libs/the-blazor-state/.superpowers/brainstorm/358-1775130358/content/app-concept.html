@@ -1,0 +1,26 @@
+<h2>What kind of demo app?</h2>
+<p class="subtitle">The demo should feel like a real app that shows the problems TheBlazorState solves</p>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>E-Commerce Store</h3>
+      <p>Product catalog, shopping cart, user preferences. Shows <code>[Persist]</code> for product pages surviving prerender, <code>[Shared]</code> for cart across pages, localStorage for user prefs.</p>
+    </div>
+  </div>
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Task / Project Management</h3>
+      <p>Boards, lists, tasks with filters. Shows <code>[Persist]</code> for board state, <code>[Shared]</code> for selected project, localStorage for filter preferences.</p>
+    </div>
+  </div>
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Admin Dashboard</h3>
+      <p>Analytics cards, data tables, settings. Shows <code>[Persist]</code> for expensive API calls (charts, reports), <code>[Shared]</code> for theme/sidebar state, sessionStorage for tab-specific filters.</p>
+    </div>
+  </div>
+</div>

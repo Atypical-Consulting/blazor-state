@@ -1,0 +1,71 @@
+- generic [ref=e2]:
+  - complementary [ref=e3]:
+    - generic [ref=e4]:
+      - heading "TaskFlow" [level=1] [ref=e5]
+      - paragraph [ref=e6]: TheBlazorState Demo
+    - generic [ref=e7]:
+      - paragraph [ref=e8]: Projects
+      - button "Marketing" [ref=e9]: Marketing
+      - button "Engineering" [ref=e11]: Engineering
+      - button "Design" [ref=e13]: Design
+    - generic [ref=e15]:
+      - paragraph [ref=e16]: Views
+      - link "Dashboard" [ref=e17] [cursor=pointer]:
+        - /url: ""
+        - img [ref=e18]
+        - text: Dashboard
+      - link "Board" [ref=e20] [cursor=pointer]:
+        - /url: board
+        - img [ref=e21]
+        - text: Board
+      - link "Settings" [ref=e23] [cursor=pointer]:
+        - /url: settings
+        - img [ref=e24]
+        - text: Settings
+    - paragraph [ref=e28]: Powered by TheBlazorState
+  - main [ref=e29]:
+    - generic [ref=e30]:
+      - generic [ref=e31]:
+        - heading "Settings" [level=1] [ref=e32]
+        - paragraph [ref=e33]: Preferences persisted to localStorage
+      - generic [ref=e34]:
+        - img [ref=e35]
+        - text: Preferences restored from localStorage — survives browser refresh
+      - generic [ref=e37]:
+        - heading "Appearance" [level=2] [ref=e39]
+        - generic [ref=e40]:
+          - generic [ref=e41]:
+            - generic [ref=e42]: Theme
+            - generic [ref=e43]:
+              - button "Light" [ref=e44]
+              - button "Dark" [ref=e45]
+          - generic [ref=e46]:
+            - generic [ref=e47]: Density
+            - generic [ref=e48]:
+              - button "Comfortable" [ref=e49]
+              - button "Compact" [ref=e50]
+      - generic [ref=e51]:
+        - heading "About Storage Strategies" [level=2] [ref=e53]
+        - generic [ref=e54]:
+          - paragraph [ref=e55]:
+            - text: These preferences use
+            - code [ref=e56]: StorageStrategy.LocalStorage()
+            - text: ", so they survive browser refresh. Try changing a setting, then refresh the page."
+          - generic [ref=e57]:
+            - generic [ref=e58]:
+              - paragraph [ref=e59]: PrerenderHtml
+              - paragraph [ref=e60]: Survives prerender only (default)
+            - generic [ref=e61]:
+              - paragraph [ref=e62]: ServerMemoryCache
+              - paragraph [ref=e63]: Survives page reload (server only)
+            - generic [ref=e64]:
+              - paragraph [ref=e65]: LocalStorage (active)
+              - paragraph [ref=e66]: Survives browser restart
+            - generic [ref=e67]:
+              - paragraph [ref=e68]: SessionStorage
+              - paragraph [ref=e69]: Survives refresh, clears on tab close
+      - button "State Inspector" [ref=e71]:
+        - generic [ref=e72]:
+          - img [ref=e73]
+          - text: State Inspector
+        - img [ref=e75]
