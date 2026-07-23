@@ -38,6 +38,22 @@ var stream = Observable.Range(1, 10)
 stream.Subscribe(Console.WriteLine);
 ```
 
+<!-- portfolio-techstack:start -->
+
+## Tech Stack
+
+- **.NET 7 · .NET Standard 2.0**
+- Shouldly
+- Microsoft.CodeAnalysis.CSharp.Analyzer.Testing.XUnit
+- Microsoft.CodeAnalysis.CSharp.CodeFix.Testing.XUnit
+- xunit
+- xunit.runner.visualstudio
+- Microsoft.CodeAnalysis.CSharp
+- Microsoft.CodeAnalysis.CSharp.Workspaces
+- HtmlAgilityPack
+
+<!-- portfolio-techstack:end -->
+
 ## 📄 License
 MIT — see LICENSE
 
