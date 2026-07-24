@@ -47,7 +47,12 @@ public class ReactiveFileWatcherTests : IDisposable
         var initialFiles = await watcher.InitialFiles.ToList().ToTask();
 
         // Assert
-        initialFiles.ShouldBe(expectedFiles);
+        // PopulateInitialFiles() enumerates the directory via Directory.GetFiles(), which makes no
+        // guarantee about ordering (it can vary across OSes/filesystems and even between runs on the
+        // same machine). Sort both sides so the assertion only depends on the *set* of files found,
+        // not on filesystem enumeration order.
+        initialFiles.OrderBy(f => f, StringComparer.Ordinal)
+            .ShouldBe(expectedFiles.OrderBy(f => f, StringComparer.Ordinal));
     }
     
     [Fact]

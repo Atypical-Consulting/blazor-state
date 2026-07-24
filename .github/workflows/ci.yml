@@ -6,22 +6,6 @@ on:
   pull_request:
     branches: [main]
 
-# Known non-building subprojects (excluded):
-#   - samples/reactive-patterns/Reactif.sln
-#       Reactif.Tests and ObjectCalisthenics.Tests target net7.0, which
-#       Microsoft.NET.Test.Sdk 18.4.0 no longer supports (build error, not just a warning).
-#       Retargeting both test projects to net10.0 does fix the build, but it then surfaces two
-#       pre-existing test problems that are unrelated to the .NET version and were never
-#       exercised before (the build error always prevented these tests from running):
-#         - Reactif.Tests.ReactiveFileWatcherTests.ShouldGetInitialFiles asserts the initial
-#           file list in filesystem-enumeration order, which is not guaranteed by
-#           Directory.GetFiles/FileSystemWatcher and is flaky by construction.
-#         - ObjectCalisthenics.Tests.OC0004.OneDotPerLineAnalyzerTests has 6 failing cases
-#           where the analyzer's collected member-access chain no longer matches the
-#           hand-written expected diagnostics/spans.
-#       Fixing either requires changing test/analyzer logic (not a minimal TFM bump), so this
-#       solution is left excluded pending a proper fix.
-
 jobs:
   build:
     name: Build ${{ matrix.name }}
@@ -47,6 +31,9 @@ jobs:
             has_tests: true
           - name: the-blazor-state (TheBlazorState)
             solution: libs/the-blazor-state/TheBlazorState.slnx
+            has_tests: true
+          - name: reactive-patterns (Reactif)
+            solution: samples/reactive-patterns/Reactif.sln
             has_tests: true
 
     steps:

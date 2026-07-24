@@ -44,10 +44,15 @@ public class OneDotPerLineAnalyzerTests
 
         // Assert that all member accesses are collected, including nested ones.
         // Adjust the expected count according to the number of member accesses in your test code.
+        //
+        // CollectMemberAccesses walks DescendantNodesAndSelf(), which is a pre-order traversal, so
+        // entries come back outermost-first, and MemberAccessExpressionSyntax.ToString() never
+        // includes the invocation's "()" (that parenthesized argument list belongs to the wrapping
+        // InvocationExpressionSyntax, not the member access node itself).
         memberAccesses.Count().ShouldBe(3);
-        memberAccesses[0].ToString().ShouldBe("someObject.First()");
+        memberAccesses[0].ToString().ShouldBe("someObject.First().Second.Third");
         memberAccesses[1].ToString().ShouldBe("someObject.First().Second");
-        memberAccesses[2].ToString().ShouldBe("someObject.First().Second.Third()");
+        memberAccesses[2].ToString().ShouldBe("someObject.First");
     }
 
     

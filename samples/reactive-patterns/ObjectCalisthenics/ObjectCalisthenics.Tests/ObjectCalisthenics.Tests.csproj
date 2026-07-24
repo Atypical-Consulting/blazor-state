@@ -1,16 +1,29 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net7.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
         <Nullable>enable</Nullable>
 
         <IsPackable>false</IsPackable>
+
+        <!-- See the xunit.assert PackageReference below for why this intentional downgrade is required. -->
+        <NoWarn>$(NoWarn);NU1605</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="Shouldly" Version="4.*" />
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Analyzer.Testing.XUnit" Version="1.1.2"/>
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp.CodeFix.Testing.XUnit" Version="1.1.2"/>
+        <!--
+          Microsoft.CodeAnalysis.Testing.Verifiers.XUnit 1.1.2 (pulled in transitively above) was built
+          against xunit.assert 2.3.0 and calls the (object, object) EqualException constructor directly.
+          That constructor was removed/changed in newer xunit.assert releases, so the higher xunit.assert
+          version resolved from the "xunit" 2.9.2 meta-package below causes a MissingMethodException at
+          runtime inside the Roslyn test verifier. Pin xunit.assert back to the version the verifier was
+          actually built against; this project only uses Shouldly for its own assertions, so downgrading
+          xunit.assert does not affect any test assertion in this project.
+        -->
+        <PackageReference Include="xunit.assert" Version="2.3.0"/>
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.4.0"/>
         <PackageReference Include="xunit" Version="2.9.2"/>
         <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
