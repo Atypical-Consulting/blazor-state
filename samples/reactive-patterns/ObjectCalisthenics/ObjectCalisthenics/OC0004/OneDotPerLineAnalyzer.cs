@@ -61,6 +61,15 @@ public class OneDotPerLineAnalyzer : DiagnosticAnalyzer
         }
 
         var (rootMemberAccess, lastMemberAccess) = DetermineRootAndLastMemberAccess(memberAccesses);
+
+        // A chain that is already split across multiple lines (one member access per line) already
+        // satisfies the "one dot per line" rule, so it should not be flagged - only chains that pack
+        // more than one dot onto a single line are a violation.
+        if (SpansMultipleLines(memberAccess.SyntaxTree, rootMemberAccess, lastMemberAccess))
+        {
+            return;
+        }
+
         var fullExpressionSpan = CalculateFullExpressionSpan(rootMemberAccess, lastMemberAccess);
         var violatingExpressionNode = FindViolatingExpressionNode(memberAccess.SyntaxTree, fullExpressionSpan);
 
@@ -87,10 +96,25 @@ public class OneDotPerLineAnalyzer : DiagnosticAnalyzer
         return (rootMemberAccess, lastMemberAccess);
     }
 
+    private static bool SpansMultipleLines(SyntaxTree syntaxTree, MemberAccessExpressionSyntax rootMemberAccess,
+        MemberAccessExpressionSyntax lastMemberAccess)
+    {
+        var startLine = syntaxTree.GetLineSpan(rootMemberAccess.Span).StartLinePosition.Line;
+        var endLine = syntaxTree.GetLineSpan(lastMemberAccess.Span).EndLinePosition.Line;
+        return startLine != endLine;
+    }
+
     private static TextSpan CalculateFullExpressionSpan(MemberAccessExpressionSyntax rootMemberAccess,
         MemberAccessExpressionSyntax lastMemberAccess)
     {
-        return TextSpan.FromBounds(rootMemberAccess.SpanStart, lastMemberAccess.Span.End);
+        // If the innermost member access in the chain is itself being invoked (e.g. "...GetNext()"),
+        // include the call's argument list so the reported expression text is valid, readable code
+        // rather than a dangling "GetNext" with no parentheses.
+        var end = lastMemberAccess.Parent is InvocationExpressionSyntax invocation
+            ? invocation.Span.End
+            : lastMemberAccess.Span.End;
+
+        return TextSpan.FromBounds(rootMemberAccess.SpanStart, end);
     }
 
     private static SyntaxNode FindViolatingExpressionNode(SyntaxTree syntaxTree, TextSpan fullExpressionSpan)
