@@ -7,32 +7,20 @@ on:
     branches: [main]
 
 # Known non-building subprojects (excluded):
-#   - utils/mutty/Mutty.sln
-#       Mutty.Tests: CS0121 - Assert.Multiple(() => {...}) is ambiguous between the
-#       NUnit.Framework.Assert.Multiple(TestDelegate) and Assert.Multiple(Action) overloads
-#       (NUnit 4.6.1). Fix: cast the lambda, e.g. Assert.Multiple((TestDelegate)(() => {...})).
-#   - libs/bustand/Bustand.sln
-#       Bustand.DevTools.csproj: NU1101 - unresolved PackageReference "Bustand" (no such
-#       package on any configured feed) alongside an existing ProjectReference to the same
-#       project. Fix: remove the redundant <PackageReference Include="Bustand" .../> line.
-#   - libs/ducky/Ducky.sln
-#       Ducky.Tests: NU1109 - central package management pins Microsoft.CodeAnalysis.Analyzers
-#       to 3.11.0 but Microsoft.CodeAnalysis.CSharp 5.3.0 requires >= 5.3.0-2.25625.1.
-#       Fix: bump the PackageVersion pin in Directory.Packages.props.
-#       Ducky.Blazor.Tests: NU1902 - AngleSharp 1.4.0 has a known moderate vulnerability,
-#       promoted to a build error by TreatWarningsAsErrors=true. Fix: upgrade AngleSharp.
-#   - libs/mvu/BlazorMVU.sln
-#       BlazorMVU.Templates.csproj has no <TargetFramework>, causing NuGet restore to fail
-#       with "Invalid framework identifier ''". Fix: add <TargetFramework>net10.0</TargetFramework>.
 #   - samples/reactive-patterns/Reactif.sln
 #       Reactif.Tests and ObjectCalisthenics.Tests target net7.0, which
 #       Microsoft.NET.Test.Sdk 18.4.0 no longer supports (build error, not just a warning).
-#       Fix: retarget both test projects to net8.0 or later.
-#   - libs/the-blazor-state (no .sln)
-#       This subproject was migrated to the newer TheBlazorState.slnx solution format and has
-#       no *.sln file, so it fell outside this workflow's solution discovery. It builds fine
-#       on its own (dotnet build TheBlazorState.slnx) — consider adding it to the matrix
-#       explicitly by path if/when the workflow is extended to support .slnx.
+#       Retargeting both test projects to net10.0 does fix the build, but it then surfaces two
+#       pre-existing test problems that are unrelated to the .NET version and were never
+#       exercised before (the build error always prevented these tests from running):
+#         - Reactif.Tests.ReactiveFileWatcherTests.ShouldGetInitialFiles asserts the initial
+#           file list in filesystem-enumeration order, which is not guaranteed by
+#           Directory.GetFiles/FileSystemWatcher and is flaky by construction.
+#         - ObjectCalisthenics.Tests.OC0004.OneDotPerLineAnalyzerTests has 6 failing cases
+#           where the analyzer's collected member-access chain no longer matches the
+#           hand-written expected diagnostics/spans.
+#       Fixing either requires changing test/analyzer logic (not a minimal TFM bump), so this
+#       solution is left excluded pending a proper fix.
 
 jobs:
   build:
@@ -45,6 +33,21 @@ jobs:
           - name: mvvm-todo (BlazorMvvmApp)
             solution: samples/mvvm-todo/BlazorMvvmApp.sln
             has_tests: false
+          - name: mvu (BlazorMVU)
+            solution: libs/mvu/BlazorMVU.sln
+            has_tests: true
+          - name: mutty (Mutty)
+            solution: utils/mutty/Mutty.sln
+            has_tests: true
+          - name: ducky (Ducky)
+            solution: libs/ducky/Ducky.sln
+            has_tests: true
+          - name: bustand (Bustand)
+            solution: libs/bustand/Bustand.sln
+            has_tests: true
+          - name: the-blazor-state (TheBlazorState)
+            solution: libs/the-blazor-state/TheBlazorState.slnx
+            has_tests: true
 
     steps:
       - name: Checkout
@@ -54,6 +57,9 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 10.0.x
+
+      - name: Restore workloads
+        run: dotnet workload restore "${{ matrix.solution }}"
 
       - name: Restore
         run: dotnet restore "${{ matrix.solution }}"

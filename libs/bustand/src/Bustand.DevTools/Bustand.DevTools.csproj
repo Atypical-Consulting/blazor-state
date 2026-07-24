@@ -27,14 +27,11 @@
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
-  <!-- For development: use ProjectReference -->
-  <ItemGroup Condition="'$(Configuration)' != 'Release'">
+  <!-- Build against source; the standalone "Bustand" NuGet package this project
+       used to reference in Release builds is not published on any configured feed
+       (NU1101), so always resolve it as a project reference instead. -->
+  <ItemGroup>
     <ProjectReference Include="..\Bustand\Bustand.csproj" />
-  </ItemGroup>
-
-  <!-- For Release/packaging: use exact version PackageReference -->
-  <ItemGroup Condition="'$(Configuration)' == 'Release'">
-    <PackageReference Include="Bustand" Version="[$(Version)]" />
   </ItemGroup>
 
   <!-- Package README and icon (to be created in Plan 02) -->

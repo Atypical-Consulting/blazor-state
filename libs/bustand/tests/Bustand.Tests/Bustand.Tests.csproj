@@ -12,6 +12,10 @@
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <!-- Required by xunit v3 -->
     <UseAppHost>true</UseAppHost>
+    <!-- Let "dotnet test" invoke the Microsoft.Testing.Platform runner directly instead of
+         resolving a legacy VSTest testhost package that this project does not reference -->
+    <IsTestProject>true</IsTestProject>
+    <TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
     <!-- Resolve static web assets by disabling collection from all targets -->
     <ResolveStaticWebAssetsInputsDependsOn>RemoveDuplicateStaticWebAssets;$(ResolveStaticWebAssetsInputsDependsOn)</ResolveStaticWebAssetsInputsDependsOn>
   </PropertyGroup>

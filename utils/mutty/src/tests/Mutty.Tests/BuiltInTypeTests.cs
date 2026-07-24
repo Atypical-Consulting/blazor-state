@@ -162,7 +162,7 @@ public class BuiltInTypeTests
         string resultMutable = generatedOutputs.First(x => x.Contains("class MutableNullablePrimitivesRecord"));
 
         // Assert — nullable primitives must NOT get the "Mutable" prefix
-        Assert.Multiple(() =>
+        Assert.Multiple((Action)(() =>
         {
             Assert.That(resultMutable, Does.Contain("string? NullableName"));
             Assert.That(resultMutable, Does.Contain("int? NullableAge"));
@@ -174,7 +174,7 @@ public class BuiltInTypeTests
             Assert.That(resultMutable, Does.Not.Contain("Mutablebool"));
             Assert.That(resultMutable, Does.Not.Contain("Mutabledouble"));
             Assert.That(resultMutable, Does.Not.Contain("Mutabledecimal"));
-        });
+        }));
     }
 
     /// <summary>
@@ -202,13 +202,13 @@ public class BuiltInTypeTests
         string resultMutable = generatedOutputs.First(x => x.Contains("class MutableNullableCollectionRecord"));
 
         // Assert — collection item types should keep nullable marker but not get "Mutable" prefix
-        Assert.Multiple(() =>
+        Assert.Multiple((Action)(() =>
         {
             Assert.That(resultMutable, Does.Contain("List<string?> NullableTags"));
             Assert.That(resultMutable, Does.Contain("List<int?> NullableScores"));
             Assert.That(resultMutable, Does.Not.Contain("Mutablestring"));
             Assert.That(resultMutable, Does.Not.Contain("Mutableint"));
-        });
+        }));
     }
 
     private static string[] GetGeneratedOutput(string sourceCode)
