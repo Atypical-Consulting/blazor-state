@@ -9,15 +9,15 @@
     <!-- Treat package downgrade as error -->
     <WarningsAsErrors>$(WarningsAsErrors);NU1605</WarningsAsErrors>
     <!-- Define common versions as properties for related packages -->
-    <AspNetCoreVersion>10.0.6</AspNetCoreVersion>
-    <EntityFrameworkCoreVersion>10.0.6</EntityFrameworkCoreVersion>
-    <MicrosoftExtensionsVersion>10.0.6</MicrosoftExtensionsVersion>
-    <CodeAnalysisVersion>5.3.0</CodeAnalysisVersion>
-    <CodeAnalysisAnalyzerUtilitiesVersion>4.14.0</CodeAnalysisAnalyzerUtilitiesVersion>
-    <RoslynatorVersion>4.15.0</RoslynatorVersion>
-    <MudBlazorVersion>9.3.0</MudBlazorVersion>
+    <AspNetCoreVersion>10.0.12</AspNetCoreVersion>
+    <EntityFrameworkCoreVersion>10.0.12</EntityFrameworkCoreVersion>
+    <MicrosoftExtensionsVersion>10.0.12</MicrosoftExtensionsVersion>
+    <CodeAnalysisVersion>5.9.0</CodeAnalysisVersion>
+    <CodeAnalysisAnalyzerUtilitiesVersion>5.6.0</CodeAnalysisAnalyzerUtilitiesVersion>
+    <RoslynatorVersion>4.16.1</RoslynatorVersion>
+    <MudBlazorVersion>9.9.0</MudBlazorVersion>
     <SerilogVersion>10.0.0</SerilogVersion>
-    <TestSdkVersion>18.4.0</TestSdkVersion>
+    <TestSdkVersion>18.9.0</TestSdkVersion>
   </PropertyGroup>
   <ItemGroup>
     <!-- Blazor & Web -->
@@ -26,7 +26,7 @@
     <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly" Version="$(AspNetCoreVersion)" />
     <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="$(AspNetCoreVersion)" PrivateAssets="all" />
     <PackageVersion Include="MudBlazor" Version="$(MudBlazorVersion)" />
-    <PackageVersion Include="MudBlazor.Extensions" Version="9.3.0" />
+    <PackageVersion Include="MudBlazor.Extensions" Version="9.9.0" />
     <PackageVersion Include="PublishSPAforGitHubPages.Build" Version="3.0.3" PrivateAssets="all" />
     <!-- Microsoft Extensions -->
     <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="$(MicrosoftExtensionsVersion)" />
@@ -61,15 +61,15 @@
     <PackageVersion Include="Roslynator.Formatting.Analyzers" Version="$(RoslynatorVersion)" PrivateAssets="all" />
     <!-- Testing -->
     <!-- AngleSharp pinned above bunit's default (1.4.0) to resolve GHSA-pgww-w46g-26qg -->
-    <PackageVersion Include="AngleSharp" Version="1.5.2" />
-    <PackageVersion Include="bunit" Version="2.7.2" />
+    <PackageVersion Include="AngleSharp" Version="1.8.0" />
+    <PackageVersion Include="bunit" Version="2.10.3" />
     <PackageVersion Include="FakeItEasy" Version="9.0.1" />
     <PackageVersion Include="Microsoft.CodeCoverage" Version="$(TestSdkVersion)" />
-    <PackageVersion Include="Microsoft.Extensions.TimeProvider.Testing" Version="10.5.0" />
+    <PackageVersion Include="Microsoft.Extensions.TimeProvider.Testing" Version="10.9.0" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="$(TestSdkVersion)" />
-    <PackageVersion Include="Microsoft.Playwright" Version="1.59.0" />
+    <PackageVersion Include="Microsoft.Playwright" Version="1.62.0" />
     <PackageVersion Include="Microsoft.Reactive.Testing" Version="6.1.0" />
-    <PackageVersion Include="Microsoft.Testing.Extensions.CodeCoverage" Version="18.6.2" />
+    <PackageVersion Include="Microsoft.Testing.Extensions.CodeCoverage" Version="18.11.0" />
     <PackageVersion Include="Shouldly" Version="4.3.0" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5" PrivateAssets="all" />
     <PackageVersion Include="xunit.v3" Version="3.2.2" />
@@ -77,16 +77,16 @@
     <PackageVersion Include="Serilog.AspNetCore" Version="$(SerilogVersion)" />
     <PackageVersion Include="Serilog.Formatting.Compact" Version="3.0.0" />
     <PackageVersion Include="Serilog.Sinks.Console" Version="6.1.1" />
-    <PackageVersion Include="Serilog.Sinks.Seq" Version="9.0.0" />
+    <PackageVersion Include="Serilog.Sinks.Seq" Version="9.1.0" />
     <!-- Build & Versioning -->
-    <PackageVersion Include="DotNet.ReproducibleBuilds" Version="2.0.2" PrivateAssets="all" />
-    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="10.0.202" PrivateAssets="all" />
+    <PackageVersion Include="DotNet.ReproducibleBuilds" Version="2.0.5" PrivateAssets="all" />
+    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="10.0.401" PrivateAssets="all" />
     <PackageVersion Include="MinVer" Version="7.0.0" PrivateAssets="all" />
     <!-- Utilities -->
     <PackageVersion Include="Humanizer.Core" Version="3.0.10" />
-    <PackageVersion Include="PolySharp" Version="1.15.0" PrivateAssets="all" />
-    <PackageVersion Include="Spectre.Console" Version="0.55.2" />
-    <PackageVersion Include="System.Formats.Asn1" Version="10.0.6" />
+    <PackageVersion Include="PolySharp" Version="1.16.0" PrivateAssets="all" />
+    <PackageVersion Include="Spectre.Console" Version="0.57.2" />
+    <PackageVersion Include="System.Formats.Asn1" Version="10.0.12" />
     <PackageVersion Include="System.Reactive" Version="6.1.0" />
   </ItemGroup>
 </Project>

@@ -9,7 +9,7 @@
   -->
 
   <ItemGroup Condition="'$(IsPackable)' != 'false'">
-    <PackageReference Include="DefaultDocumentation" Version="1.2.2" PrivateAssets="all" />
+    <PackageReference Include="DefaultDocumentation" Version="1.2.5" PrivateAssets="all" />
   </ItemGroup>
 
   <PropertyGroup Condition="'$(IsPackable)' != 'false'">
