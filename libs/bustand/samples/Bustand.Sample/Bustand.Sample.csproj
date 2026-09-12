@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <!-- Server-side WebAssembly hosting support -->
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="10.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="10.0.12" />
   </ItemGroup>
 
   <ItemGroup>

@@ -29,7 +29,7 @@
   </Target>
 
   <ItemGroup>
-    <PackageReference Include="bunit" Version="2.5.3" />
+    <PackageReference Include="bunit" Version="2.10.3" />
     <PackageReference Include="coverlet.collector" Version="6.0.4" />
     <PackageReference Include="NSubstitute" Version="5.3.0" />
     <!-- Use xunit v3 for .NET 10 compatibility (does not use Microsoft.NET.Test.Sdk) -->
